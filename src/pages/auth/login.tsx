@@ -42,22 +42,21 @@ export default function LoginPage() {
         // The backend expects json content directly based on auth.route.ts
       const response = await api.post("/auth/login", values);
 
-      const { user } = response.data;
-      console.log("Logged in user:", user);
+      // Login successful, now fetch full user info to check role
+      const infoResponse = await api.get("/auth/info");
+      const { user: fullUser } = infoResponse.data;
 
-      if (user.role !== 'ADMIN') {
+      console.log("User Info:", fullUser);
+
+      if (fullUser.role !== 'ADMIN') {
           toast.error("Access Denied: You must be an ADMIN to access this dashboard.");
-          // Ensure we don't save any session state if we were relying on that,
-          // though typically the backend cookie might be set.
-          // Ideally we call logout API, but for now just don't set local state and return.
-          // We can also actively call /auth/signout to be safe.
           await api.post("/auth/signout").catch(() => {});
           return;
       }
 
       localStorage.setItem("isAuthenticated", "true");
-      // Store user info if needed
-      localStorage.setItem("user", JSON.stringify(user));
+      // Store user info
+      localStorage.setItem("user", JSON.stringify(fullUser));
 
       toast.success("Login successful");
       navigate({ to: "/" });
