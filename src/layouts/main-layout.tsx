@@ -1,11 +1,23 @@
 import { cn } from "@/lib/utils";
-import { Outlet } from "@tanstack/react-router";
+import { Outlet, useLocation } from "@tanstack/react-router";
 import { AppSidebar } from "@/components/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Toaster } from "@/components/ui/sonner";
 import Header from "@/components/header";
 
 export default function MainLayout() {
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/login";
+
+  if (isLoginPage) {
+    return (
+      <div className="min-h-svh w-full bg-background font-sans antialiased text-foreground">
+        <Outlet />
+        <Toaster />
+      </div>
+    );
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />

@@ -7,6 +7,8 @@ import {
   Sparkles,
 } from "lucide-react"
 
+import api from "@/lib/api"
+
 import {
   Avatar,
   AvatarFallback,
@@ -28,6 +30,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
+
+
 export default function NavUser({
   user,
 }: {
@@ -38,6 +42,17 @@ export default function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/signout');
+    } catch (e) {
+      console.error("Logout failed", e);
+    } finally {
+      localStorage.clear();
+      window.location.href = "/login";
+    }
+  };
 
   return (
     <SidebarMenu>
@@ -100,7 +115,7 @@ export default function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

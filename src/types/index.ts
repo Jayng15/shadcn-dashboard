@@ -9,13 +9,13 @@ export type Auth = {
 
 export type User = {
   id: string;
-  username: string;
-  firstName: string;
-  lastName: string;
   email: string;
-  phone: string;
-  gender: string;
-  birthDate: string;
+  role: 'ADMIN' | 'USER';
+  isSeller: boolean;
+  status: 'ACTIVE' | 'BAN';
+  createdAt: string;
+  // Optional profile fields if available
+  fullName?: string;
 }
 
 export type Contribute = {

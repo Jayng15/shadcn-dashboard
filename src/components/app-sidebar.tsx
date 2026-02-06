@@ -1,19 +1,10 @@
+
 import {
-  AudioWaveform,
-  BookOpen,
-  Bot,
-  GalleryVerticalEnd,
-  Map,
-  PieChart,
-  Settings2,
-  SquareTerminal,
-  Command,
   Home,
-  Settings,
   User,
-  Package,
-  ClipboardCheck,
-  Frame
+  ShoppingBag,
+  Store,
+  Command,
 } from "lucide-react"
 import {
   Sidebar,
@@ -28,15 +19,14 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import NavUser from "./nav-user"
-import NavMain from "./nav-main"
-import NavProjects from "./nav-projects"
 import { ScrollArea } from "./ui/scroll-area"
 import { Link, useLocation } from "@tanstack/react-router"
+import { useEffect, useState } from "react"
 
 // Menu items.
 const items = [
   {
-    title: "Home",
+    title: "Dashboard",
     url: "/",
     icon: Home,
   },
@@ -46,156 +36,44 @@ const items = [
     icon: User,
   },
   {
-    title: "Inventory",
-    url: "/inventory",
-    icon: Package,
+    title: "Stores",
+    url: "/stores",
+    icon: Store,
   },
   {
-    title: "Tasks",
-    url: "/task",
-    icon: ClipboardCheck,
-  },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
+    title: "Products",
+    url: "/products",
+    icon: ShoppingBag,
   },
 ]
-
-const data = {
-  user: {
-    name: "n2duc",
-    email: "ngocduc8122002@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
-  teams: [
-    {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
-    },
-  ],
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
-    },
-  ],
-}
-
 
 export function AppSidebar() {
   const pathname = useLocation({
     select: (location) => location.pathname,
   })
+
+  // State to hold user info
+  const [user, setUser] = useState({
+    name: "Admin",
+    email: "admin@lovaselcard.com",
+    avatar: "/avatars/shadcn.jpg",
+  });
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+        try {
+            const parsed = JSON.parse(storedUser);
+            setUser({
+                name: parsed.fullName || "Admin",
+                email: parsed.email || "admin@lovaselcard.com",
+                avatar: parsed.avatar || "/avatars/shadcn.jpg"
+            });
+        } catch (e) {
+            console.error("Failed to parse user from localstorage");
+        }
+    }
+  }, []);
 
   return (
     <Sidebar variant="floating" collapsible="icon">
@@ -204,12 +82,12 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
               <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <Command className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">Acme Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
+                  <span className="truncate font-semibold">Lova-Selcard</span>
+                  <span className="truncate text-xs">Admin Panel</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -219,12 +97,12 @@ export function AppSidebar() {
       <SidebarContent>
         <ScrollArea>
           <SidebarGroup>
-            <SidebarGroupLabel>Application</SidebarGroupLabel>
+            <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={pathname === item.url}>
+                    <SidebarMenuButton asChild isActive={pathname === item.url || pathname.startsWith(item.url + '/')}>
                       <Link to={item.url}>
                         <item.icon />
                         <span>{item.title}</span>
@@ -235,12 +113,10 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          <NavMain items={data.navMain} />
-          <NavProjects projects={data.projects} />
         </ScrollArea>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   )

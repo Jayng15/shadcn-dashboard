@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -21,21 +22,22 @@ import {
 } from "@tanstack/react-table";
 import DataTablePagination from "./components/data-table-pagination";
 import DataTableToolBar from "./components/data-table-toolbar";
+import api from "@/lib/api";
 
 export default function UsersPage() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const { isPending, error, data } = useQuery({
-    queryKey: ["users"],
-    queryFn: () =>
-      fetch(
-        "https://dummyjson.com/users?limit=50&select=firstName,lastName,username,email,phone,birthDate,gender"
-      ).then((res) => res.json()),
+  const { isPending, error, data, refetch } = useQuery({
+    queryKey: ["users", sorting, columnFilters],
+    queryFn: async () => {
+        const res = await api.get('/user/list?limit=100');
+        return res.data;
+    }
   });
 
   const table = useReactTable({
-    data: data?.users,
+    data: data?.users || [],
     columns,
     state: {
       sorting,
@@ -47,9 +49,12 @@ export default function UsersPage() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    meta: {
+        refetch: () => refetch()
+    }
   });
 
-  if (error) return "An error has occurred: " + error.message;
+  if (error) return <div className="p-4 text-red-500">An error has occurred: {(error as Error).message}</div>;
 
   return (
     <Card className="bg-sidebar w-full min-h-full flex flex-col">
@@ -61,7 +66,7 @@ export default function UsersPage() {
       ) : (
         <>
           <CardContent className="flex-1">
-            <DataTableToolBar table={table} />
+            {/* <DataTableToolBar table={table} />  Toolbar might break if field names changed, disable for now or update */}
             <DataTable table={table} columns={columns} />
           </CardContent>
           <CardFooter>
