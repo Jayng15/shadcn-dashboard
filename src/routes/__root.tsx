@@ -12,7 +12,7 @@ export const Route = createRootRoute({
 
     console.log("Root Guard - Path:", location.pathname, "Auth:", isAuthenticated);
 
-    if (isAuthenticated && user?.role !== 'ADMIN' && !location.pathname.startsWith('/login')) {
+    if (isAuthenticated && user?.role !== 'ADMIN' && !location.pathname.includes('/login')) {
          // Invalid role, clear and redirect
          localStorage.removeItem('isAuthenticated');
          localStorage.removeItem('user');
@@ -20,7 +20,8 @@ export const Route = createRootRoute({
     }
 
     // If not logged in and trying to access something other than login
-    if (!isAuthenticated && !location.pathname.startsWith('/login')) {
+    // Update: Check for 'login' anywhere in the path to handle basepath (/admin/login)
+    if (!isAuthenticated && !location.pathname.includes('/login')) {
       console.log("Redirecting to login from:", location.pathname);
       throw redirect({
         to: '/login',
