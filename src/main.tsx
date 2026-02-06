@@ -7,7 +7,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 
 import { routeTree } from './routeTree.gen'
 
-const router = createRouter({ routeTree })
+const router = createRouter({
+  routeTree,
+  basepath: '/admin'
+})
 
 const queryClient = new QueryClient()
 

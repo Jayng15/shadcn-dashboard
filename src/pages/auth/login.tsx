@@ -43,6 +43,7 @@ export default function LoginPage() {
       const response = await api.post("/auth/login", values);
 
       const { user } = response.data;
+      console.log("Logged in user:", user);
 
       if (user.role !== 'ADMIN') {
           toast.error("Access Denied: You must be an ADMIN to access this dashboard.");
