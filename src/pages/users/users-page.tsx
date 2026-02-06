@@ -21,7 +21,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import DataTablePagination from "./components/data-table-pagination";
-import DataTableToolBar from "./components/data-table-toolbar";
+// import DataTableToolBar from "./components/data-table-toolbar";
 import api from "@/lib/api";
 
 export default function UsersPage() {

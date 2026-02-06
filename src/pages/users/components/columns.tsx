@@ -88,7 +88,7 @@ export const columns: ColumnDef<User>[] = [
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                    <Link to={`/users/${user.id}`}>View Details</Link>
+                    <Link to={`/users/$userId`} params={{ userId: user.id }}>View Details</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {user.role !== 'ADMIN' && (

@@ -42,39 +42,17 @@ export default function LoginPage() {
         // The backend expects json content directly based on auth.route.ts
       const response = await api.post("/auth/login", values);
 
-      const { user } = response.data; // Assuming token is set in cookie or returned.
-      // Checking auth.route.ts, it returns user object.
-      // If session is cookie-based, we don't need to save token manually.
-      // IF JWT based, we need to save it. Does backend use cookies or Bearer token?
-      // Based on typical Hono/Lucia setup it might be cookies.
-      // BUT my plan assumed localStorage.
-      // Let's check if the response has a token or if it's cookie based.
-      // Backend route /auth/login returns { success: boolean, user: {id, email} }
-      // It does NOT seem to return a token explicitly in the body based on the route definition I saw earlier.
-      // It likely sets a session cookie.
-      // IF it is cookie based, axios withCredentials: true is needed usually.
+      const { user } = response.data;
 
-      // WAIT, the `api.ts` I created uses localStorage 'token'.
-      // If the backend is cookie-only, that won't work.
-      // However, usually API returns a token if it's for mobile/SPA unless strictly same-site.
-      // Looking at `auth.route.ts`:
-      /*
-        74:         200: {
-        75:             description: 'Login successful',
-        76:             content: {
-        77:                 'application/json': {
-        78:                     schema: z.object({
-        79:                         success: z.boolean(),
-        80:                         user: z.object({ ... })
-        81:                     })
-        82:                 }
-        83:             }
-        84:         },
-      */
-      // No token in response body. This suggests strictly HttpOnly cookies via Lucia.
-
-      // I will assume for now we just rely on the cookie and set a "loggedIn" flag in localStorage for UI state.
-      // AND I need to insure `api.ts` sends credentials.
+      if (user.role !== 'ADMIN') {
+          toast.error("Access Denied: You must be an ADMIN to access this dashboard.");
+          // Ensure we don't save any session state if we were relying on that,
+          // though typically the backend cookie might be set.
+          // Ideally we call logout API, but for now just don't set local state and return.
+          // We can also actively call /auth/signout to be safe.
+          await api.post("/auth/signout").catch(() => {});
+          return;
+      }
 
       localStorage.setItem("isAuthenticated", "true");
       // Store user info if needed

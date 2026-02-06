@@ -22,7 +22,7 @@ export default function StoreDetailPage() {
     // However, createLazyFileRoute used in index won't strictly type access here unless generated.
     // We can use `useParams({ from: ... })` if we knew the route ID, OR just generic useParams.
     const { storeId } = useParams({ strict: false }) as { storeId: string };
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const { isPending, error, data } = useQuery({

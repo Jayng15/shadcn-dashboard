@@ -155,7 +155,7 @@ export const columns: ColumnDef<Store>[] = [
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link to={`/stores/${store.id}`}>View Details</Link>
+                <Link to={`/stores/$storeId`} params={{ storeId: store.id }}>View Details</Link>
             </DropdownMenuItem>
 
             {/* Admin Actions */}

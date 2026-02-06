@@ -52,25 +52,17 @@ export default function DataTableRowActions<TData extends WithId<string>>({
               <Label className="text-right">ID:</Label>
               <p className="col-span-3">{user.id}</p>
             </div>
-            <div className="grid grid-cols-4 items-center gap-4">
+            {/* <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">First Name:</Label>
               <p className="col-span-3">{user.firstName}</p>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Last Name:</Label>
-              <p className="col-span-3">{user.lastName}</p>
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Username:</Label>
-              <p className="col-span-3">{user.username}</p>
-            </div>
+            </div> */}
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Email:</Label>
               <p className="col-span-3">{user.email}</p>
             </div>
             <div className="grid grid-cols-4 items-center gap-4">
-              <Label className="text-right">Birth Date:</Label>
-              <p className="col-span-3">{user.birthDate}</p>
+              <Label className="text-right">Role:</Label>
+              <p className="col-span-3">{user.role}</p>
             </div>
           </div>
         ) : null}
