@@ -40,7 +40,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
         // The backend expects json content directly based on auth.route.ts
-      const response = await api.post("/auth/login", values);
+      await api.post("/auth/login", values);
 
       // Login successful, now fetch full user info to check role
       const infoResponse = await api.get("/auth/info");
