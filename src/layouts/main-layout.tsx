@@ -7,7 +7,8 @@ import Header from "@/components/header";
 
 export default function MainLayout() {
   const location = useLocation();
-  const isLoginPage = location.pathname === "/login";
+  console.log("MainLayout current pathname:", location.pathname);
+  const isLoginPage = location.pathname.startsWith("/login");
 
   if (isLoginPage) {
     return (
