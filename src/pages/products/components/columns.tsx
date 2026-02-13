@@ -3,7 +3,6 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { MoreHorizontal } from "lucide-react"
-import { SafeImage } from "@/components/safe-image"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import api from "@/lib/api"
 import { toast } from "sonner"
+import { exactImageUrl } from "@/lib/utils"
 
 export type Product = {
   id: string;
@@ -24,6 +24,17 @@ export type Product = {
   isVerified: boolean;
   thumbnailUrl: string;
   createdAt: string;
+  // Optional additional fields from detail API
+  userId?: string;
+  description?: string;
+  totalInventory?: number;
+  reservedInventory?: number;
+  soldInventory?: number;
+  teamName?: string;
+  teamMember?: string;
+  additionalUrls?: string;
+  verifiedAt?: string;
+  favoriteCount?: number;
   // TODO: Add storeName if available in projection
 }
 
@@ -44,8 +55,8 @@ export const columns: ColumnDef<Product>[] = [
       accessorKey: "thumbnailUrl",
       header: "Image",
       cell: ({ row }) => (
-          <SafeImage
-            src={row.original.thumbnailUrl}
+          <img
+            src={exactImageUrl(row.original.thumbnailUrl)}
             alt={row.original.name}
             className="w-10 h-10 object-cover rounded"
           />
@@ -99,6 +110,13 @@ export const columns: ColumnDef<Product>[] = [
               onClick={() => navigator.clipboard.writeText(product.id)}
             >
               Copy ID
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                (table.options.meta as any)?.openProductDetail?.(product)
+              }
+            >
+              View Details
             </DropdownMenuItem>
             {!product.isVerified && (
                  <DropdownMenuItem onClick={() => verifyProduct(product.id, table.options.meta)}>

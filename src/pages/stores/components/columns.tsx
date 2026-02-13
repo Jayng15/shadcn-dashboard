@@ -12,7 +12,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Link } from "@tanstack/react-router"
 import { toast } from "sonner"
 import api from "@/lib/api"
 
@@ -154,8 +153,12 @@ export const columns: ColumnDef<Store>[] = [
               Copy User ID
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-                <Link to={`/stores/$storeId`} params={{ storeId: store.id }}>View Details</Link>
+            <DropdownMenuItem
+              onClick={() =>
+                (meta as any)?.openStoreDetail?.(store)
+              }
+            >
+              View Details
             </DropdownMenuItem>
 
             {/* Admin Actions */}

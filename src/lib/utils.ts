@@ -82,3 +82,9 @@ export function generateProductNumber(): string {
   
   return `${day}${month}${year}-${hours}${minutes}${seconds}${milliseconds}`;
 }
+
+const BASE_URL = 'https://lovaselcard.tgndigital.vn';
+
+export const exactImageUrl = (url: string) => {
+  return `${BASE_URL}${url}`;
+}

@@ -5,6 +5,7 @@ import {
   ShoppingBag,
   Store,
   Command,
+  Banknote,
 } from "lucide-react"
 import {
   Sidebar,
@@ -44,6 +45,11 @@ const items = [
     title: "Products",
     url: "/products",
     icon: ShoppingBag,
+  },
+  {
+    title: "Finance",
+    url: "/finance",
+    icon: Banknote,
   },
 ]
 
@@ -100,16 +106,29 @@ export function AppSidebar() {
             <SidebarGroupLabel>Menu</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={pathname === item.url || pathname.startsWith(item.url + '/')}>
-                      <Link to={item.url}>
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {items.map((item) => {
+                  const currentPath =
+                    pathname.includes("/admin") && pathname.startsWith("/admin")
+                      ? pathname.replace("/admin", "") || "/"
+                      : pathname || "/"
+
+                  const isRoot = item.url === "/"
+                  const isActive = isRoot
+                    ? currentPath === "/"
+                    : currentPath === item.url ||
+                      currentPath.startsWith(item.url + "/")
+
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild isActive={isActive}>
+                        <Link to={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

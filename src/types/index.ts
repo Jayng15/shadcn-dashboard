@@ -16,6 +16,14 @@ export type User = {
   createdAt: string;
   // Optional profile fields if available
   fullName?: string;
+  contactPhone?: string;
+  contactEmail?: string;
+  gender?: string;
+  birthdate?: string;
+  avatarUrl?: string;
+  bio?: string;
+  address?: string;
+  updatedAt?: string;
 }
 
 export type Contribute = {

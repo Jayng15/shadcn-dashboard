@@ -1,6 +1,5 @@
 
 import { ColumnDef } from "@tanstack/react-table"
-import { Link } from "@tanstack/react-router"
 import DataTableColumnHeader from "./column-header"
 import { Badge } from "@/components/ui/badge";
 import { type User } from "@/types";
@@ -87,8 +86,12 @@ export const columns: ColumnDef<User>[] = [
                   Copy ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                    <Link to={`/users/$userId`} params={{ userId: user.id }}>View Details</Link>
+                <DropdownMenuItem
+                  onClick={() =>
+                    (table.options.meta as any)?.openUserDetail?.(user)
+                  }
+                >
+                  View Details
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {user.role !== 'ADMIN' && (
