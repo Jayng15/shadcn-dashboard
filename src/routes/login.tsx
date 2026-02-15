@@ -9,9 +9,8 @@ export const Route = createFileRoute('/login')({
       <LoginPage />
     </AuthLayout>
   ),
-  beforeLoad: () => {
-      if (localStorage.getItem('isAuthenticated') === 'true') {
-          throw redirect({ to: '/' })
-      }
+  beforeLoad: async () => {
+      // Intentionally empty.
+      // We rely on root guard to redirect authorized users AWAY from login if needed.
   }
 })

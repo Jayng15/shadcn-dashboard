@@ -9,7 +9,8 @@ export const Route = createRootRoute({
   notFoundComponent: NotFoundPage,
   beforeLoad: async ({ location }) => {
     // Allow access to login page without check
-    if (location.pathname.startsWith('/login')) {
+    // Using includes to catch both /login and potentially /admin/login if base path exists
+    if (location.pathname.includes('/login')) {
       return
     }
 
