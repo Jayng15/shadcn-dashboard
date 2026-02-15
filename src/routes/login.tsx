@@ -1,5 +1,5 @@
 
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import LoginPage from '@/pages/auth/login'
 import AuthLayout from '@/layouts/auth-layout'
 
