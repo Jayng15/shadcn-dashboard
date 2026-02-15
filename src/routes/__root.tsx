@@ -13,6 +13,13 @@ export const Route = createRootRoute({
       return
     }
 
+    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+    if (!isAuthenticated) {
+      throw redirect({
+        to: '/login',
+      });
+    }
+
     try {
       // Always fetch fresh user info to validate session and role
       const res = await api.get('/auth/info');
@@ -30,6 +37,7 @@ export const Route = createRootRoute({
       console.error("Auth check failed:", error);
       localStorage.removeItem('isAuthenticated');
       localStorage.removeItem('user');
+      localStorage.removeItem('token');
 
       // Redirect to login if check fails
       throw redirect({
