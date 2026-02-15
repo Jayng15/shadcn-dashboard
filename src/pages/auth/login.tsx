@@ -73,7 +73,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Đăng nhập</CardTitle>>
+        <CardTitle className="text-2xl">Đăng nhập</CardTitle>
         <CardDescription>
           Nhập email của bạn bên dưới để đăng nhập vào tài khoản
         </CardDescription>
