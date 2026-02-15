@@ -15,18 +15,18 @@ export default function InventoryPage() {
     <div>
       <Dialog>
         <DialogTrigger asChild>
-          <Button variant="outline">Create New</Button>
+          <Button variant="outline">Tạo mới</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px] lg:max-w-3xl">
           <DialogHeader>
-            <DialogTitle>Create New Product</DialogTitle>
+            <DialogTitle>Tạo sản phẩm mới</DialogTitle>
             <DialogDescription>
-              Make a new product here. Click save when you're done.
+              Tạo sản phẩm mới tại đây. Nhấn lưu khi bạn hoàn tất.
             </DialogDescription>
           </DialogHeader>
           <CreateProductForm />
           <DialogFooter>
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">Lưu thay đổi</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

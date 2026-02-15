@@ -45,35 +45,35 @@ export default function MainDashoard() {
 
   const cardStatictisData = [
     {
-      title: "Total Users",
+      title: "Tổng số người dùng",
       icon: User,
       value: loading ? "..." : stats.users,
-      description: "Registered users"
+      description: "Người dùng đã đăng ký"
     },
     {
-      title: "Total Stores",
+      title: "Tổng số cửa hàng",
       icon: Store,
       value: loading ? "..." : stats.stores,
-      description: "All stores (Active & Pending)"
+      description: "Tất cả cửa hàng (Đang hoạt động & Chờ duyệt)"
     },
     {
-      title: "Active Stores",
+      title: "Cửa hàng đang hoạt động",
       icon: Activity,
       value: loading ? "..." : stats.activeStores,
-      description: "Currently active stores"
+      description: "Cửa hàng hiện đang hoạt động"
     },
     {
-      title: "Total Products",
+      title: "Tổng số sản phẩm",
       icon: ShoppingBag,
       value: loading ? "..." : stats.products,
-      description: "Products across all stores"
+      description: "Sản phẩm trên tất cả các cửa hàng"
     }
   ]
 
   return (
     <>
       <div className="w-full flex items-center justify-between">
-        <h2 className="text-base md:text-lg font-bold tracking-tight ml-1.5">Overview</h2>
+        <h2 className="text-base md:text-lg font-bold tracking-tight ml-1.5">Tổng quan</h2>
       </div>
       <div className="grid auto-rows-min gap-2 mobile:grid-cols-2 lg:grid-cols-4">
         {cardStatictisData.map((item) => (

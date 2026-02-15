@@ -20,8 +20,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useState } from "react";
 
 const formSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: z.string().email("Email không hợp lệ"),
+  password: z.string().min(6, "Mật khẩu phải có ít nhất 6 ký tự"),
 });
 
 export default function LoginPage() {
@@ -49,7 +49,7 @@ export default function LoginPage() {
       console.log("User Info:", fullUser);
 
       if (fullUser.role !== 'ADMIN') {
-          toast.error("Access Denied: You must be an ADMIN to access this dashboard.");
+          toast.error("Từ chối truy cập: Bạn phải là QUẢN TRỊ VIÊN để truy cập bảng điều khiển này.");
           await api.post("/auth/signout").catch(() => {});
           return;
       }
@@ -58,22 +58,24 @@ export default function LoginPage() {
       // Store user info
       localStorage.setItem("user", JSON.stringify(fullUser));
 
-      toast.success("Login successful");
+      toast.success("Đăng nhập thành công");
       navigate({ to: "/" });
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Login failed");
+      toast.error(error.response?.data?.message || "Đăng nhập thất bại");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <Card className="mx-auto max-w-sm">
+    <div className="flex bg-muted min-h-screen items-center justify-center p-6 md:p-10">
+      <div className="w-full max-w-sm">
+        <Card className="mx-auto max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Login</CardTitle>
+        <CardTitle className="text-2xl">Đăng nhập</CardTitle>>
         <CardDescription>
-          Enter your email below to login to your account
+          Nhập email của bạn bên dưới để đăng nhập vào tài khoản
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -97,7 +99,7 @@ export default function LoginPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Mật khẩu</FormLabel>
                   <FormControl>
                     <Input type="password" {...field} />
                   </FormControl>
@@ -106,11 +108,13 @@ export default function LoginPage() {
               )}
             />
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+              {loading ? "Đang đăng nhập..." : "Đăng nhập"}
             </Button>
           </form>
         </Form>
       </CardContent>
-    </Card>
+        </Card>
+      </div>
+    </div>
   );
 }

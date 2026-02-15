@@ -5,7 +5,7 @@ export default function TaskPage() {
   return (
     <Card className="w-full min-h-full h-full flex flex-col border bg-primary-foreground text-neutral-50 rounded-lg">
       <CardHeader>
-        <CardTitle>Manage Tasks</CardTitle>
+        <CardTitle>Quản lý công việc</CardTitle>
       </CardHeader>
       <CardContent className="flex-1">
         <Board />

@@ -12,21 +12,21 @@ const Board = () => {
     <ScrollArea>
       <div className="flex max-h-full h-full w-full gap-3">
         <Column
-          title="Data Structures"
+          title="Cấu trúc dữ liệu"
           column="data-structures"
           headingColor="text-emerald-500"
           tasks={tasks}
           setTasks={setTasks}
         />
         <Column
-          title="Algorithms"
+          title="Thuật toán"
           column="algorithms"
           headingColor="text-yellow-200"
           tasks={tasks}
           setTasks={setTasks}
         />
         <Column
-          title="Techniques"
+          title="Kỹ thuật"
           column="techniques"
           headingColor="text-blue-200"
           tasks={tasks}

@@ -93,17 +93,17 @@ export default function StoreListPage() {
   const requestColumns = [
     {
       accessorKey: "id",
-      header: "Request ID",
+      header: "ID Yêu cầu",
       cell: ({ row }: any) => <div className="font-medium">{row.getValue("id").substring(0, 8)}...</div>,
     },
     {
       accessorKey: "targetId",
-      header: "Store ID",
+      header: "ID Cửa hàng",
       cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("targetId")}</div>,
     },
     {
         accessorKey: "createdAt",
-        header: "Requested At",
+        header: "Yêu cầu lúc",
         cell: ({ row }: any) => <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
     },
     {
@@ -118,7 +118,7 @@ export default function StoreListPage() {
                 setIsRequestDialogOpen(true);
             }}
           >
-            Review
+            Xem xét
           </Button>
         )
       },
@@ -154,8 +154,8 @@ export default function StoreListPage() {
             kyc: detail.kyc,
           };
           setSelectedStore(combined);
-        } catch (e) {
-          toast.error("Failed to load store details");
+        } catch (_) {
+          toast.error("Không thể tải chi tiết cửa hàng");
           setSelectedStore(store as StoreDetail);
         } finally {
           setIsDetailLoading(false);
@@ -184,83 +184,83 @@ export default function StoreListPage() {
 
     return (
       <div className="p-4 text-red-500">
-        An error has occurred: {(storeError as Error).message}
+        Đã xảy ra lỗi: {(storeError as Error).message}
       </div>
     );
 
   return (
     <Card className="bg-sidebar w-full min-h-full flex flex-col">
       <CardHeader>
-        <CardTitle>Manage Stores</CardTitle>
+        <CardTitle>Quản lý cửa hàng</CardTitle>
       </CardHeader>
       <ResponsiveDialog
         isOpen={isDetailOpen}
         setIsOpen={setIsDetailOpen}
-        title="Store Details"
+        title="Chi tiết cửa hàng"
       >
         {isDetailLoading && (
           <div className="py-4 text-center text-sm text-muted-foreground">
-            Loading store details...
+            Đang tải chi tiết cửa hàng...
           </div>
         )}
         {!isDetailLoading && selectedStore && (
           <div className="space-y-4 text-sm">
             <div className="space-y-2">
               <div>
-                <span className="font-semibold">Name: </span>
+                <span className="font-semibold">Tên: </span>
                 <span>{selectedStore.name}</span>
               </div>
               <div>
-                <span className="font-semibold">Owner User ID: </span>
+                <span className="font-semibold">ID Chủ sở hữu: </span>
                 <span>{selectedStore.userId}</span>
               </div>
               <div>
-                <span className="font-semibold">Status: </span>
+                <span className="font-semibold">Trạng thái: </span>
                 <span>{selectedStore.status}</span>
               </div>
               <div>
-                <span className="font-semibold">Verified: </span>
-                <span>{selectedStore.isVerified ? "Yes" : "No"}</span>
+                <span className="font-semibold">Đã xác minh: </span>
+                <span>{selectedStore.isVerified ? "Có" : "Không"}</span>
               </div>
               <div>
-                <span className="font-semibold">Follow Count: </span>
+                <span className="font-semibold">Lượt theo dõi: </span>
                 <span>{selectedStore.followCount ?? 0}</span>
               </div>
               <div>
-                <span className="font-semibold">Contact Phone: </span>
+                <span className="font-semibold">Số điện thoại liên hệ: </span>
                 <span>{selectedStore.contactPhone}</span>
               </div>
               <div>
-                <span className="font-semibold">Contact Email: </span>
+                <span className="font-semibold">Email liên hệ: </span>
                 <span>{selectedStore.contactEmail}</span>
               </div>
               <div>
-                <span className="font-semibold">Address: </span>
+                <span className="font-semibold">Địa chỉ: </span>
                 <span>{selectedStore.address}</span>
               </div>
               <div>
-                <span className="font-semibold">Description: </span>
+                <span className="font-semibold">Mô tả: </span>
                 <span>{selectedStore.description}</span>
               </div>
             </div>
 
             {selectedStore.payment && (
               <div className="space-y-2">
-                <div className="font-semibold">Payment Information</div>
+                <div className="font-semibold">Thông tin thanh toán</div>
                 <div>
-                  <span className="font-semibold">Bank Name: </span>
+                  <span className="font-semibold">Tên ngân hàng: </span>
                   <span>{selectedStore.payment.bankName}</span>
                 </div>
                 <div>
-                  <span className="font-semibold">Bank Code: </span>
+                  <span className="font-semibold">Mã ngân hàng: </span>
                   <span>{selectedStore.payment.bankCode}</span>
                 </div>
                 <div>
-                  <span className="font-semibold">Account Holder: </span>
+                  <span className="font-semibold">Chủ tài khoản: </span>
                   <span>{selectedStore.payment.accountHolderName}</span>
                 </div>
                 <div>
-                  <span className="font-semibold">Account Number: </span>
+                  <span className="font-semibold">Số tài khoản: </span>
                   <span>{selectedStore.payment.accountNumber}</span>
                 </div>
               </div>
@@ -268,13 +268,13 @@ export default function StoreListPage() {
 
             {selectedStore.kyc && (
               <div className="space-y-2">
-                <div className="font-semibold">KYC Information</div>
+                <div className="font-semibold">Thông tin KYC</div>
                 <div>
                   <span className="font-semibold">Status: </span>
                   <span>{selectedStore.kyc.status}</span>
                 </div>
                 <div>
-                  <span className="font-semibold">Submitted At: </span>
+                  <span className="font-semibold">Đã gửi lúc: </span>
                   <span>
                     {selectedStore.kyc.submittedAt
                       ? new Date(
@@ -297,7 +297,7 @@ export default function StoreListPage() {
                       try {
                         setIsActionLoading(true);
                         await api.post(`/store/${selectedStore.id}/verify`);
-                        toast.success("Store verified successfully");
+                        toast.success("Xác minh cửa hàng thành công");
                         setSelectedStore((prev) =>
                           prev
                             ? {
@@ -308,13 +308,13 @@ export default function StoreListPage() {
                         );
                         refetchStores();
                       } catch (e) {
-                        toast.error("Verification failed");
+                        toast.error("Xác minh thất bại");
                       } finally {
                         setIsActionLoading(false);
                       }
                     }}
                   >
-                    Verify Store
+                    Xác minh cửa hàng
                   </Button>
                   <Button
                     size="sm"
@@ -327,7 +327,7 @@ export default function StoreListPage() {
                         await api.patch(`/store/${selectedStore.id}/status`, {
                           status: "REJECTED",
                         });
-                        toast.success("Store status updated to REJECTED");
+                        toast.success("Trạng thái cửa hàng đã cập nhật thành TỪ CHỐI");
                         setSelectedStore((prev) =>
                           prev
                             ? {
@@ -338,13 +338,13 @@ export default function StoreListPage() {
                         );
                         refetchStores();
                       } catch (e) {
-                        toast.error("Status update failed");
+                        toast.error("Cập nhật trạng thái thất bại");
                       } finally {
                         setIsActionLoading(false);
                       }
                     }}
                   >
-                    Reject
+                    Từ chối
                   </Button>
                 </>
               )}
@@ -361,7 +361,7 @@ export default function StoreListPage() {
                       await api.patch(`/store/${selectedStore.id}/status`, {
                         status: "BANNED",
                       });
-                      toast.success("Store status updated to BANNED");
+                      toast.success("Trạng thái cửa hàng đã cập nhật thành BỊ CẤM");
                       setSelectedStore((prev) =>
                         prev
                           ? {
@@ -372,13 +372,13 @@ export default function StoreListPage() {
                       );
                       refetchStores();
                     } catch (e) {
-                      toast.error("Status update failed");
+                      toast.error("Cập nhật trạng thái thất bại");
                     } finally {
                       setIsActionLoading(false);
                     }
                   }}
                 >
-                  Ban Store
+                  Cấm cửa hàng
                 </Button>
               )}
 
@@ -394,7 +394,7 @@ export default function StoreListPage() {
                       await api.patch(`/store/${selectedStore.id}/status`, {
                         status: "ACTIVE",
                       });
-                      toast.success("Store status updated to ACTIVE");
+                      toast.success("Trạng thái cửa hàng đã cập nhật thành HOẠT ĐỘNG");
                       setSelectedStore((prev) =>
                         prev
                           ? {
@@ -405,13 +405,13 @@ export default function StoreListPage() {
                       );
                       refetchStores();
                     } catch (e) {
-                      toast.error("Status update failed");
+                      toast.error("Cập nhật trạng thái thất bại");
                     } finally {
                       setIsActionLoading(false);
                     }
                   }}
                 >
-                  Unban Store
+                  Bỏ cấm cửa hàng
                 </Button>
               )}
             </div>
@@ -430,14 +430,14 @@ export default function StoreListPage() {
          <Tabs defaultValue="all" onValueChange={setTabFilter} className="w-full h-full flex flex-col">
             <div className="px-6 pt-4">
                 <TabsList>
-                    <TabsTrigger value="all">All Stores</TabsTrigger>
-                    <TabsTrigger value="requests">Update Requests</TabsTrigger>
+                    <TabsTrigger value="all">Tất cả cửa hàng</TabsTrigger>
+                    <TabsTrigger value="requests">Yêu cầu cập nhật</TabsTrigger>
                 </TabsList>
             </div>
 
             <TabsContent value="all" className="flex-1 flex flex-col p-6 pt-2">
                 {isStorePending ? (
-                    <CardContent>Loading...</CardContent>
+                    <CardContent>Đang tải...</CardContent>
                 ) : (
                     <>
                     <CardContent className="flex-1 p-0">
@@ -452,7 +452,7 @@ export default function StoreListPage() {
 
              <TabsContent value="requests" className="flex-1 flex flex-col p-6 pt-2">
                 {isRequestPending ? (
-                     <CardContent>Loading Requests...</CardContent>
+                     <CardContent>Đang tải yêu cầu...</CardContent>
                 ) : (
                     <>
                          <CardContent className="flex-1 p-0">

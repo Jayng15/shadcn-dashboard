@@ -82,7 +82,7 @@ function AuthorizedImage({
   if (loading) {
     return (
       <div className="flex h-60 w-full items-center justify-center rounded border bg-muted text-sm text-muted-foreground">
-        Loading image...
+        Đang tải hình ảnh...
       </div>
     )
   }
@@ -90,7 +90,7 @@ function AuthorizedImage({
   if (error || !src) {
     return (
       <div className="flex h-60 w-full items-center justify-center rounded border bg-muted text-sm text-muted-foreground">
-        Failed to load image
+        Không thể tải hình ảnh
       </div>
     )
   }
@@ -127,10 +127,10 @@ export default function FinancePage() {
       await api.post("/finance/withdrawal-fee", payload)
     },
     onSuccess: () => {
-      toast.success("Withdrawal fee updated")
+      toast.success("Phí rút tiền đã được cập nhật")
     },
     onError: (err: any) => {
-      toast.error(err?.response?.data?.message || "Failed to update withdrawal fee")
+      toast.error(err?.response?.data?.message || "Cập nhật phí rút tiền thất bại")
     },
   })
 
@@ -174,7 +174,7 @@ export default function FinancePage() {
   if (error) {
     return (
       <div className="p-4 text-red-500">
-        An error has occurred: {(error as Error).message}
+        Đã xảy ra lỗi: {(error as Error).message}
       </div>
     )
   }
@@ -182,17 +182,17 @@ export default function FinancePage() {
   return (
     <div className="flex flex-col space-y-4 h-full">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight">Finance</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Tài chính</h2>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Withdrawal Fee</CardTitle>
-          <CardDescription>Update the fee applied to withdrawal transactions.</CardDescription>
+          <CardTitle>Phí rút tiền</CardTitle>
+          <CardDescription>Cập nhật phí áp dụng cho các giao dịch rút tiền.</CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-3">
           <div className="space-y-2">
-            <Label htmlFor="fee-amount">Amount</Label>
+            <Label htmlFor="fee-amount">Số tiền</Label>
             <Input
               id="fee-amount"
               type="number"
@@ -206,7 +206,7 @@ export default function FinancePage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="fee-type">Type</Label>
+            <Label htmlFor="fee-type">Loại</Label>
             <Select
               value={withdrawalFee.type}
               onValueChange={(val: "FIXED" | "PERCENTAGE") =>
@@ -214,16 +214,16 @@ export default function FinancePage() {
               }
             >
               <SelectTrigger id="fee-type">
-                <SelectValue placeholder="Select type" />
+                <SelectValue placeholder="Chọn loại" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="FIXED">Fixed</SelectItem>
-                <SelectItem value="PERCENTAGE">Percentage</SelectItem>
+                <SelectItem value="FIXED">Cố định</SelectItem>
+                <SelectItem value="PERCENTAGE">Phần trăm</SelectItem>
               </SelectContent>
             </Select>
           </div>
           <div className="space-y-2 md:col-span-1">
-            <Label htmlFor="fee-description">Description</Label>
+            <Label htmlFor="fee-description">Mô tả</Label>
             <Input
               id="fee-description"
               value={withdrawalFee.description}
@@ -241,7 +241,7 @@ export default function FinancePage() {
             disabled={feeMutation.isPending}
             onClick={() => feeMutation.mutate(withdrawalFee)}
           >
-            Save Withdrawal Fee
+            Lưu phí rút tiền
           </Button>
         </CardFooter>
       </Card>
@@ -253,30 +253,30 @@ export default function FinancePage() {
       >
         {isDetailLoading && (
           <div className="py-4 text-center text-sm text-muted-foreground">
-            Loading transaction details...
+            Đang tải chi tiết giao dịch...
           </div>
         )}
         {!isDetailLoading && selectedTx && (
           <div className="space-y-4 text-sm">
             <div className="space-y-1">
               <div>
-                <span className="font-semibold">Tx Code: </span>
+                <span className="font-semibold">Mã giao dịch: </span>
                 <span>{selectedTx.txCode}</span>
               </div>
               <div>
-                <span className="font-semibold">User ID: </span>
+                <span className="font-semibold">ID Người dùng: </span>
                 <span>{selectedTx.userId}</span>
               </div>
               <div>
-                <span className="font-semibold">Account ID: </span>
+                <span className="font-semibold">ID Tài khoản: </span>
                 <span>{selectedTx.accountId}</span>
               </div>
               <div>
-                <span className="font-semibold">Type: </span>
+                <span className="font-semibold">Loại: </span>
                 <span>{selectedTx.type}</span>
               </div>
               <div>
-                <span className="font-semibold">Amount: </span>
+                <span className="font-semibold">Số tiền: </span>
                 <span>
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
@@ -285,30 +285,30 @@ export default function FinancePage() {
                 </span>
               </div>
               <div>
-                <span className="font-semibold">Status: </span>
+                <span className="font-semibold">Trạng thái: </span>
                 <span>{selectedTx.status}</span>
               </div>
               <div>
-                <span className="font-semibold">Verified Status: </span>
+                <span className="font-semibold">Trạng thái xác minh: </span>
                 <span>{selectedTx.verifiedStatus}</span>
               </div>
               <div>
-                <span className="font-semibold">Payment Method: </span>
+                <span className="font-semibold">Phương thức thanh toán: </span>
                 <span>{selectedTx.paymentMethod}</span>
               </div>
               <div>
-                <span className="font-semibold">Description: </span>
+                <span className="font-semibold">Mô tả: </span>
                 <span>{selectedTx.description}</span>
               </div>
               <div>
-                <span className="font-semibold">Tx Time: </span>
+                <span className="font-semibold">Thời gian giao dịch: </span>
                 <span>{new Date(selectedTx.txAt).toLocaleString()}</span>
               </div>
             </div>
 
             {selectedTx.txProofUrl && (
               <div className="space-y-2">
-                <div className="font-semibold">Proof Image</div>
+                <div className="font-semibold">Hình ảnh bằng chứng</div>
                 <AuthorizedImage
                   url={`/finance/transactions/${selectedTx.id}/media/proof`}
                   alt="Transaction proof"
@@ -335,7 +335,7 @@ export default function FinancePage() {
                           status: "VERIFIED",
                         })
                       }
-                      toast.success("Transaction verified")
+                      toast.success("Giao dịch đã được xác minh")
                       setSelectedTx((prev) =>
                         prev
                           ? {
@@ -345,22 +345,22 @@ export default function FinancePage() {
                           : prev
                       )
                       refetch()
-                    } catch (e) {
-                      toast.error("Failed to verify transaction")
+                    } catch (_) {
+                      toast.error("Xác minh giao dịch thất bại")
                     } finally {
                       setIsVerifyLoading(false)
                     }
                   }}
                 >
                   {selectedTx.type === "WITHDRAW"
-                    ? "Verify Withdrawal"
-                    : "Verify Deposit"}
+                    ? "Xác minh rút tiền"
+                    : "Xác minh nạp tiền"}
                 </Button>
               </div>
             )}
             {selectedTx.verifiedStatus === "VERIFIED" && (
               <div className="text-xs text-muted-foreground text-center">
-                This transaction is already verified.
+                Giao dịch này đã được xác minh.
               </div>
             )}
           </div>
@@ -387,20 +387,20 @@ export default function FinancePage() {
         }}
       >
         <TabsList>
-          <TabsTrigger value="all">All</TabsTrigger>
-          <TabsTrigger value="deposits">Deposits</TabsTrigger>
-          <TabsTrigger value="withdrawals">Withdrawals</TabsTrigger>
-          <TabsTrigger value="pending">Pending</TabsTrigger>
+          <TabsTrigger value="all">Tất cả</TabsTrigger>
+          <TabsTrigger value="deposits">Nạp tiền</TabsTrigger>
+          <TabsTrigger value="withdrawals">Rút tiền</TabsTrigger>
+          <TabsTrigger value="pending">Chờ xử lý</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="h-full">
           <Card className="bg-sidebar w-full min-h-full flex flex-col">
             <CardHeader>
-              <CardTitle>All Transactions</CardTitle>
-              <CardDescription>Overview of all finance transactions.</CardDescription>
+              <CardTitle>Tất cả giao dịch</CardTitle>
+              <CardDescription>Tổng quan về tất cả các giao dịch tài chính.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              {isPending ? "Loading..." : <DataTable table={table} columns={columns} />}
+              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
             </CardContent>
             <CardFooter>
               {!isPending && (
@@ -413,11 +413,11 @@ export default function FinancePage() {
         <TabsContent value="deposits" className="h-full">
           <Card className="bg-sidebar w-full min-h-full flex flex-col">
             <CardHeader>
-              <CardTitle>Deposits</CardTitle>
-              <CardDescription>Deposit transactions only.</CardDescription>
+              <CardTitle>Nạp tiền</CardTitle>
+              <CardDescription>Chỉ các giao dịch nạp tiền.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              {isPending ? "Loading..." : <DataTable table={table} columns={columns} />}
+              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
             </CardContent>
             <CardFooter>
               {!isPending && (
@@ -430,11 +430,11 @@ export default function FinancePage() {
         <TabsContent value="withdrawals" className="h-full">
           <Card className="bg-sidebar w-full min-h-full flex flex-col">
             <CardHeader>
-              <CardTitle>Withdrawals</CardTitle>
-              <CardDescription>Withdrawal transactions only.</CardDescription>
+              <CardTitle>Rút tiền</CardTitle>
+              <CardDescription>Chỉ các giao dịch rút tiền.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              {isPending ? "Loading..." : <DataTable table={table} columns={columns} />}
+              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
             </CardContent>
             <CardFooter>
               {!isPending && (
@@ -447,11 +447,11 @@ export default function FinancePage() {
         <TabsContent value="pending" className="h-full">
           <Card className="bg-sidebar w-full min-h-full flex flex-col">
             <CardHeader>
-              <CardTitle>Pending Transactions</CardTitle>
-              <CardDescription>Transactions awaiting verification.</CardDescription>
+              <CardTitle>Giao dịch chờ xử lý</CardTitle>
+              <CardDescription>Các giao dịch đang chờ xác minh.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              {isPending ? "Loading..." : <DataTable table={table} columns={columns} />}
+              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
             </CardContent>
             <CardFooter>
               {!isPending && (

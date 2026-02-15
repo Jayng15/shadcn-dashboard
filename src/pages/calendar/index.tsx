@@ -1,5 +1,5 @@
-const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-const DAYS = ["Mon", "Wed", "Fri"];
+const MONTHS = ["Th1", "Th2", "Th3", "Th4", "Th5", "Th6", "Th7", "Th8", "Th9", "Th10", "Th11", "Th12"];
+const DAYS = ["T2", "T4", "T6"];
 
 export default function CalendarPage() {
   return (

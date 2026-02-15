@@ -96,8 +96,8 @@ export default function ProductListPage() {
           const res = await api.get(`/product/${product.id}`);
           const detail = res.data.product as ProductDetail;
           setSelectedProduct(detail);
-        } catch (e) {
-          toast.error("Failed to load product details");
+        } catch (_) {
+          toast.error("Không thể tải chi tiết sản phẩm");
           setSelectedProduct(product);
         } finally {
           setIsDetailLoading(false);
@@ -109,17 +109,17 @@ export default function ProductListPage() {
   const requestColumns = [
     {
       accessorKey: "id",
-      header: "Request ID",
+      header: "ID Yêu cầu",
       cell: ({ row }: any) => <div className="font-medium">{row.getValue("id").substring(0, 8)}...</div>,
     },
     {
       accessorKey: "targetId",
-      header: "Product ID",
+      header: "ID Sản phẩm",
       cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("targetId")}</div>,
     },
     {
         accessorKey: "createdAt",
-        header: "Requested At",
+        header: "Yêu cầu lúc",
         cell: ({ row }: any) => <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
     },
     {
@@ -134,7 +134,7 @@ export default function ProductListPage() {
                 setIsRequestDialogOpen(true);
             }}
           >
-            Review
+            Xem xét
           </Button>
         )
       },
@@ -159,24 +159,24 @@ export default function ProductListPage() {
   if (error)
     return (
       <div className="p-4 text-red-500">
-        An error has occurred: {(error as Error).message}
+        Đã xảy ra lỗi: {(error as Error).message}
       </div>
     );
 
   return (
     <div className="flex flex-col space-y-4 h-full">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight">Products</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Sản phẩm</h2>
       </div>
 
       <ResponsiveDialog
         isOpen={isDetailOpen}
         setIsOpen={setIsDetailOpen}
-        title="Product Details"
+        title="Chi tiết sản phẩm"
       >
         {isDetailLoading && (
           <div className="py-4 text-center text-sm text-muted-foreground">
-            Loading product details...
+            Đang tải chi tiết sản phẩm...
           </div>
         )}
         {!isDetailLoading && selectedProduct && (
@@ -192,7 +192,7 @@ export default function ProductListPage() {
                   {selectedProduct.name}
                 </div>
                 <div>
-                  <span className="font-semibold">Price: </span>
+                  <span className="font-semibold">Giá: </span>
                   <span>
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
@@ -201,50 +201,50 @@ export default function ProductListPage() {
                   </span>
                 </div>
                 <div>
-                  <span className="font-semibold">Status: </span>
+                  <span className="font-semibold">Trạng thái: </span>
                   <span>{selectedProduct.status}</span>
                 </div>
                 <div>
-                  <span className="font-semibold">Verified: </span>
-                  <span>{selectedProduct.isVerified ? "Yes" : "No"}</span>
+                  <span className="font-semibold">Đã xác minh: </span>
+                  <span>{selectedProduct.isVerified ? "Có" : "Không"}</span>
                 </div>
               </div>
             </div>
 
             <div className="space-y-1">
               <div>
-                <span className="font-semibold">Store ID: </span>
+                <span className="font-semibold">ID Cửa hàng: </span>
                 <span>{selectedProduct.storeId}</span>
               </div>
               <div>
-                <span className="font-semibold">User ID: </span>
+                <span className="font-semibold">ID Người dùng: </span>
                 <span>{selectedProduct.userId}</span>
               </div>
               <div>
-                <span className="font-semibold">Description: </span>
+                <span className="font-semibold">Mô tả: </span>
                 <span>{selectedProduct.description}</span>
               </div>
               <div>
-                <span className="font-semibold">Inventory: </span>
+                <span className="font-semibold">Kho hàng: </span>
                 <span>
-                  Total {selectedProduct.totalInventory ?? 0} / Sold{" "}
+                  Tổng {selectedProduct.totalInventory ?? 0} / Đã bán{" "}
                   {selectedProduct.soldInventory ?? 0}
                 </span>
               </div>
               <div>
-                <span className="font-semibold">Reserved: </span>
+                <span className="font-semibold">Đã đặt trước: </span>
                 <span>{selectedProduct.reservedInventory ?? 0}</span>
               </div>
               <div>
-                <span className="font-semibold">Team Name: </span>
+                <span className="font-semibold">Tên đội: </span>
                 <span>{selectedProduct.teamName}</span>
               </div>
               <div>
-                <span className="font-semibold">Team Member: </span>
+                <span className="font-semibold">Thành viên đội: </span>
                 <span>{selectedProduct.teamMember}</span>
               </div>
               <div>
-                <span className="font-semibold">Favorites: </span>
+                <span className="font-semibold">Yêu thích: </span>
                 <span>{selectedProduct.favoriteCount ?? 0}</span>
               </div>
             </div>
@@ -261,24 +261,24 @@ export default function ProductListPage() {
                       await api.post(
                         `/product/${selectedProduct.id}/verify`
                       );
-                      toast.success("Product verified");
+                      toast.success("Sản phẩm đã được xác minh");
                       setSelectedProduct((prev) =>
                         prev ? { ...prev, isVerified: true } : prev
                       );
                       refetch();
                     } catch (e) {
-                      toast.error("Failed to verify product");
+                      toast.error("Không thể xác minh sản phẩm");
                     } finally {
                       setIsVerifyLoading(false);
                     }
                   }}
                 >
-                  Verify Product
+                  Xác minh sản phẩm
                 </Button>
               )}
               {selectedProduct.isVerified && (
                 <div className="text-xs text-muted-foreground text-center">
-                  This product is already verified.
+                  Sản phẩm này đã được xác minh.
                 </div>
               )}
             </div>
@@ -299,19 +299,19 @@ export default function ProductListPage() {
         onValueChange={setStatusFilter}
       >
         <TabsList>
-          <TabsTrigger value="all">All Products</TabsTrigger>
-          <TabsTrigger value="pending">Pending Verification</TabsTrigger>
-          <TabsTrigger value="requests">Update Requests</TabsTrigger>
+          <TabsTrigger value="all">Tất cả sản phẩm</TabsTrigger>
+          <TabsTrigger value="pending">Chờ xác minh</TabsTrigger>
+          <TabsTrigger value="requests">Yêu cầu cập nhật</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="h-full">
           <Card className="bg-sidebar w-full min-h-full flex flex-col">
             <CardHeader>
-              <CardTitle>All Products</CardTitle>
-              <CardDescription>Manage all products.</CardDescription>
+              <CardTitle>Tất cả sản phẩm</CardTitle>
+              <CardDescription>Quản lý tất cả sản phẩm.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              {isPending ? "Loading..." : <DataTable table={table} columns={columns} />}
+              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
             </CardContent>
             <CardFooter>
               {!isPending && (
@@ -324,11 +324,11 @@ export default function ProductListPage() {
         <TabsContent value="pending" className="h-full">
           <Card className="bg-sidebar w-full min-h-full flex flex-col">
             <CardHeader>
-              <CardTitle>Pending Products</CardTitle>
-              <CardDescription>Products requiring verification.</CardDescription>
+              <CardTitle>Sản phẩm chờ duyệt</CardTitle>
+              <CardDescription>Sản phẩm cần xác minh.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1">
-              {isPending ? "Loading..." : <DataTable table={table} columns={columns} />}
+              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
             </CardContent>
             <CardFooter>
               {!isPending && (
@@ -341,11 +341,11 @@ export default function ProductListPage() {
         <TabsContent value="requests" className="h-full">
             <Card className="bg-sidebar w-full min-h-full flex flex-col">
                 <CardHeader>
-                    <CardTitle>Update Requests</CardTitle>
-                    <CardDescription>Review product update requests.</CardDescription>
+                    <CardTitle>Yêu cầu cập nhật</CardTitle>
+                    <CardDescription>Xem xét yêu cầu cập nhật sản phẩm.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
-                    {isRequestPending ? "Loading..." : <DataTable table={requestTable} columns={requestColumns} />}
+                    {isRequestPending ? "Đang tải..." : <DataTable table={requestTable} columns={requestColumns} />}
                 </CardContent>
                  <CardFooter>
                   {!isRequestPending && (

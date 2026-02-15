@@ -24,12 +24,12 @@ import { generateProductNumber } from "@/lib/utils";
 import { useEffect } from "react";
 
 const productSchema = z.object({
-  productName: z.string().min(1, 'Product name is required'),
-  cost: z.number().min(0, 'Cost must be a positive number'),
-  profit: z.number().min(0, 'Profit must be a positive number'),
-  revenue: z.number().min(0, 'Revenue must be a positive number'),
-  customerEmail: z.string().email('Invalid email address'),
-  merchantName: z.string().min(1, 'Merchant name is required'),
+  productName: z.string().min(1, 'Tên sản phẩm là bắt buộc'),
+  cost: z.number().min(0, 'Chi phí phải là số dương'),
+  profit: z.number().min(0, 'Lợi nhuận phải là số dương'),
+  revenue: z.number().min(0, 'Doanh thu phải là số dương'),
+  customerEmail: z.string().email('Địa chỉ email không hợp lệ'),
+  merchantName: z.string().min(1, 'Tên người bán là bắt buộc'),
   receiptStatus: z.enum(['received', 'not_received']),
   paymentStatus: z.enum(['paid', 'not_paid']),
 });
@@ -87,7 +87,7 @@ export default function CreateProductForm() {
               name="productName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product Name</FormLabel>
+                  <FormLabel>Tên sản phẩm</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -101,11 +101,11 @@ export default function CreateProductForm() {
               name="cost"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Cost</FormLabel>
+                  <FormLabel>Chi phí</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
-                      {...field} 
+                    <Input
+                      type="number"
+                      {...field}
                       onChange={e => field.onChange(parseFloat(e.target.value))}
                     />
                   </FormControl>
@@ -119,10 +119,10 @@ export default function CreateProductForm() {
               name="profit"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Profit</FormLabel>
+                  <FormLabel>Lợi nhuận</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
+                    <Input
+                      type="number"
                       {...field}
                       onChange={e => field.onChange(parseFloat(e.target.value))}
                     />
@@ -137,10 +137,10 @@ export default function CreateProductForm() {
               name="revenue"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Revenue</FormLabel>
+                  <FormLabel>Doanh thu</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="number" 
+                    <Input
+                      type="number"
                       {...field}
                       disabled
                       className="bg-zinc-800"
@@ -157,7 +157,7 @@ export default function CreateProductForm() {
               name="customerEmail"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Customer Email</FormLabel>
+                  <FormLabel>Email khách hàng</FormLabel>
                   <FormControl>
                     <Input type="email" {...field} />
                   </FormControl>
@@ -171,7 +171,7 @@ export default function CreateProductForm() {
               name="merchantName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Merchant Name</FormLabel>
+                  <FormLabel>Tên người bán</FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -185,16 +185,16 @@ export default function CreateProductForm() {
               name="receiptStatus"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Receipt Status</FormLabel>
+                  <FormLabel>Trạng thái biên lai</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select receipt status" />
+                        <SelectValue placeholder="Chọn trạng thái biên lai" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="received">Received</SelectItem>
-                      <SelectItem value="not_received">Not Received</SelectItem>
+                      <SelectItem value="received">Đã nhận</SelectItem>
+                      <SelectItem value="not_received">Chưa nhận</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -207,16 +207,16 @@ export default function CreateProductForm() {
               name="paymentStatus"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Payment Status</FormLabel>
+                  <FormLabel>Trạng thái thanh toán</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Select payment status" />
+                        <SelectValue placeholder="Chọn trạng thái thanh toán" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="paid">Paid</SelectItem>
-                      <SelectItem value="not_paid">Not Paid</SelectItem>
+                      <SelectItem value="paid">Đã thanh toán</SelectItem>
+                      <SelectItem value="not_paid">Chưa thanh toán</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -225,7 +225,7 @@ export default function CreateProductForm() {
             />
           </div>
         </div>
-        <Button type="submit" className="mt-5">Create Product</Button>
+        <Button type="submit" className="mt-5">Tạo sản phẩm</Button>
       </form>
     </Form>
   )

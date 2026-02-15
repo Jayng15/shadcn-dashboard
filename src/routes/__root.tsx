@@ -1,31 +1,40 @@
 import { createRootRoute, redirect } from '@tanstack/react-router'
 import MainLayout from '@/layouts/main-layout'
 import NotFoundPage from '@/pages/not-found'
+import api from '@/lib/api'
 
 
 export const Route = createRootRoute({
   component: MainLayout,
   notFoundComponent: NotFoundPage,
-  beforeLoad: ({ location }) => {
-    const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-
-    console.log("Root Guard - Path:", location.pathname, "Auth:", isAuthenticated);
-
-    if (isAuthenticated && user?.role !== 'ADMIN' && !location.pathname.includes('/login')) {
-         // Invalid role, clear and redirect
-         localStorage.removeItem('isAuthenticated');
-         localStorage.removeItem('user');
-         throw redirect({ to: '/login' });
+  beforeLoad: async ({ location }) => {
+    // Allow access to login page without check
+    if (location.pathname.startsWith('/login')) {
+      return
     }
 
-    // If not logged in and trying to access something other than login
-    // Update: Check for 'login' anywhere in the path to handle basepath (/admin/login)
-    if (!isAuthenticated && !location.pathname.includes('/login')) {
-      console.log("Redirecting to login from:", location.pathname);
+    try {
+      // Always fetch fresh user info to validate session and role
+      const res = await api.get('/auth/info');
+      const user = res.data.user;
+
+      if (!user || user.role !== 'ADMIN') {
+        throw new Error("Unauthorized: Role is not ADMIN");
+      }
+
+      // Update local storage with fresh data
+      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('isAuthenticated', 'true');
+
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      localStorage.removeItem('isAuthenticated');
+      localStorage.removeItem('user');
+
+      // Redirect to login if check fails
       throw redirect({
         to: '/login',
-      })
+      });
     }
   }
 })

@@ -35,17 +35,17 @@ const AddTask = ({ column, setTasks }: AddTaskProps) => {
     <>
       {adding ? (
         <motion.form layout onSubmit={handleSubmit}>
-          <Textarea 
+          <Textarea
             onChange={(e) => setText(e.target.value)}
             autoFocus
-            placeholder="Add a task..."
+            placeholder="Thêm công việc..."
           />
           <div className="mt-1.5 flex items-center justify-end gap-1.5">
             <Button onClick={() => setAdding(false)} variant="secondary" size="sm">
-              Close
+              Đóng
             </Button>
             <Button type="submit" size="sm">
-              Add <Plus />
+              Thêm <Plus />
             </Button>
           </div>
         </motion.form>
@@ -55,7 +55,7 @@ const AddTask = ({ column, setTasks }: AddTaskProps) => {
             layout
             onClick={() => setAdding(true)}
           >
-            Add Task <Plus />
+            Thêm công việc <Plus />
           </motion.button>
         </Button>
       )}

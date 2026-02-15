@@ -71,8 +71,8 @@ export default function UsersPage() {
             ...detail.profile,   // profile fields (fullName, contactPhone, etc.)
           };
           setSelectedUser(combined);
-        } catch (e) {
-          toast.error("Failed to load user details");
+        } catch (_) {
+          toast.error("Không thể tải chi tiết người dùng");
           // fall back to at least showing the row data
           setSelectedUser(user);
         } finally {
@@ -82,12 +82,12 @@ export default function UsersPage() {
     }
   });
 
-  if (error) return <div className="p-4 text-red-500">An error has occurred: {(error as Error).message}</div>;
+  if (error) return <div className="p-4 text-red-500">Đã xảy ra lỗi: {(error as Error).message}</div>;
 
   return (
     <Card className="bg-sidebar w-full min-h-full flex flex-col">
       <CardHeader>
-        <CardTitle>Manage Users Account</CardTitle>
+        <CardTitle>Quản lý tài khoản người dùng</CardTitle>
       </CardHeader>
       <ResponsiveDialog
         isOpen={isDetailOpen}
@@ -96,14 +96,14 @@ export default function UsersPage() {
       >
         {isDetailLoading && (
           <div className="py-4 text-center text-sm text-muted-foreground">
-            Loading user details...
+            Đang tải chi tiết người dùng...
           </div>
         )}
         {!isDetailLoading && selectedUser && (
           <div className="space-y-4 text-sm">
             <div className="space-y-2">
               <div>
-                <span className="font-semibold">Full Name: </span>
+                <span className="font-semibold">Họ và tên: </span>
                 <span>{selectedUser.fullName}</span>
               </div>
               <div>
@@ -111,31 +111,31 @@ export default function UsersPage() {
                 <span>{selectedUser.email}</span>
               </div>
               <div>
-                <span className="font-semibold">Role: </span>
+                <span className="font-semibold">Vai trò: </span>
                 <span>{selectedUser.role}</span>
               </div>
               <div>
-                <span className="font-semibold">Status: </span>
+                <span className="font-semibold">Trạng thái: </span>
                 <span>{selectedUser.status}</span>
               </div>
               <div>
-                <span className="font-semibold">Seller: </span>
-                <span>{selectedUser.isSeller ? "Yes" : "No"}</span>
+                <span className="font-semibold">Người bán: </span>
+                <span>{selectedUser.isSeller ? "Có" : "Không"}</span>
               </div>
               <div>
-                <span className="font-semibold">Contact Phone: </span>
+                <span className="font-semibold">Số điện thoại liên hệ: </span>
                 <span>{selectedUser.contactPhone}</span>
               </div>
               <div>
-                <span className="font-semibold">Contact Email: </span>
+                <span className="font-semibold">Email liên hệ: </span>
                 <span>{selectedUser.contactEmail}</span>
               </div>
               <div>
-                <span className="font-semibold">Gender: </span>
+                <span className="font-semibold">Giới tính: </span>
                 <span>{selectedUser.gender}</span>
               </div>
               <div>
-                <span className="font-semibold">Birthdate: </span>
+                <span className="font-semibold">Ngày sinh: </span>
                 <span>
                   {selectedUser.birthdate
                     ? new Date(selectedUser.birthdate).toLocaleDateString()
@@ -143,11 +143,11 @@ export default function UsersPage() {
                 </span>
               </div>
               <div>
-                <span className="font-semibold">Address: </span>
+                <span className="font-semibold">Địa chỉ: </span>
                 <span>{selectedUser.address}</span>
               </div>
               <div>
-                <span className="font-semibold">Bio: </span>
+                <span className="font-semibold">Tiểu sử: </span>
                 <span>{selectedUser.bio}</span>
               </div>
             </div>
@@ -162,22 +162,22 @@ export default function UsersPage() {
                     await api.patch(`/user/${selectedUser.id}/status`, {
                       status: newStatus,
                     });
-                    toast.success(`User status updated to ${newStatus}`);
+                    toast.success(`Trạng thái người dùng đã cập nhật thành ${newStatus}`);
                     setSelectedUser({ ...selectedUser, status: newStatus });
                     refetch();
-                  } catch (e) {
-                    toast.error("Failed to update status");
+                  } catch (_) {
+                    toast.error("Cập nhật trạng thái thất bại");
                   }
                 }}
               >
-                {selectedUser.status === "ACTIVE" ? "Ban User" : "Activate User"}
+                {selectedUser.status === "ACTIVE" ? "Cấm người dùng" : "Kích hoạt người dùng"}
               </Button>
             </div>
           </div>
         )}
       </ResponsiveDialog>
       {isPending ? (
-        <CardContent>Loading...</CardContent>
+        <CardContent>Đang tải...</CardContent>
       ) : (
         <>
           <CardContent className="flex-1">
