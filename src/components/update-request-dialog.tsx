@@ -108,7 +108,17 @@ export function UpdateRequestDialog({
             <div>
               <h4 className="mb-2 text-sm font-medium">Proposed Changes (JSON Payload)</h4>
               <pre className="bg-muted p-4 rounded-lg text-xs overflow-auto">
-                {JSON.stringify(request.payload, null, 2)}
+                {(() => {
+                  let payload = request.payload;
+                  try {
+                    if (typeof payload === 'string') {
+                      payload = JSON.parse(payload);
+                    }
+                  } catch (e) {
+                    // If parsing fails, use original payload
+                  }
+                  return JSON.stringify(payload, null, 2);
+                })()}
               </pre>
             </div>
           </div>
