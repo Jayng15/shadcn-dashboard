@@ -7,7 +7,7 @@ import {
   CardDescription,
 } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import DataTable from "@/pages/users/components/data-table"
 import {
@@ -28,12 +28,74 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { exactImageUrl } from "@/lib/utils"
+
+
 
 type WithdrawalFeePayload = {
   amount: number
   type: "FIXED" | "PERCENTAGE"
   description?: string
+}
+
+function AuthorizedImage({
+  url,
+  alt,
+  className,
+}: {
+  url: string
+  alt: string
+  className?: string
+}) {
+  const [src, setSrc] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    setLoading(true)
+    setError(false)
+    let active = true
+    let objectUrl: string | null = null
+
+    api
+      .get(url, { responseType: "blob" })
+      .then((res) => {
+        if (active) {
+          objectUrl = URL.createObjectURL(res.data)
+          setSrc(objectUrl)
+          setLoading(false)
+        }
+      })
+      .catch((err) => {
+        console.error(err)
+        if (active) {
+          setError(true)
+          setLoading(false)
+        }
+      })
+
+    return () => {
+      active = false
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [url])
+
+  if (loading) {
+    return (
+      <div className="flex h-60 w-full items-center justify-center rounded border bg-muted text-sm text-muted-foreground">
+        Loading image...
+      </div>
+    )
+  }
+
+  if (error || !src) {
+    return (
+      <div className="flex h-60 w-full items-center justify-center rounded border bg-muted text-sm text-muted-foreground">
+        Failed to load image
+      </div>
+    )
+  }
+
+  return <img src={src} alt={alt} className={className} />
 }
 
 export default function FinancePage() {
@@ -247,8 +309,8 @@ export default function FinancePage() {
             {selectedTx.txProofUrl && (
               <div className="space-y-2">
                 <div className="font-semibold">Proof Image</div>
-                <img
-                  src={exactImageUrl(selectedTx.txProofUrl)}
+                <AuthorizedImage
+                  url={`/finance/transactions/${selectedTx.id}/media/proof`}
                   alt="Transaction proof"
                   className="w-full max-h-60 object-contain rounded border"
                 />

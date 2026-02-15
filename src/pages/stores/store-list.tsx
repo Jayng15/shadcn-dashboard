@@ -2,11 +2,11 @@
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DataTable from "@/pages/users/components/data-table"; // Reuse generic table
@@ -26,6 +26,7 @@ import api from "@/lib/api";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { UpdateRequestDialog } from "@/components/update-request-dialog";
 
 type StoreDetail = Store & {
   description?: string;
@@ -64,18 +65,69 @@ export default function StoreListPage() {
   const [selectedStore, setSelectedStore] = useState<StoreDetail | null>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
 
-  // Fetch stores from our API
-  const { isPending, error, data, refetch } = useQuery({
+  // Update Request State
+  const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [tabFilter, setTabFilter] = useState("all");
+
+  // Fetch stores
+  const { isPending: isStorePending, error: storeError, data: storeData, refetch: refetchStores } = useQuery({
     queryKey: ["stores", sorting, columnFilters],
     queryFn: async () => {
-      // TODO: Map sorting/filters to API query params if backend supports it
-      const res = await api.get("/store?limit=100"); // Fetch 100 for now, client side pagination
+      const res = await api.get("/store?limit=100");
       return res.data;
     },
+    enabled: tabFilter !== "requests"
   });
 
+  // Fetch Update Requests
+  const { isPending: isRequestPending, data: requestData, refetch: refetchRequests } = useQuery({
+    queryKey: ["store-updates"],
+    queryFn: async () => {
+        const res = await api.get("/store/admin/updates?status=PENDING&targetType=STORE");
+        return res.data;
+    },
+    enabled: tabFilter === "requests"
+  });
+
+  const requestColumns = [
+    {
+      accessorKey: "id",
+      header: "Request ID",
+      cell: ({ row }: any) => <div className="font-medium">{row.getValue("id").substring(0, 8)}...</div>,
+    },
+    {
+      accessorKey: "targetId",
+      header: "Store ID",
+      cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("targetId")}</div>,
+    },
+    {
+        accessorKey: "createdAt",
+        header: "Requested At",
+        cell: ({ row }: any) => <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+    },
+    {
+      id: "actions",
+      cell: ({ row }: any) => {
+        return (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+                setSelectedRequest(row.original);
+                setIsRequestDialogOpen(true);
+            }}
+          >
+            Review
+          </Button>
+        )
+      },
+    },
+  ]
+
+
   const table = useReactTable({
-    data: data?.stores || [],
+    data: storeData?.stores || [],
     columns,
     state: {
       sorting,
@@ -88,7 +140,7 @@ export default function StoreListPage() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     meta: {
-      refetch: () => refetch(),
+      refetch: () => refetchStores(),
       openStoreDetail: async (store: Store) => {
         setIsDetailOpen(true);
         setIsDetailLoading(true);
@@ -112,10 +164,27 @@ export default function StoreListPage() {
     },
   });
 
-  if (error)
+  const requestTable = useReactTable({
+    data: requestData?.requests || [],
+    columns: requestColumns,
+    state: {
+      sorting,
+      columnFilters,
+    },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+  });
+
+  if (storeError)
+
+
     return (
       <div className="p-4 text-red-500">
-        An error has occurred: {(error as Error).message}
+        An error has occurred: {(storeError as Error).message}
       </div>
     );
 
@@ -237,7 +306,7 @@ export default function StoreListPage() {
                               }
                             : prev
                         );
-                        refetch();
+                        refetchStores();
                       } catch (e) {
                         toast.error("Verification failed");
                       } finally {
@@ -267,7 +336,7 @@ export default function StoreListPage() {
                               }
                             : prev
                         );
-                        refetch();
+                        refetchStores();
                       } catch (e) {
                         toast.error("Status update failed");
                       } finally {
@@ -301,7 +370,7 @@ export default function StoreListPage() {
                             }
                           : prev
                       );
-                      refetch();
+                      refetchStores();
                     } catch (e) {
                       toast.error("Status update failed");
                     } finally {
@@ -334,7 +403,7 @@ export default function StoreListPage() {
                             }
                           : prev
                       );
-                      refetch();
+                      refetchStores();
                     } catch (e) {
                       toast.error("Status update failed");
                     } finally {
@@ -349,20 +418,55 @@ export default function StoreListPage() {
           </div>
         )}
       </ResponsiveDialog>
-      {isPending ? (
-        <CardContent>Loading...</CardContent>
-      ) : (
-        <>
-          <CardContent className="flex-1">
-            {/* <DataTableToolBar table={table} /> */}
-            {/* Toolbar might need customization for specific filters, check compatibility */}
-            <DataTable table={table} columns={columns} />
-          </CardContent>
-          <CardFooter>
-            <DataTablePagination table={table} className="w-full" />
-          </CardFooter>
-        </>
-      )}
+        <UpdateRequestDialog
+            isOpen={isRequestDialogOpen}
+            setIsOpen={setIsRequestDialogOpen}
+            request={selectedRequest}
+            onSuccess={() => refetchRequests()}
+            type="STORE"
+        />
+
+      <div className="flex-1 p-0">
+         <Tabs defaultValue="all" onValueChange={setTabFilter} className="w-full h-full flex flex-col">
+            <div className="px-6 pt-4">
+                <TabsList>
+                    <TabsTrigger value="all">All Stores</TabsTrigger>
+                    <TabsTrigger value="requests">Update Requests</TabsTrigger>
+                </TabsList>
+            </div>
+
+            <TabsContent value="all" className="flex-1 flex flex-col p-6 pt-2">
+                {isStorePending ? (
+                    <CardContent>Loading...</CardContent>
+                ) : (
+                    <>
+                    <CardContent className="flex-1 p-0">
+                        <DataTable table={table} columns={columns} />
+                    </CardContent>
+                    <div className="mt-4">
+                         <DataTablePagination table={table} className="w-full" />
+                    </div>
+                    </>
+                )}
+            </TabsContent>
+
+             <TabsContent value="requests" className="flex-1 flex flex-col p-6 pt-2">
+                {isRequestPending ? (
+                     <CardContent>Loading Requests...</CardContent>
+                ) : (
+                    <>
+                         <CardContent className="flex-1 p-0">
+                            <DataTable table={requestTable} columns={requestColumns} />
+                        </CardContent>
+                         <div className="mt-4">
+                            <DataTablePagination table={requestTable} className="w-full" />
+                        </div>
+                    </>
+                )}
+            </TabsContent>
+        </Tabs>
+      </div>
+
     </Card>
   );
 }

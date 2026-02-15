@@ -26,13 +26,14 @@ import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { exactImageUrl } from "@/lib/utils";
+import { UpdateRequestDialog } from "@/components/update-request-dialog";
 
 type ProductDetail = Product;
 
 export default function ProductListPage() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [isDetailOpen, setIsDetailOpen] = useState(false);
   const [isDetailLoading, setIsDetailLoading] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductDetail | null>(
@@ -40,28 +41,36 @@ export default function ProductListPage() {
   );
   const [isVerifyLoading, setIsVerifyLoading] = useState(false);
 
-    // const queryClient = useQueryClient();
+  // Update Request State
+  const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
+  const [selectedRequest, setSelectedRequest] = useState<any>(null);
 
   const { isPending, error, data, refetch } = useQuery({
-    queryKey: ["products", sorting, columnFilters], // We might want to include statusFilter effectively if we used API filtering
+    queryKey: ["products", sorting, columnFilters],
     queryFn: async () => {
       const response = await api.get("/product?limit=100");
       return response.data;
     },
+    enabled: statusFilter !== "requests"
   });
 
-    // Filter data client-side for "Pending Verification" tab if needed,
-    // OR just rely on the table functionality.
-    // For "Pending", logic is usually isVerified == false AND status != REJECTED/CLOSED?
-    // User requested "Tabs for: All, Pending Verification".
+  // Fetch Update Requests
+  const { isPending: isRequestPending, data: requestData, refetch: refetchRequests } = useQuery({
+    queryKey: ["product-updates"],
+    queryFn: async () => {
+        const res = await api.get("/product/admin/updates?status=PENDING&targetType=PRODUCT");
+        return res.data;
+    },
+    enabled: statusFilter === "requests"
+  });
 
   const allProducts = data?.products || [];
   const pendingProducts = allProducts.filter(
     (p: any) => !p.isVerified && p.status !== "CLOSED"
-  ); // Simple logic
+  );
 
   const currentData =
-    statusFilter === "PENDING" ? pendingProducts : allProducts;
+    statusFilter === "pending" ? pendingProducts : allProducts;
 
   const table = useReactTable({
     data: currentData,
@@ -95,6 +104,56 @@ export default function ProductListPage() {
         }
       },
     },
+  });
+
+  const requestColumns = [
+    {
+      accessorKey: "id",
+      header: "Request ID",
+      cell: ({ row }: any) => <div className="font-medium">{row.getValue("id").substring(0, 8)}...</div>,
+    },
+    {
+      accessorKey: "targetId",
+      header: "Product ID",
+      cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("targetId")}</div>,
+    },
+    {
+        accessorKey: "createdAt",
+        header: "Requested At",
+        cell: ({ row }: any) => <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+    },
+    {
+      id: "actions",
+      cell: ({ row }: any) => {
+        return (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+                setSelectedRequest(row.original);
+                setIsRequestDialogOpen(true);
+            }}
+          >
+            Review
+          </Button>
+        )
+      },
+    },
+  ];
+
+  const requestTable = useReactTable({
+    data: requestData?.requests || [],
+    columns: requestColumns,
+    state: {
+      sorting,
+      columnFilters,
+    },
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
   });
 
   if (error)
@@ -226,17 +285,23 @@ export default function ProductListPage() {
           </div>
         )}
       </ResponsiveDialog>
+      <UpdateRequestDialog
+        isOpen={isRequestDialogOpen}
+        setIsOpen={setIsRequestDialogOpen}
+        request={selectedRequest}
+        onSuccess={() => refetchRequests()}
+        type="PRODUCT"
+      />
 
       <Tabs
         defaultValue="all"
         className="w-full"
-        onValueChange={(val) =>
-          setStatusFilter(val === "pending" ? "PENDING" : "ALL")
-        }
+        onValueChange={setStatusFilter}
       >
         <TabsList>
           <TabsTrigger value="all">All Products</TabsTrigger>
           <TabsTrigger value="pending">Pending Verification</TabsTrigger>
+          <TabsTrigger value="requests">Update Requests</TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="h-full">
@@ -271,6 +336,23 @@ export default function ProductListPage() {
               )}
             </CardFooter>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="requests" className="h-full">
+            <Card className="bg-sidebar w-full min-h-full flex flex-col">
+                <CardHeader>
+                    <CardTitle>Update Requests</CardTitle>
+                    <CardDescription>Review product update requests.</CardDescription>
+                </CardHeader>
+                <CardContent className="flex-1">
+                    {isRequestPending ? "Loading..." : <DataTable table={requestTable} columns={requestColumns} />}
+                </CardContent>
+                 <CardFooter>
+                  {!isRequestPending && (
+                    <DataTablePagination table={requestTable} className="w-full" />
+                  )}
+                </CardFooter>
+            </Card>
         </TabsContent>
       </Tabs>
     </div>
