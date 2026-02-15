@@ -107,19 +107,62 @@ export function UpdateRequestDialog({
 
             <div>
               <h4 className="mb-2 text-sm font-medium">Proposed Changes (JSON Payload)</h4>
-              <pre className="bg-muted p-4 rounded-lg text-xs overflow-auto">
-                {(() => {
-                  let payload = request.payload;
-                  try {
-                    if (typeof payload === 'string') {
-                      payload = JSON.parse(payload);
+                <div className="space-y-4">
+                  {(() => {
+                    let payload = request.payload;
+                    try {
+                      if (typeof payload === 'string') {
+                        // Handle double-stringified JSON if necessary, though simpler is often better
+                        // But here we suspect it might be a stringified object
+                        const parsed = JSON.parse(payload);
+                        // If parsing succeeded, use it
+                        payload = parsed;
+                      }
+                    } catch (e) {
+                      // fallback to original
                     }
-                  } catch (e) {
-                    // If parsing fails, use original payload
-                  }
-                  return JSON.stringify(payload, null, 2);
-                })()}
-              </pre>
+
+                    if (typeof payload !== 'object' || payload === null) {
+                        return <div className="text-sm">{String(payload)}</div>
+                    }
+
+                    const formatKey = (key: string) => {
+                      return key
+                        .replace(/([A-Z])/g, ' $1') // insert space before caps
+                        .replace(/^./, (str) => str.toUpperCase()); // capitalize first letter
+                    };
+
+                    const renderValue = (value: any): React.ReactNode => {
+                        if (typeof value === 'object' && value !== null) {
+                             return (
+                                <div className="pl-4 border-l-2 border-muted mt-1 space-y-2">
+                                    {Object.entries(value).map(([subKey, subValue]) => (
+                                        <div key={subKey}>
+                                            <span className="font-semibold text-xs text-muted-foreground">{formatKey(subKey)}:</span>
+                                            <div className="text-sm">{renderValue(subValue)}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                             )
+                        }
+                        if (String(value).match(/\.(jpeg|jpg|gif|png|webp)$/i) || (typeof value === 'string' && value.startsWith('/uploads'))) {
+                             return (
+                                 <img src={value as string} alt="Preview" className="w-24 h-24 object-cover rounded mt-1 border" />
+                             )
+                        }
+                        return <span className="ml-1">{String(value)}</span>
+                    };
+
+                    return Object.entries(payload).map(([key, value]) => (
+                      <div key={key} className="border-b pb-2 last:border-0">
+                        <span className="font-semibold text-sm">{formatKey(key)}</span>
+                        <div className="mt-1 text-sm text-foreground">
+                            {renderValue(value)}
+                        </div>
+                      </div>
+                    ));
+                  })()}
+                </div>
             </div>
           </div>
         </ScrollArea>
