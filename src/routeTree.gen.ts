@@ -21,6 +21,7 @@ const UsersLazyImport = createFileRoute('/users')()
 const TaskLazyImport = createFileRoute('/task')()
 const StoresLazyImport = createFileRoute('/stores')()
 const ProductsLazyImport = createFileRoute('/products')()
+const OrdersLazyImport = createFileRoute('/orders')()
 const InventoryLazyImport = createFileRoute('/inventory')()
 const FinanceLazyImport = createFileRoute('/finance')()
 const CalendarLazyImport = createFileRoute('/calendar')()
@@ -53,6 +54,12 @@ const ProductsLazyRoute = ProductsLazyImport.update({
   path: '/products',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/products.lazy').then((d) => d.Route))
+
+const OrdersLazyRoute = OrdersLazyImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/orders.lazy').then((d) => d.Route))
 
 const InventoryLazyRoute = InventoryLazyImport.update({
   id: '/inventory',
@@ -137,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InventoryLazyImport
       parentRoute: typeof rootRoute
     }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/products': {
       id: '/products'
       path: '/products'
@@ -214,6 +228,7 @@ export interface FileRoutesByFullPath {
   '/calendar': typeof CalendarLazyRoute
   '/finance': typeof FinanceLazyRoute
   '/inventory': typeof InventoryLazyRoute
+  '/orders': typeof OrdersLazyRoute
   '/products': typeof ProductsLazyRoute
   '/stores': typeof StoresLazyRouteWithChildren
   '/task': typeof TaskLazyRoute
@@ -228,6 +243,7 @@ export interface FileRoutesByTo {
   '/calendar': typeof CalendarLazyRoute
   '/finance': typeof FinanceLazyRoute
   '/inventory': typeof InventoryLazyRoute
+  '/orders': typeof OrdersLazyRoute
   '/products': typeof ProductsLazyRoute
   '/stores': typeof StoresLazyRouteWithChildren
   '/task': typeof TaskLazyRoute
@@ -243,6 +259,7 @@ export interface FileRoutesById {
   '/calendar': typeof CalendarLazyRoute
   '/finance': typeof FinanceLazyRoute
   '/inventory': typeof InventoryLazyRoute
+  '/orders': typeof OrdersLazyRoute
   '/products': typeof ProductsLazyRoute
   '/stores': typeof StoresLazyRouteWithChildren
   '/task': typeof TaskLazyRoute
@@ -259,6 +276,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/finance'
     | '/inventory'
+    | '/orders'
     | '/products'
     | '/stores'
     | '/task'
@@ -272,6 +290,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/finance'
     | '/inventory'
+    | '/orders'
     | '/products'
     | '/stores'
     | '/task'
@@ -285,6 +304,7 @@ export interface FileRouteTypes {
     | '/calendar'
     | '/finance'
     | '/inventory'
+    | '/orders'
     | '/products'
     | '/stores'
     | '/task'
@@ -300,6 +320,7 @@ export interface RootRouteChildren {
   CalendarLazyRoute: typeof CalendarLazyRoute
   FinanceLazyRoute: typeof FinanceLazyRoute
   InventoryLazyRoute: typeof InventoryLazyRoute
+  OrdersLazyRoute: typeof OrdersLazyRoute
   ProductsLazyRoute: typeof ProductsLazyRoute
   StoresLazyRoute: typeof StoresLazyRouteWithChildren
   TaskLazyRoute: typeof TaskLazyRoute
@@ -312,6 +333,7 @@ const rootRouteChildren: RootRouteChildren = {
   CalendarLazyRoute: CalendarLazyRoute,
   FinanceLazyRoute: FinanceLazyRoute,
   InventoryLazyRoute: InventoryLazyRoute,
+  OrdersLazyRoute: OrdersLazyRoute,
   ProductsLazyRoute: ProductsLazyRoute,
   StoresLazyRoute: StoresLazyRouteWithChildren,
   TaskLazyRoute: TaskLazyRoute,
@@ -333,6 +355,7 @@ export const routeTree = rootRoute
         "/calendar",
         "/finance",
         "/inventory",
+        "/orders",
         "/products",
         "/stores",
         "/task",
@@ -353,6 +376,9 @@ export const routeTree = rootRoute
     },
     "/inventory": {
       "filePath": "inventory.lazy.tsx"
+    },
+    "/orders": {
+      "filePath": "orders.lazy.tsx"
     },
     "/products": {
       "filePath": "products.lazy.tsx"

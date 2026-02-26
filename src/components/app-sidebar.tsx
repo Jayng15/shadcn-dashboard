@@ -6,6 +6,7 @@ import {
   Store,
   Command,
   Banknote,
+  Package,
 } from "lucide-react"
 import {
   Sidebar,
@@ -30,6 +31,11 @@ const items = [
     title: "Dashboard",
     url: "/",
     icon: Home,
+  },
+  {
+    title: "Orders",
+    url: "/orders",
+    icon: Package,
   },
   {
     title: "Users",
