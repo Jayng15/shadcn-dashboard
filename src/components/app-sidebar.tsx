@@ -7,6 +7,7 @@ import {
   Command,
   Banknote,
   Package,
+  Star,
 } from "lucide-react"
 import {
   Sidebar,
@@ -56,6 +57,11 @@ const items = [
     title: "Finance",
     url: "/finance",
     icon: Banknote,
+  },
+  {
+    title: "Idols",
+    url: "/idols",
+    icon: Star,
   },
 ]
 

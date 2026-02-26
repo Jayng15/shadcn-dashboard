@@ -62,3 +62,22 @@ export type Product = {
   paymentStatus: 'not_paid' | 'paid';
   orderTime: string;
 }
+
+export type Team = {
+  id: string;
+  name: string;
+  description: string | null;
+  thumbnailUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type Member = {
+  id: string;
+  teamId: string;
+  name: string;
+  description: string | null;
+  thumbnailUrl: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
