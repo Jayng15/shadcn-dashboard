@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Team } from "@/types"
 import { SafeImage } from "@/components/safe-image"
-import { Link } from "@tanstack/react-router"
 
 export const columns: ColumnDef<Team>[] = [
   {
@@ -64,8 +63,12 @@ export const columns: ColumnDef<Team>[] = [
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Hành động</DropdownMenuLabel>
-            <DropdownMenuItem asChild>
-                <Link to={`/idols/${team.id}` as any}>Quản lý thành viên</Link>
+            <DropdownMenuItem
+              onClick={() =>
+                (table.options.meta as unknown as { manageMembers: (team: Team) => void })?.manageMembers?.(team)
+              }
+            >
+              Quản lý thành viên
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>

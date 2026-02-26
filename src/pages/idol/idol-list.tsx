@@ -23,8 +23,10 @@ import { columns } from "./components/team-columns"
 import { TeamForm } from "./components/team-form"
 import { ResponsiveDialog } from "@/components/responsive-dialog"
 import { Team } from "@/types"
+import { useNavigate } from "@tanstack/react-router"
 
 export default function IdolListPage() {
+  const navigate = useNavigate()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
@@ -56,6 +58,10 @@ export default function IdolListPage() {
   const handleOpenDelete = (team: Team) => {
     setTeamToDelete(team)
     setIsDeleteOpen(true)
+  }
+
+  const handleManageMembers = (team: Team) => {
+    navigate({ to: "/idols/$teamId" as any, params: { teamId: team.id } as any })
   }
 
   const handleDelete = async () => {
@@ -110,6 +116,7 @@ export default function IdolListPage() {
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     meta: {
+      manageMembers: handleManageMembers,
       editTeam: handleOpenEdit,
       deleteTeam: handleOpenDelete,
     },
