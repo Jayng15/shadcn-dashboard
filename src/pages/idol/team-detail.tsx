@@ -42,7 +42,7 @@ export default function TeamDetailPage() {
   const { data: teamsData } = useQuery({
     queryKey: ["admin-teams"],
     queryFn: async () => {
-      const res = await api.get("/teams")
+      const res = await api.get("/idol/teams")
       return res.data
     },
   })
@@ -51,7 +51,7 @@ export default function TeamDetailPage() {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["admin-team-members", teamId, sorting, columnFilters],
     queryFn: async () => {
-      const res = await api.get(`/teams/${teamId}/members`)
+      const res = await api.get(`/idol/teams/${teamId}/members`)
       return res.data
     },
   })
@@ -75,7 +75,7 @@ export default function TeamDetailPage() {
     if (!memberToDelete) return
     try {
       setIsSubmitting(true)
-      await api.delete(`/members/${memberToDelete.id}`)
+      await api.delete(`/idol/members/${memberToDelete.id}`)
       toast.success("Xóa thành viên thành công")
       setIsDeleteOpen(false)
       refetch()
@@ -90,12 +90,12 @@ export default function TeamDetailPage() {
     try {
       setIsSubmitting(true)
       if (selectedMember) {
-        await api.put(`/members/${selectedMember.id}`, formData, {
+        await api.put(`/idol/members/${selectedMember.id}`, formData, {
            headers: { "Content-Type": "multipart/form-data" }
         })
         toast.success("Cập nhật thành viên thành công")
       } else {
-        await api.post("/members", formData, {
+        await api.post("/idol/members", formData, {
            headers: { "Content-Type": "multipart/form-data" }
         })
         toast.success("Thêm thành viên thành công")

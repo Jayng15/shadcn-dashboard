@@ -38,7 +38,7 @@ export default function IdolListPage() {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["admin-teams", sorting, columnFilters],
     queryFn: async () => {
-      const res = await api.get("/teams")
+      const res = await api.get("/idol/teams")
       return res.data
     },
   })
@@ -62,7 +62,7 @@ export default function IdolListPage() {
     if (!teamToDelete) return
     try {
       setIsSubmitting(true)
-      await api.delete(`/teams/${teamToDelete.id}`)
+      await api.delete(`/idol/teams/${teamToDelete.id}`)
       toast.success("Xóa nhóm thành công")
       setIsDeleteOpen(false)
       refetch()
@@ -77,12 +77,12 @@ export default function IdolListPage() {
     try {
       setIsSubmitting(true)
       if (selectedTeam) {
-        await api.put(`/teams/${selectedTeam.id}`, formData, {
+        await api.put(`/idol/teams/${selectedTeam.id}`, formData, {
            headers: { "Content-Type": "multipart/form-data" }
         })
         toast.success("Cập nhật nhóm thành công")
       } else {
-        await api.post("/teams", formData, {
+        await api.post("/idol/teams", formData, {
            headers: { "Content-Type": "multipart/form-data" }
         })
         toast.success("Tạo nhóm thành công")
