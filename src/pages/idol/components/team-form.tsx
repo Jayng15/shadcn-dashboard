@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Team } from "@/types"
+import { exactImageUrl } from "@/lib/utils"
 
 const formSchema = z.object({
   name: z.string().min(1, "Vui lòng nhập tên nhóm"),
@@ -110,7 +111,7 @@ export function TeamForm({ initialData, onSubmit, isLoading }: TeamFormProps) {
                     </FormControl>
                     {initialData?.thumbnailUrl && !file && (
                         <div className="mt-2 text-sm text-muted-foreground flex items-center gap-2">
-                             Đã có ảnh: <img src={initialData.thumbnailUrl} alt="current" className="h-8 w-8 object-cover rounded" />
+                             Đã có ảnh: <img src={exactImageUrl(initialData.thumbnailUrl)} alt="current" className="h-8 w-8 object-cover rounded" />
                         </div>
                     )}
                 </FormItem>

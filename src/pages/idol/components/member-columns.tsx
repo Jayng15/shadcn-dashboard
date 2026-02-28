@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Member } from "@/types"
 import { SafeImage } from "@/components/safe-image"
+import { exactImageUrl } from "@/lib/utils"
 
 export const columns: ColumnDef<Member>[] = [
   {
@@ -20,8 +21,9 @@ export const columns: ColumnDef<Member>[] = [
       return (
         <div className="h-10 w-10 overflow-hidden rounded-md border">
           {url ? (
-             <SafeImage src={url} alt="thumbnail" className="h-full w-full object-cover" />
+             <SafeImage src={exactImageUrl(url)} alt="thumbnail" className="h-full w-full object-cover" />
           ) : (
+
              <div className="h-full w-full bg-slate-100 flex items-center justify-center text-xs text-muted-foreground">N/A</div>
           )}
         </div>

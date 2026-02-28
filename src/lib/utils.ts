@@ -79,12 +79,15 @@ export function generateProductNumber(): string {
   const minutes = String(now.getMinutes()).padStart(2, '0');
   const seconds = String(now.getSeconds()).padStart(2, '0');
   const milliseconds = String(now.getMilliseconds()).padStart(2, '0').slice(0, 2);
-  
+
   return `${day}${month}${year}-${hours}${minutes}${seconds}${milliseconds}`;
 }
 
 const BASE_URL = 'https://lovaselcard.tgndigital.vn';
 
 export const exactImageUrl = (url: string) => {
-  return `${BASE_URL}${url}`;
+  if (!url) return "";
+  // If the url starts with /api/uploads, strip the /api part
+  const neutralizedUrl = url.startsWith('/api/') ? url.replace('/api', '') : url;
+  return `${BASE_URL}${neutralizedUrl}`;
 }

@@ -11,6 +11,7 @@ import {
 import { Team } from "@/types"
 import { SafeImage } from "@/components/safe-image"
 import { Link } from "@tanstack/react-router"
+import { exactImageUrl } from "@/lib/utils"
 
 export const columns: ColumnDef<Team>[] = [
   {
@@ -21,8 +22,9 @@ export const columns: ColumnDef<Team>[] = [
       return (
         <div className="h-10 w-10 overflow-hidden rounded-md border">
           {url ? (
-             <SafeImage src={url} alt="thumbnail" className="h-full w-full object-cover" />
+             <SafeImage src={exactImageUrl(url)} alt="thumbnail" className="h-full w-full object-cover" />
           ) : (
+
              <div className="h-full w-full bg-slate-100 flex items-center justify-center text-xs text-muted-foreground">N/A</div>
           )}
         </div>
@@ -69,9 +71,10 @@ export const columns: ColumnDef<Team>[] = [
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                (table.options.meta as unknown as { editTeam: (team: Team) => void })?.editTeam?.(team)
+                (table.options.meta as { editTeam: (team: Team) => void })?.editTeam?.(team)
               }
             >
+
               Chỉnh sửa
             </DropdownMenuItem>
             <DropdownMenuItem
