@@ -27,6 +27,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { exactImageUrl } from "@/lib/utils";
 import { UpdateRequestDialog } from "@/components/update-request-dialog";
+import { Input } from "@/components/ui/input";
+import { Search, X } from "lucide-react";
 
 type ProductDetail = Product;
 
@@ -309,6 +311,23 @@ export default function ProductListPage() {
             <CardHeader>
               <CardTitle>Tất cả sản phẩm</CardTitle>
               <CardDescription>Quản lý tất cả sản phẩm.</CardDescription>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm tên sản phẩm..."
+                    className="pl-8"
+                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                {table.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                    <X className="h-4 w-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="flex-1">
               {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
@@ -326,6 +345,23 @@ export default function ProductListPage() {
             <CardHeader>
               <CardTitle>Sản phẩm chờ duyệt</CardTitle>
               <CardDescription>Sản phẩm cần xác minh.</CardDescription>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm tên sản phẩm..."
+                    className="pl-8"
+                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                {table.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                    <X className="h-4 w-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="flex-1">
               {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}

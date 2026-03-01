@@ -23,6 +23,9 @@ import DataTablePagination from "@/pages/users/components/data-table-pagination"
 import api from "@/lib/api"
 import { ResponsiveDialog } from "@/components/responsive-dialog"
 import { type Order, columns } from "./components/columns"
+import { Input } from "@/components/ui/input"
+import { Search, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export default function OrderPage() {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -235,6 +238,32 @@ export default function OrderPage() {
             <CardHeader>
               <CardTitle>Danh sách đơn hàng</CardTitle>
               <CardDescription>Quản lý tất cả đơn hàng trên hệ thống.</CardDescription>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm mã đơn hàng..."
+                    className="pl-8"
+                    value={(table.getColumn("orderCode")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("orderCode")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm tên khách hàng..."
+                    className="pl-8"
+                    value={(table.getColumn("customerFullName")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("customerFullName")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                {table.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                    <X className="h-4 w-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="flex-1">
               {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}

@@ -28,6 +28,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
+import { Search, X } from "lucide-react"
 
 
 
@@ -398,6 +399,32 @@ export default function FinancePage() {
             <CardHeader>
               <CardTitle>Tất cả giao dịch</CardTitle>
               <CardDescription>Tổng quan về tất cả các giao dịch tài chính.</CardDescription>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm mã giao dịch..."
+                    className="pl-8"
+                    value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm User ID..."
+                    className="pl-8"
+                    value={(table.getColumn("userId")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("userId")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                {table.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                    <X className="h-4 w-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="flex-1">
               {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
@@ -415,6 +442,23 @@ export default function FinancePage() {
             <CardHeader>
               <CardTitle>Nạp tiền</CardTitle>
               <CardDescription>Chỉ các giao dịch nạp tiền.</CardDescription>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm mã giao dịch..."
+                    className="pl-8"
+                    value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                {table.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                    <X className="h-4 w-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="flex-1">
               {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
@@ -432,6 +476,23 @@ export default function FinancePage() {
             <CardHeader>
               <CardTitle>Rút tiền</CardTitle>
               <CardDescription>Chỉ các giao dịch rút tiền.</CardDescription>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm mã giao dịch..."
+                    className="pl-8"
+                    value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                {table.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                    <X className="h-4 w-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="flex-1">
               {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
@@ -449,6 +510,23 @@ export default function FinancePage() {
             <CardHeader>
               <CardTitle>Giao dịch chờ xử lý</CardTitle>
               <CardDescription>Các giao dịch đang chờ xác minh.</CardDescription>
+              <div className="flex items-center gap-2 pt-1">
+                <div className="relative flex-1 max-w-sm">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    placeholder="Tìm mã giao dịch..."
+                    className="pl-8"
+                    value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
+                  />
+                </div>
+                {table.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                    <X className="h-4 w-4 mr-1" />
+                    Xóa bộ lọc
+                  </Button>
+                )}
+              </div>
             </CardHeader>
             <CardContent className="flex-1">
               {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}

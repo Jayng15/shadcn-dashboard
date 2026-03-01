@@ -28,7 +28,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UpdateRequestDialog } from "@/components/update-request-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Star, AlertTriangle, X } from "lucide-react";
+import { Star, AlertTriangle, X, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 type StoreDetail = Store & {
   description?: string;
@@ -660,6 +661,23 @@ export default function StoreListPage() {
                     <CardContent>Đang tải...</CardContent>
                 ) : (
                     <>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="relative flex-1 max-w-sm">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          placeholder="Tìm tên cửa hàng..."
+                          className="pl-8"
+                          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                          onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                        />
+                      </div>
+                      {table.getState().columnFilters.length > 0 && (
+                        <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                          <X className="h-4 w-4 mr-1" />
+                          Xóa bộ lọc
+                        </Button>
+                      )}
+                    </div>
                     <CardContent className="flex-1 p-0">
                         <DataTable table={table} columns={columns} />
                     </CardContent>
