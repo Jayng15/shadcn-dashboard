@@ -160,6 +160,20 @@ export const columns: ColumnDef<Store>[] = [
             >
               View Details
             </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                (meta as any)?.openStoreReviews?.(store)
+              }
+            >
+              Xem đánh giá
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() =>
+                (meta as any)?.openStoreReports?.(store)
+              }
+            >
+              Xem báo cáo
+            </DropdownMenuItem>
 
             {/* Admin Actions */}
             <DropdownMenuSeparator />

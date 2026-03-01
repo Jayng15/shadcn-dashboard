@@ -27,6 +27,8 @@ import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UpdateRequestDialog } from "@/components/update-request-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Star, AlertTriangle, X } from "lucide-react";
 
 type StoreDetail = Store & {
   description?: string;
@@ -70,6 +72,12 @@ export default function StoreListPage() {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [tabFilter, setTabFilter] = useState("all");
 
+  // Reviews & Reports State
+  const [selectedStoreForReviews, setSelectedStoreForReviews] = useState<Store | null>(null);
+  const [selectedStoreForReports, setSelectedStoreForReports] = useState<Store | null>(null);
+  const [isInvalidatingReview, setIsInvalidatingReview] = useState<string | null>(null);
+  const [isInvalidatingReport, setIsInvalidatingReport] = useState<string | null>(null);
+
   // Fetch stores
   const { isPending: isStorePending, error: storeError, data: storeData, refetch: refetchStores } = useQuery({
     queryKey: ["stores", sorting, columnFilters],
@@ -88,6 +96,26 @@ export default function StoreListPage() {
         return res.data;
     },
     enabled: tabFilter === "requests"
+  });
+
+  // Fetch Reviews for selected store
+  const { isPending: isReviewsPending, data: reviewsData, refetch: refetchReviews } = useQuery({
+    queryKey: ["store-reviews", selectedStoreForReviews?.id],
+    queryFn: async () => {
+      const res = await api.get(`/store/${selectedStoreForReviews!.id}/reviews?limit=100`);
+      return res.data;
+    },
+    enabled: tabFilter === "reviews" && !!selectedStoreForReviews,
+  });
+
+  // Fetch Reports for selected store
+  const { isPending: isReportsPending, data: reportsData, refetch: refetchReports } = useQuery({
+    queryKey: ["store-reports", selectedStoreForReports?.id],
+    queryFn: async () => {
+      const res = await api.get(`/store/${selectedStoreForReports!.id}/reports?limit=100`);
+      return res.data;
+    },
+    enabled: tabFilter === "reports" && !!selectedStoreForReports,
   });
 
   const requestColumns = [
@@ -125,6 +153,160 @@ export default function StoreListPage() {
     },
   ]
 
+  const reviewColumns = [
+    {
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("id").substring(0, 10)}...</div>,
+    },
+    {
+      accessorKey: "userId",
+      header: "User ID",
+      cell: ({ row }: any) => <div className="font-mono text-xs truncate max-w-[100px]" title={row.getValue("userId")}>{row.getValue("userId")}</div>,
+    },
+    {
+      accessorKey: "rating",
+      header: "Đánh giá",
+      cell: ({ row }: any) => {
+        const rating = row.getValue("rating") as number;
+        return (
+          <div className="flex items-center gap-1">
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <span>{rating}</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "description",
+      header: "Nội dung",
+      cell: ({ row }: any) => (
+        <div className="max-w-[200px] truncate" title={row.getValue("description")}>
+          {row.getValue("description") || <span className="text-muted-foreground italic">Không có</span>}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Thời gian",
+      cell: ({ row }: any) => <div className="text-xs">{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+    },
+    {
+      accessorKey: "deletedAt",
+      header: "Trạng thái",
+      cell: ({ row }: any) => {
+        const deletedAt = row.getValue("deletedAt");
+        return deletedAt
+          ? <Badge variant="destructive" className="text-xs">Đã vô hiệu</Badge>
+          : <Badge variant="outline" className="text-xs text-green-600 border-green-500">Hiển thị</Badge>;
+      },
+    },
+    {
+      id: "actions",
+      header: "Hành động",
+      cell: ({ row }: any) => {
+        const review = row.original;
+        if (review.deletedAt) return null;
+        return (
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={isInvalidatingReview === review.id}
+            onClick={async () => {
+              setIsInvalidatingReview(review.id);
+              try {
+                await api.post(`/store/admin/reviews/${review.id}/invalidate`);
+                toast.success("Đã vô hiệu hóa đánh giá");
+                refetchReviews();
+              } catch {
+                toast.error("Vô hiệu hóa thất bại");
+              } finally {
+                setIsInvalidatingReview(null);
+              }
+            }}
+          >
+            Vô hiệu hóa
+          </Button>
+        );
+      },
+    },
+  ];
+
+  const reportColumns = [
+    {
+      accessorKey: "id",
+      header: "ID",
+      cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("id").substring(0, 10)}...</div>,
+    },
+    {
+      accessorKey: "userId",
+      header: "User ID",
+      cell: ({ row }: any) => <div className="font-mono text-xs truncate max-w-[100px]" title={row.getValue("userId")}>{row.getValue("userId")}</div>,
+    },
+    {
+      accessorKey: "title",
+      header: "Tiêu đề",
+      cell: ({ row }: any) => (
+        <div className="max-w-[150px] truncate font-medium" title={row.getValue("title")}>
+          {row.getValue("title")}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "description",
+      header: "Mô tả",
+      cell: ({ row }: any) => (
+        <div className="max-w-[200px] truncate" title={row.getValue("description")}>
+          {row.getValue("description") || <span className="text-muted-foreground italic">Không có</span>}
+        </div>
+      ),
+    },
+    {
+      accessorKey: "createdAt",
+      header: "Thời gian",
+      cell: ({ row }: any) => <div className="text-xs">{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+    },
+    {
+      accessorKey: "deletedAt",
+      header: "Trạng thái",
+      cell: ({ row }: any) => {
+        const deletedAt = row.getValue("deletedAt");
+        return deletedAt
+          ? <Badge variant="destructive" className="text-xs">Đã vô hiệu</Badge>
+          : <Badge variant="outline" className="text-xs text-orange-600 border-orange-500">Đang mở</Badge>;
+      },
+    },
+    {
+      id: "actions",
+      header: "Hành động",
+      cell: ({ row }: any) => {
+        const report = row.original;
+        if (report.deletedAt) return null;
+        return (
+          <Button
+            variant="destructive"
+            size="sm"
+            disabled={isInvalidatingReport === report.id}
+            onClick={async () => {
+              setIsInvalidatingReport(report.id);
+              try {
+                await api.post(`/store/admin/reports/${report.id}/invalidate`);
+                toast.success("Đã vô hiệu hóa báo cáo");
+                refetchReports();
+              } catch {
+                toast.error("Vô hiệu hóa thất bại");
+              } finally {
+                setIsInvalidatingReport(null);
+              }
+            }}
+          >
+            Vô hiệu hóa
+          </Button>
+        );
+      },
+    },
+  ];
+
 
   const table = useReactTable({
     data: storeData?.stores || [],
@@ -161,6 +343,14 @@ export default function StoreListPage() {
           setIsDetailLoading(false);
         }
       },
+      openStoreReviews: (store: Store) => {
+        setSelectedStoreForReviews(store);
+        setTabFilter("reviews");
+      },
+      openStoreReports: (store: Store) => {
+        setSelectedStoreForReports(store);
+        setTabFilter("reports");
+      },
     },
   });
 
@@ -173,6 +363,24 @@ export default function StoreListPage() {
     },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+  });
+
+  const reviewTable = useReactTable({
+    data: reviewsData?.reviews || [],
+    columns: reviewColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+  });
+
+  const reportTable = useReactTable({
+    data: reportsData?.reports || [],
+    columns: reportColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -427,11 +635,23 @@ export default function StoreListPage() {
         />
 
       <div className="flex-1 p-0">
-         <Tabs defaultValue="all" onValueChange={setTabFilter} className="w-full h-full flex flex-col">
+         <Tabs value={tabFilter} onValueChange={setTabFilter} className="w-full h-full flex flex-col">
             <div className="px-6 pt-4">
                 <TabsList>
                     <TabsTrigger value="all">Tất cả cửa hàng</TabsTrigger>
                     <TabsTrigger value="requests">Yêu cầu cập nhật</TabsTrigger>
+                    <TabsTrigger value="reviews">
+                      Đánh giá
+                      {selectedStoreForReviews && (
+                        <span className="ml-1 text-xs text-muted-foreground">({selectedStoreForReviews.name})</span>
+                      )}
+                    </TabsTrigger>
+                    <TabsTrigger value="reports">
+                      Báo cáo
+                      {selectedStoreForReports && (
+                        <span className="ml-1 text-xs text-muted-foreground">({selectedStoreForReports.name})</span>
+                      )}
+                    </TabsTrigger>
                 </TabsList>
             </div>
 
@@ -463,6 +683,74 @@ export default function StoreListPage() {
                         </div>
                     </>
                 )}
+            </TabsContent>
+
+            <TabsContent value="reviews" className="flex-1 flex flex-col p-6 pt-2">
+              {!selectedStoreForReviews ? (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
+                  <Star className="h-8 w-8 opacity-30" />
+                  <p className="text-sm">Chọn một cửa hàng từ tab "Tất cả cửa hàng" để xem đánh giá.</p>
+                  <Button variant="outline" size="sm" onClick={() => setTabFilter("all")}>Quay lại danh sách</Button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-sm font-medium">Đánh giá cửa hàng: <span className="text-primary">{selectedStoreForReviews.name}</span></p>
+                      <p className="text-xs text-muted-foreground">ID: {selectedStoreForReviews.id}</p>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => { setSelectedStoreForReviews(null); setTabFilter("all"); }}>
+                      <X className="h-4 w-4 mr-1" /> Đóng
+                    </Button>
+                  </div>
+                  {isReviewsPending ? (
+                    <CardContent>Đang tải đánh giá...</CardContent>
+                  ) : (
+                    <>
+                      <CardContent className="flex-1 p-0">
+                        <DataTable table={reviewTable} columns={reviewColumns} />
+                      </CardContent>
+                      <div className="mt-4">
+                        <DataTablePagination table={reviewTable} className="w-full" />
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
+            </TabsContent>
+
+            <TabsContent value="reports" className="flex-1 flex flex-col p-6 pt-2">
+              {!selectedStoreForReports ? (
+                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
+                  <AlertTriangle className="h-8 w-8 opacity-30" />
+                  <p className="text-sm">Chọn một cửa hàng từ tab "Tất cả cửa hàng" để xem báo cáo.</p>
+                  <Button variant="outline" size="sm" onClick={() => setTabFilter("all")}>Quay lại danh sách</Button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className="text-sm font-medium">Báo cáo cửa hàng: <span className="text-primary">{selectedStoreForReports.name}</span></p>
+                      <p className="text-xs text-muted-foreground">ID: {selectedStoreForReports.id}</p>
+                    </div>
+                    <Button variant="ghost" size="sm" onClick={() => { setSelectedStoreForReports(null); setTabFilter("all"); }}>
+                      <X className="h-4 w-4 mr-1" /> Đóng
+                    </Button>
+                  </div>
+                  {isReportsPending ? (
+                    <CardContent>Đang tải báo cáo...</CardContent>
+                  ) : (
+                    <>
+                      <CardContent className="flex-1 p-0">
+                        <DataTable table={reportTable} columns={reportColumns} />
+                      </CardContent>
+                      <div className="mt-4">
+                        <DataTablePagination table={reportTable} className="w-full" />
+                      </div>
+                    </>
+                  )}
+                </>
+              )}
             </TabsContent>
         </Tabs>
       </div>
