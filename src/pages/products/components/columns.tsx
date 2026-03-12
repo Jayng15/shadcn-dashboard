@@ -70,7 +70,14 @@ export const columns: ColumnDef<Product>[] = [
       accessorKey: "price",
       header: "Price",
       cell: ({ row }) => {
-          return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: row.original.currency }).format(Number(row.original.price));
+          try {
+              return new Intl.NumberFormat('vi-VN', {
+                  style: 'currency',
+                  currency: row.original.currency || 'VND'
+              }).format(Number(row.original.price) || 0);
+          } catch {
+              return `${row.original.price || 0} ${row.original.currency || ''}`;
+          }
       }
   },
   {

@@ -85,8 +85,8 @@ export function generateProductNumber(): string {
 
 const BASE_URL = 'https://lovaselcard.tgndigital.vn';
 
-export const exactImageUrl = (url: string) => {
-  if (!url) return "";
+export const exactImageUrl = (url: string | null | undefined) => {
+  if (!url || typeof url !== 'string') return "";
   // If the url starts with /api/uploads, strip the /api part
   const neutralizedUrl = url.startsWith('/api/') ? url.replace('/api', '') : url;
   return `${BASE_URL}${neutralizedUrl}`;

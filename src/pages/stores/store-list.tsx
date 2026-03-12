@@ -7,7 +7,7 @@ import {
 } from "@/components/ui/card";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DataTable from "@/pages/users/components/data-table"; // Reuse generic table
 import { columns, type Store } from "./components/columns";
@@ -28,8 +28,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UpdateRequestDialog } from "@/components/update-request-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Star, AlertTriangle, X, Search } from "lucide-react";
+import { Star, X, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { exactImageUrl } from "@/lib/utils";
 
 type StoreDetail = Store & {
   description?: string;
@@ -70,7 +71,7 @@ export default function StoreListPage() {
 
   // Update Request State
   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
   const [tabFilter, setTabFilter] = useState("all");
 
   // Reviews & Reports State
@@ -99,31 +100,45 @@ export default function StoreListPage() {
     enabled: tabFilter === "requests"
   });
 
-  // Fetch Reviews for selected store
+  // Fetch Reviews
   const { isPending: isReviewsPending, data: reviewsData, refetch: refetchReviews } = useQuery({
     queryKey: ["store-reviews", selectedStoreForReviews?.id],
     queryFn: async () => {
-      const res = await api.get(`/store/${selectedStoreForReviews!.id}/reviews?limit=100`);
+      const endpoint = selectedStoreForReviews
+        ? `/store/${selectedStoreForReviews.id}/reviews?limit=100`
+        : `/store/admin/all-reviews?limit=100`;
+      const res = await api.get(endpoint);
       return res.data;
     },
-    enabled: tabFilter === "reviews" && !!selectedStoreForReviews,
+    enabled: tabFilter === "reviews",
   });
 
-  // Fetch Reports for selected store
+  // Fetch Reports
   const { isPending: isReportsPending, data: reportsData, refetch: refetchReports } = useQuery({
     queryKey: ["store-reports", selectedStoreForReports?.id],
     queryFn: async () => {
-      const res = await api.get(`/store/${selectedStoreForReports!.id}/reports?limit=100`);
+      const endpoint = selectedStoreForReports
+        ? `/store/${selectedStoreForReports.id}/reports?limit=100`
+        : `/store/admin/all-reports?limit=100`;
+      const res = await api.get(endpoint);
       return res.data;
     },
-    enabled: tabFilter === "reports" && !!selectedStoreForReports,
+    enabled: tabFilter === "reports",
   });
 
-  const requestColumns = [
+  const stores = useMemo(() => storeData?.stores || [], [storeData]);
+  const requests = useMemo(() => requestData?.requests || [], [requestData]);
+  const reviews = useMemo(() => reviewsData?.reviews || [], [reviewsData]);
+  const reports = useMemo(() => reportsData?.reports || [], [reportsData]);
+
+  const requestColumns = useMemo(() => [
     {
       accessorKey: "id",
       header: "ID Yêu cầu",
-      cell: ({ row }: any) => <div className="font-medium">{row.getValue("id").substring(0, 8)}...</div>,
+      cell: ({ row }: any) => {
+        const id = row.getValue("id") as string;
+        return <div className="font-medium">{id ? `${id.substring(0, 8)}...` : "N/A"}</div>;
+      },
     },
     {
       accessorKey: "targetId",
@@ -133,11 +148,19 @@ export default function StoreListPage() {
     {
         accessorKey: "createdAt",
         header: "Yêu cầu lúc",
-        cell: ({ row }: any) => <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+        cell: ({ row }: any) => {
+          const date = row.getValue("createdAt");
+          if (!date) return <div>-</div>;
+          try {
+            return <div>{new Date(date).toLocaleString()}</div>;
+          } catch {
+            return <div>-</div>;
+          }
+        },
     },
     {
       id: "actions",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: any }) => {
         return (
           <Button
             variant="outline"
@@ -152,51 +175,87 @@ export default function StoreListPage() {
         )
       },
     },
-  ]
+  ], []);
 
-  const reviewColumns = [
+  const reviewColumns = useMemo(() => [
     {
-      accessorKey: "id",
+      accessorKey: "review.id",
       header: "ID",
-      cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("id").substring(0, 10)}...</div>,
-    },
-    {
-      accessorKey: "userId",
-      header: "User ID",
-      cell: ({ row }: any) => <div className="font-mono text-xs truncate max-w-[100px]" title={row.getValue("userId")}>{row.getValue("userId")}</div>,
-    },
-    {
-      accessorKey: "rating",
-      header: "Đánh giá",
       cell: ({ row }: any) => {
-        const rating = row.getValue("rating") as number;
+        const id = row.original.review?.id;
+        return <div className="font-mono text-xs">{id ? `${id.substring(0, 10)}...` : "N/A"}</div>;
+      },
+    },
+    {
+      accessorKey: "reviewer.fullName",
+      header: "Người đánh giá",
+      cell: ({ row }: any) => {
+        const reviewer = row.original.reviewer;
         return (
-          <div className="flex items-center gap-1">
-            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
-            <span>{rating}</span>
+          <div className="flex items-center gap-2">
+            {reviewer?.avatarUrl && (
+              <img src={exactImageUrl(reviewer.avatarUrl)} className="h-6 w-6 rounded-full object-cover" alt="" />
+            )}
+            <span className="text-xs font-medium">{reviewer?.fullName || "Ẩn danh"}</span>
           </div>
         );
       },
     },
     {
-      accessorKey: "description",
+      accessorKey: "product.name",
+      header: "Sản phẩm",
+      cell: ({ row }: any) => {
+        const product = row.original.product;
+        return (
+          <div className="max-w-[150px] truncate text-xs" title={product?.name}>
+            {product?.name || <span className="text-muted-foreground italic">N/A</span>}
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "review.rating",
+      header: "Đánh giá",
+      cell: ({ row }: any) => {
+        const rating = row.original.review?.rating;
+        return (
+          <div className="flex items-center gap-1">
+            <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+            <span>{rating ?? 0}</span>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: "review.description",
       header: "Nội dung",
-      cell: ({ row }: any) => (
-        <div className="max-w-[200px] truncate" title={row.getValue("description")}>
-          {row.getValue("description") || <span className="text-muted-foreground italic">Không có</span>}
-        </div>
-      ),
+      cell: ({ row }: any) => {
+        const description = row.original.review?.description;
+        return (
+          <div className="max-w-[150px] truncate" title={description}>
+            {description || <span className="text-muted-foreground italic">Không có</span>}
+          </div>
+        );
+      },
     },
     {
-      accessorKey: "createdAt",
+      accessorKey: "review.createdAt",
       header: "Thời gian",
-      cell: ({ row }: any) => <div className="text-xs">{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+      cell: ({ row }: any) => {
+        const date = row.original.review?.createdAt;
+        if (!date) return <div className="text-xs">-</div>;
+        try {
+          return <div className="text-xs">{new Date(date).toLocaleString()}</div>;
+        } catch {
+          return <div className="text-xs">-</div>;
+        }
+      },
     },
     {
-      accessorKey: "deletedAt",
+      accessorKey: "review.deletedAt",
       header: "Trạng thái",
       cell: ({ row }: any) => {
-        const deletedAt = row.getValue("deletedAt");
+        const deletedAt = row.original.review?.deletedAt;
         return deletedAt
           ? <Badge variant="destructive" className="text-xs">Đã vô hiệu</Badge>
           : <Badge variant="outline" className="text-xs text-green-600 border-green-500">Hiển thị</Badge>;
@@ -206,17 +265,18 @@ export default function StoreListPage() {
       id: "actions",
       header: "Hành động",
       cell: ({ row }: any) => {
-        const review = row.original;
-        if (review.deletedAt) return null;
+        const review = row.original.review;
+        if (!review || review.deletedAt) return null;
         return (
           <Button
             variant="destructive"
             size="sm"
             disabled={isInvalidatingReview === review.id}
             onClick={async () => {
-              setIsInvalidatingReview(review.id);
+              const reviewId = review.id;
+              setIsInvalidatingReview(reviewId);
               try {
-                await api.post(`/store/admin/reviews/${review.id}/invalidate`);
+                await api.post(`/store/admin/reviews/${reviewId}/invalidate`);
                 toast.success("Đã vô hiệu hóa đánh giá");
                 refetchReviews();
               } catch {
@@ -231,47 +291,82 @@ export default function StoreListPage() {
         );
       },
     },
-  ];
+  ], [isInvalidatingReview, refetchReviews]);
 
-  const reportColumns = [
+  const reportColumns = useMemo(() => [
     {
-      accessorKey: "id",
+      accessorKey: "report.id",
       header: "ID",
-      cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("id").substring(0, 10)}...</div>,
+      cell: ({ row }: any) => {
+        const id = row.original.report?.id || row.original.id;
+        return <div className="font-mono text-xs">{id ? `${id.substring(0, 10)}...` : "N/A"}</div>;
+      },
     },
     {
-      accessorKey: "userId",
-      header: "User ID",
-      cell: ({ row }: any) => <div className="font-mono text-xs truncate max-w-[100px]" title={row.getValue("userId")}>{row.getValue("userId")}</div>,
+      accessorKey: "reporter.fullName",
+      header: "Người báo cáo",
+      cell: ({ row }: any) => {
+        const reporter = row.original.reporter;
+        return (
+          <div className="flex items-center gap-2">
+            {reporter?.avatarUrl && (
+              <img src={exactImageUrl(reporter.avatarUrl)} className="h-6 w-6 rounded-full object-cover" alt="" />
+            )}
+            <span className="text-xs font-medium">{reporter?.fullName || "Ẩn danh"}</span>
+          </div>
+        );
+      },
     },
     {
-      accessorKey: "title",
+      accessorKey: "order.orderCode",
+      header: "Đơn hàng",
+      cell: ({ row }: any) => {
+        const order = row.original.order;
+        return <div className="text-xs font-mono">{order?.orderCode || "N/A"}</div>;
+      },
+    },
+    {
+      accessorKey: "report.title",
       header: "Tiêu đề",
-      cell: ({ row }: any) => (
-        <div className="max-w-[150px] truncate font-medium" title={row.getValue("title")}>
-          {row.getValue("title")}
-        </div>
-      ),
+      cell: ({ row }: any) => {
+        const title = row.original.report?.title || row.original.title;
+        return (
+          <div className="max-w-[120px] truncate font-medium text-xs" title={title}>
+            {title || "N/A"}
+          </div>
+        );
+      },
     },
     {
-      accessorKey: "description",
+      accessorKey: "report.description",
       header: "Mô tả",
-      cell: ({ row }: any) => (
-        <div className="max-w-[200px] truncate" title={row.getValue("description")}>
-          {row.getValue("description") || <span className="text-muted-foreground italic">Không có</span>}
-        </div>
-      ),
+      cell: ({ row }: any) => {
+        const description = row.original.report?.description || row.original.description;
+        return (
+          <div className="max-w-[150px] truncate text-xs" title={description}>
+            {description || <span className="text-muted-foreground italic">Không có</span>}
+          </div>
+        );
+      },
     },
     {
       accessorKey: "createdAt",
       header: "Thời gian",
-      cell: ({ row }: any) => <div className="text-xs">{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+      cell: ({ row }: any) => {
+        const date = row.original.createdAt || row.original.report?.createdAt;
+        if (!date) return <div className="text-xs">-</div>;
+        try {
+          return <div className="text-xs">{new Date(date).toLocaleString()}</div>;
+        } catch {
+          return <div className="text-xs">-</div>;
+        }
+      },
     },
     {
       accessorKey: "deletedAt",
       header: "Trạng thái",
       cell: ({ row }: any) => {
-        const deletedAt = row.getValue("deletedAt");
+        const deletedAt = row.original.deletedAt || row.original.report?.deletedAt;
         return deletedAt
           ? <Badge variant="destructive" className="text-xs">Đã vô hiệu</Badge>
           : <Badge variant="outline" className="text-xs text-orange-600 border-orange-500">Đang mở</Badge>;
@@ -281,17 +376,18 @@ export default function StoreListPage() {
       id: "actions",
       header: "Hành động",
       cell: ({ row }: any) => {
-        const report = row.original;
-        if (report.deletedAt) return null;
+        const report = row.original.report || row.original;
+        if (!report || report.deletedAt) return null;
         return (
           <Button
             variant="destructive"
             size="sm"
             disabled={isInvalidatingReport === report.id}
             onClick={async () => {
-              setIsInvalidatingReport(report.id);
+              const reportId = report.id;
+              setIsInvalidatingReport(reportId);
               try {
-                await api.post(`/store/admin/reports/${report.id}/invalidate`);
+                await api.post(`/store/admin/reports/${reportId}/invalidate`);
                 toast.success("Đã vô hiệu hóa báo cáo");
                 refetchReports();
               } catch {
@@ -306,11 +402,43 @@ export default function StoreListPage() {
         );
       },
     },
-  ];
+  ], [isInvalidatingReport, refetchReports]);
 
+
+  const tableMeta = useMemo(() => ({
+    refetch: () => refetchStores(),
+    openStoreDetail: async (store: Store) => {
+      setIsDetailOpen(true);
+      setIsDetailLoading(true);
+      try {
+        const res = await api.get(`/store/detail/${store.id}`);
+        const detail = res.data.store;
+        const combined: StoreDetail = {
+          ...store,
+          ...detail,
+          payment: detail.payment,
+          kyc: detail.kyc,
+        };
+        setSelectedStore(combined);
+      } catch {
+        toast.error("Không thể tải chi tiết cửa hàng");
+        setSelectedStore(store as StoreDetail);
+      } finally {
+        setIsDetailLoading(false);
+      }
+    },
+    openStoreReviews: (store: Store) => {
+      setSelectedStoreForReviews(store);
+      setTabFilter("reviews");
+    },
+    openStoreReports: (store: Store) => {
+      setSelectedStoreForReports(store);
+      setTabFilter("reports");
+    },
+  }), [refetchStores]);
 
   const table = useReactTable({
-    data: storeData?.stores || [],
+    data: stores,
     columns,
     state: {
       sorting,
@@ -322,41 +450,11 @@ export default function StoreListPage() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    meta: {
-      refetch: () => refetchStores(),
-      openStoreDetail: async (store: Store) => {
-        setIsDetailOpen(true);
-        setIsDetailLoading(true);
-        try {
-          const res = await api.get(`/store/detail/${store.id}`);
-          const detail = res.data.store;
-          const combined: StoreDetail = {
-            ...store,
-            ...detail,
-            payment: detail.payment,
-            kyc: detail.kyc,
-          };
-          setSelectedStore(combined);
-        } catch (_) {
-          toast.error("Không thể tải chi tiết cửa hàng");
-          setSelectedStore(store as StoreDetail);
-        } finally {
-          setIsDetailLoading(false);
-        }
-      },
-      openStoreReviews: (store: Store) => {
-        setSelectedStoreForReviews(store);
-        setTabFilter("reviews");
-      },
-      openStoreReports: (store: Store) => {
-        setSelectedStoreForReports(store);
-        setTabFilter("reports");
-      },
-    },
+    meta: tableMeta,
   });
 
   const requestTable = useReactTable({
-    data: requestData?.requests || [],
+    data: requests,
     columns: requestColumns,
     state: {
       sorting,
@@ -371,7 +469,7 @@ export default function StoreListPage() {
   });
 
   const reviewTable = useReactTable({
-    data: reviewsData?.reviews || [],
+    data: reviews,
     columns: reviewColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -380,7 +478,7 @@ export default function StoreListPage() {
   });
 
   const reportTable = useReactTable({
-    data: reportsData?.reports || [],
+    data: reports,
     columns: reportColumns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -516,11 +614,11 @@ export default function StoreListPage() {
                             : prev
                         );
                         refetchStores();
-                      } catch (e) {
+                      } catch {
                         toast.error("Xác minh thất bại");
                       } finally {
                         setIsActionLoading(false);
-                      }
+                       }
                     }}
                   >
                     Xác minh cửa hàng
@@ -546,11 +644,11 @@ export default function StoreListPage() {
                             : prev
                         );
                         refetchStores();
-                      } catch (e) {
-                        toast.error("Cập nhật trạng thái thất bại");
+                      } catch {
+                        toast.error("Từ chối thất bại");
                       } finally {
                         setIsActionLoading(false);
-                      }
+                       }
                     }}
                   >
                     Từ chối
@@ -704,71 +802,63 @@ export default function StoreListPage() {
             </TabsContent>
 
             <TabsContent value="reviews" className="flex-1 flex flex-col p-6 pt-2">
-              {!selectedStoreForReviews ? (
-                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
-                  <Star className="h-8 w-8 opacity-30" />
-                  <p className="text-sm">Chọn một cửa hàng từ tab "Tất cả cửa hàng" để xem đánh giá.</p>
-                  <Button variant="outline" size="sm" onClick={() => setTabFilter("all")}>Quay lại danh sách</Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-sm font-medium">Đánh giá cửa hàng: <span className="text-primary">{selectedStoreForReviews.name}</span></p>
-                      <p className="text-xs text-muted-foreground">ID: {selectedStoreForReviews.id}</p>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={() => { setSelectedStoreForReviews(null); setTabFilter("all"); }}>
-                      <X className="h-4 w-4 mr-1" /> Đóng
-                    </Button>
+                <div className="flex items-center justify-between mb-3 h-12">
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      {selectedStoreForReviews ? `Đánh giá: ${selectedStoreForReviews.name}` : "Tất cả đánh giá"}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedStoreForReviews ? `ID Cửa hàng: ${selectedStoreForReviews.id}` : "Đang hiển thị đánh giá mới nhất từ tất cả cửa hàng"}
+                    </p>
                   </div>
-                  {isReviewsPending ? (
-                    <CardContent>Đang tải đánh giá...</CardContent>
-                  ) : (
-                    <>
-                      <CardContent className="flex-1 p-0">
-                        <DataTable table={reviewTable} columns={reviewColumns} />
-                      </CardContent>
-                      <div className="mt-4">
-                        <DataTablePagination table={reviewTable} className="w-full" />
-                      </div>
-                    </>
+                  {selectedStoreForReviews && (
+                    <Button variant="ghost" size="sm" className="h-8" onClick={() => setSelectedStoreForReviews(null)}>
+                      <X className="h-4 w-4 mr-1" /> Xóa bộ lọc
+                    </Button>
                   )}
-                </>
-              )}
+                </div>
+                {isReviewsPending ? (
+                  <CardContent className="flex-1 flex items-center justify-center">Đang tải đánh giá...</CardContent>
+                ) : (
+                  <>
+                    <CardContent className="flex-1 p-0">
+                      <DataTable table={reviewTable} columns={reviewColumns} />
+                    </CardContent>
+                    <div className="mt-4">
+                      <DataTablePagination table={reviewTable} className="w-full" />
+                    </div>
+                  </>
+                )}
             </TabsContent>
 
             <TabsContent value="reports" className="flex-1 flex flex-col p-6 pt-2">
-              {!selectedStoreForReports ? (
-                <div className="flex flex-col items-center justify-center py-12 text-muted-foreground gap-2">
-                  <AlertTriangle className="h-8 w-8 opacity-30" />
-                  <p className="text-sm">Chọn một cửa hàng từ tab "Tất cả cửa hàng" để xem báo cáo.</p>
-                  <Button variant="outline" size="sm" onClick={() => setTabFilter("all")}>Quay lại danh sách</Button>
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-sm font-medium">Báo cáo cửa hàng: <span className="text-primary">{selectedStoreForReports.name}</span></p>
-                      <p className="text-xs text-muted-foreground">ID: {selectedStoreForReports.id}</p>
-                    </div>
-                    <Button variant="ghost" size="sm" onClick={() => { setSelectedStoreForReports(null); setTabFilter("all"); }}>
-                      <X className="h-4 w-4 mr-1" /> Đóng
-                    </Button>
+                <div className="flex items-center justify-between mb-3 h-12">
+                  <div>
+                    <h3 className="text-lg font-semibold">
+                      {selectedStoreForReports ? `Báo cáo: ${selectedStoreForReports.name}` : "Tất cả báo cáo"}
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      {selectedStoreForReports ? `ID Cửa hàng: ${selectedStoreForReports.id}` : "Đang hiển thị báo cáo mới nhất từ tất cả cửa hàng"}
+                    </p>
                   </div>
-                  {isReportsPending ? (
-                    <CardContent>Đang tải báo cáo...</CardContent>
-                  ) : (
-                    <>
-                      <CardContent className="flex-1 p-0">
-                        <DataTable table={reportTable} columns={reportColumns} />
-                      </CardContent>
-                      <div className="mt-4">
-                        <DataTablePagination table={reportTable} className="w-full" />
-                      </div>
-                    </>
+                  {selectedStoreForReports && (
+                    <Button variant="ghost" size="sm" className="h-8" onClick={() => setSelectedStoreForReports(null)}>
+                      <X className="h-4 w-4 mr-1" /> Xóa bộ lọc
+                    </Button>
                   )}
-                </>
-              )}
+                </div>
+                {isReportsPending ? (
+                  <CardContent className="flex-1 flex items-center justify-center">Đang tải báo cáo...</CardContent>
+                ) : (
+                  <>
+                    <CardContent className="flex-1 p-0">
+                      <DataTable table={reportTable} columns={reportColumns} />
+                    </CardContent>
+                    <div className="mt-4">
+                      <DataTablePagination table={reportTable} className="w-full" />
+                    </div>
+                  </>
+                )}
             </TabsContent>
         </Tabs>
       </div>

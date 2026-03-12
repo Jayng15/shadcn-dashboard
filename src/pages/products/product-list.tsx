@@ -7,7 +7,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DataTable from "@/pages/users/components/data-table";
 import { columns, type Product } from "./components/columns";
@@ -32,6 +32,17 @@ import { Search, X } from "lucide-react";
 
 type ProductDetail = Product;
 
+interface UpdateRequest {
+  id: string;
+  targetId: string;
+  payload: unknown;
+  status: string;
+  targetType: string;
+  createdAt: string;
+  name?: string;
+  storeName?: string;
+}
+
 export default function ProductListPage() {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -45,7 +56,7 @@ export default function ProductListPage() {
 
   // Update Request State
   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [selectedRequest, setSelectedRequest] = useState<UpdateRequest | null>(null);
 
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["products", sorting, columnFilters],
@@ -66,15 +77,38 @@ export default function ProductListPage() {
     enabled: statusFilter === "requests"
   });
 
-  const allProducts = data?.products || [];
-  const pendingProducts = allProducts.filter(
-    (p: any) => !p.isVerified && p.status !== "CLOSED"
+  const allProducts = useMemo(() => data?.products || [], [data]);
+  const pendingProducts = useMemo(
+    () => allProducts.filter((p: Product) => !p.isVerified && p.status !== "CLOSED"),
+    [allProducts]
   );
 
-  const currentData =
-    statusFilter === "pending" ? pendingProducts : allProducts;
+  const currentData = useMemo(
+    () => (statusFilter === "pending" ? pendingProducts : allProducts),
+    [statusFilter, pendingProducts, allProducts]
+  );
 
-  const table = useReactTable({
+  const tableMeta = useMemo(() => ({
+    refetch: () => {
+      refetch();
+    },
+    openProductDetail: async (product: Product) => {
+      setIsDetailOpen(true);
+      setIsDetailLoading(true);
+      try {
+        const res = await api.get(`/product/${product.id}`);
+        const detail = res.data.product as ProductDetail;
+        setSelectedProduct(detail);
+      } catch {
+        toast.error("Không thể tải chi tiết sản phẩm");
+        setSelectedProduct(product);
+      } finally {
+        setIsDetailLoading(false);
+      }
+    },
+  }), [refetch]);
+
+  const table = useMemo(() => ({
     data: currentData,
     columns,
     state: {
@@ -87,52 +121,53 @@ export default function ProductListPage() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    meta: {
-      refetch: () => {
-        refetch();
-      },
-      openProductDetail: async (product: Product) => {
-        setIsDetailOpen(true);
-        setIsDetailLoading(true);
-        try {
-          const res = await api.get(`/product/${product.id}`);
-          const detail = res.data.product as ProductDetail;
-          setSelectedProduct(detail);
-        } catch (_) {
-          toast.error("Không thể tải chi tiết sản phẩm");
-          setSelectedProduct(product);
-        } finally {
-          setIsDetailLoading(false);
-        }
-      },
-    },
-  });
+    meta: tableMeta,
+  }), [currentData, sorting, columnFilters, tableMeta]);
 
-  const requestColumns = [
+  const tableInstance = useReactTable(table);
+
+  const requestColumns = useMemo(() => [
     {
       accessorKey: "id",
       header: "ID Yêu cầu",
-      cell: ({ row }: any) => <div className="font-medium">{row.getValue("id").substring(0, 8)}...</div>,
+      cell: ({ row }: { row: { getValue: (key: string) => unknown } }) => {
+        const id = row.getValue("id");
+        const idStr = id ? String(id) : "";
+        return <div className="font-medium">{idStr ? `${idStr.substring(0, 8)}...` : 'N/A'}</div>;
+      },
     },
     {
-      accessorKey: "targetId",
-      header: "ID Sản phẩm",
-      cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("targetId")}</div>,
+      accessorKey: "name",
+      header: "Tên sản phẩm",
+      cell: ({ row }: { row: { getValue: (key: string) => unknown } }) => <div className="font-medium">{row.getValue("name") as string || "N/A"}</div>,
+    },
+    {
+      accessorKey: "storeName",
+      header: "Cửa hàng",
+      cell: ({ row }: { row: { getValue: (key: string) => unknown } }) => <div className="text-muted-foreground">{row.getValue("storeName") as string || "N/A"}</div>,
     },
     {
         accessorKey: "createdAt",
         header: "Yêu cầu lúc",
-        cell: ({ row }: any) => <div>{new Date(row.getValue("createdAt")).toLocaleString()}</div>,
+        cell: ({ row }: { row: { getValue: (key: string) => any } }) => {
+          const date = row.getValue("createdAt");
+          if (!date) return <div>N/A</div>;
+          try {
+            return <div>{new Date(date).toLocaleString()}</div>;
+          } catch {
+            return <div>N/A</div>;
+          }
+        },
     },
     {
       id: "actions",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: any }) => {
         return (
           <Button
             variant="outline"
             size="sm"
             onClick={() => {
-                setSelectedRequest(row.original);
+                setSelectedRequest(row.original as UpdateRequest);
                 setIsRequestDialogOpen(true);
             }}
           >
@@ -141,9 +176,9 @@ export default function ProductListPage() {
         )
       },
     },
-  ];
+  ], []);
 
-  const requestTable = useReactTable({
+  const requestTableOptions = useMemo(() => ({
     data: requestData?.requests || [],
     columns: requestColumns,
     state: {
@@ -156,7 +191,9 @@ export default function ProductListPage() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-  });
+  }), [requestData?.requests, requestColumns, sorting, columnFilters]);
+
+  const requestTableInstance = useReactTable(requestTableOptions);
 
   if (error)
     return (
@@ -196,10 +233,16 @@ export default function ProductListPage() {
                 <div>
                   <span className="font-semibold">Giá: </span>
                   <span>
-                    {new Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: selectedProduct.currency,
-                    }).format(Number(selectedProduct.price))}
+                    {(() => {
+                      try {
+                        return new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: selectedProduct.currency || "VND",
+                        }).format(Number(selectedProduct.price) || 0);
+                      } catch {
+                        return `${selectedProduct.price || 0} ${selectedProduct.currency || ""}`;
+                      }
+                    })()}
                   </span>
                 </div>
                 <div>
@@ -268,7 +311,7 @@ export default function ProductListPage() {
                         prev ? { ...prev, isVerified: true } : prev
                       );
                       refetch();
-                    } catch (e) {
+                    } catch {
                       toast.error("Không thể xác minh sản phẩm");
                     } finally {
                       setIsVerifyLoading(false);
@@ -317,12 +360,12 @@ export default function ProductListPage() {
                   <Input
                     placeholder="Tìm tên sản phẩm..."
                     className="pl-8"
-                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                    value={(tableInstance.getColumn("name")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => tableInstance.getColumn("name")?.setFilterValue(e.target.value)}
                   />
                 </div>
-                {table.getState().columnFilters.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                {tableInstance.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => tableInstance.resetColumnFilters()}>
                     <X className="h-4 w-4 mr-1" />
                     Xóa bộ lọc
                   </Button>
@@ -330,11 +373,11 @@ export default function ProductListPage() {
               </div>
             </CardHeader>
             <CardContent className="flex-1">
-              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
+              {isPending ? "Đang tải..." : <DataTable table={tableInstance} columns={columns} />}
             </CardContent>
             <CardFooter>
               {!isPending && (
-                <DataTablePagination table={table} className="w-full" />
+                <DataTablePagination table={tableInstance} className="w-full" />
               )}
             </CardFooter>
           </Card>
@@ -351,12 +394,12 @@ export default function ProductListPage() {
                   <Input
                     placeholder="Tìm tên sản phẩm..."
                     className="pl-8"
-                    value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-                    onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                    value={(tableInstance.getColumn("name")?.getFilterValue() as string) ?? ""}
+                    onChange={(e) => tableInstance.getColumn("name")?.setFilterValue(e.target.value)}
                   />
                 </div>
-                {table.getState().columnFilters.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                {tableInstance.getState().columnFilters.length > 0 && (
+                  <Button variant="ghost" size="sm" onClick={() => tableInstance.resetColumnFilters()}>
                     <X className="h-4 w-4 mr-1" />
                     Xóa bộ lọc
                   </Button>
@@ -364,11 +407,11 @@ export default function ProductListPage() {
               </div>
             </CardHeader>
             <CardContent className="flex-1">
-              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
+              {isPending ? "Đang tải..." : <DataTable table={tableInstance} columns={columns} />}
             </CardContent>
             <CardFooter>
               {!isPending && (
-                <DataTablePagination table={table} className="w-full" />
+                <DataTablePagination table={tableInstance} className="w-full" />
               )}
             </CardFooter>
           </Card>
@@ -381,11 +424,11 @@ export default function ProductListPage() {
                     <CardDescription>Xem xét yêu cầu cập nhật sản phẩm.</CardDescription>
                 </CardHeader>
                 <CardContent className="flex-1">
-                    {isRequestPending ? "Đang tải..." : <DataTable table={requestTable} columns={requestColumns} />}
+                    {isRequestPending ? "Đang tải..." : <DataTable table={requestTableInstance} columns={requestColumns} />}
                 </CardContent>
                  <CardFooter>
                   {!isRequestPending && (
-                    <DataTablePagination table={requestTable} className="w-full" />
+                    <DataTablePagination table={requestTableInstance} className="w-full" />
                   )}
                 </CardFooter>
             </Card>
