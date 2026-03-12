@@ -92,7 +92,7 @@ export default function UsersPage() {
       <ResponsiveDialog
         isOpen={isDetailOpen}
         setIsOpen={setIsDetailOpen}
-        title="User Details"
+        title="Chi tiết người dùng"
       >
         {isDetailLoading && (
           <div className="py-4 text-center text-sm text-muted-foreground">
@@ -165,7 +165,7 @@ export default function UsersPage() {
                     toast.success(`Trạng thái người dùng đã cập nhật thành ${newStatus}`);
                     setSelectedUser({ ...selectedUser, status: newStatus });
                     refetch();
-                  } catch (_) {
+                  } catch {
                     toast.error("Cập nhật trạng thái thất bại");
                   }
                 }}

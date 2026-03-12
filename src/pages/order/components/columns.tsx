@@ -44,11 +44,11 @@ export type Order = {
 export const columns: ColumnDef<Order>[] = [
   {
     accessorKey: "orderCode",
-    header: "Order Code",
+    header: "Mã đơn hàng",
   },
   {
     accessorKey: "userId",
-    header: "User ID",
+    header: "ID Người dùng",
     cell: ({ row }) => {
       const id = row.getValue("userId") as string;
       return <div className="max-w-[100px] truncate" title={id}>{id}</div>
@@ -56,7 +56,7 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: "storeId",
-    header: "Store ID",
+    header: "ID Cửa hàng",
     cell: ({ row }) => {
       const id = row.getValue("storeId") as string;
       return <div className="max-w-[100px] truncate" title={id}>{id}</div>
@@ -64,7 +64,7 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: "totalAmount",
-    header: "Total",
+    header: "Tổng cộng",
     cell: ({ row }) => {
       const amount = Number(row.getValue("totalAmount") as string)
       return new Intl.NumberFormat("vi-VN", {
@@ -75,7 +75,7 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: "Trạng thái",
     cell: ({ row }) => {
       const status = row.getValue("status") as string
       let variant: "default" | "secondary" | "destructive" | "outline" =
@@ -110,7 +110,7 @@ export const columns: ColumnDef<Order>[] = [
   },
   {
     accessorKey: "createdAt",
-    header: "Date",
+    header: "Ngày tạo",
     cell: ({ row }) => {
       const createdAt = row.getValue("createdAt") as string
       return new Date(createdAt).toLocaleString()
@@ -130,23 +130,23 @@ export const columns: ColumnDef<Order>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(order.id)}
             >
-              Copy Order ID
+              Sao chép ID đơn hàng
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(order.orderCode)}
             >
-              Copy Order Code
+              Sao chép mã đơn hàng
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
                 (table.options.meta as any)?.openOrderDetail?.(order)
               }
             >
-              View Details
+              Xem chi tiết
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

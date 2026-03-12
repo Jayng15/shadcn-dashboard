@@ -35,9 +35,10 @@ export type Product = {
   additionalUrls?: string;
   verifiedAt?: string;
   favoriteCount?: number;
-  // TODO: Add storeName if available in projection
+  storeName?: string;
 }
 
+// Helper to verify from column action
 // Helper to verify from column action
 const verifyProduct = async (id: string, tableMeta: any) => {
     try {
@@ -45,7 +46,7 @@ const verifyProduct = async (id: string, tableMeta: any) => {
         toast.success("Product verified");
         // Trigger refetch
         tableMeta?.refetch();
-    } catch (e: any) {
+    } catch {
         toast.error("Failed to verify product");
     }
 }
@@ -53,7 +54,7 @@ const verifyProduct = async (id: string, tableMeta: any) => {
 export const columns: ColumnDef<Product>[] = [
   {
       accessorKey: "thumbnailUrl",
-      header: "Image",
+      header: "Hình ảnh",
       cell: ({ row }) => (
           <img
             src={exactImageUrl(row.original.thumbnailUrl)}
@@ -64,11 +65,20 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "name",
-    header: "Name",
+    header: "Tên sản phẩm",
+  },
+  {
+    accessorKey: "storeName",
+    header: "Cửa hàng",
+    cell: ({ row }) => (
+      <div className="text-muted-foreground italic truncate max-w-[150px]" title={row.getValue("storeName")}>
+        {row.getValue("storeName") || "N/A"}
+      </div>
+    )
   },
   {
       accessorKey: "price",
-      header: "Price",
+      header: "Giá",
       cell: ({ row }) => {
           try {
               return new Intl.NumberFormat('vi-VN', {
@@ -82,7 +92,7 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: "Trạng thái",
     cell: ({ row }) => {
         const status = row.getValue("status") as string
         return <Badge variant="outline">{status}</Badge>
@@ -91,11 +101,11 @@ export const columns: ColumnDef<Product>[] = [
   },
   {
     accessorKey: "isVerified",
-    header: "Verified",
+    header: "Đã xác minh",
     cell: ({ row }) => {
         return row.original.isVerified ?
-            <Badge className="bg-green-500 hover:bg-green-600">Yes</Badge> :
-            <Badge variant="destructive">No</Badge>
+            <Badge className="bg-green-500 hover:bg-green-600">Có</Badge> :
+            <Badge variant="destructive">Chưa</Badge>
     }
   },
   {
@@ -112,22 +122,22 @@ export const columns: ColumnDef<Product>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(product.id)}
             >
-              Copy ID
+              Sao chép ID
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                (table.options.meta as any)?.openProductDetail?.(product)
+                (table.options.meta as { openProductDetail?: (p: Product) => void })?.openProductDetail?.(product)
               }
             >
-              View Details
+              Xem chi tiết
             </DropdownMenuItem>
             {!product.isVerified && (
                  <DropdownMenuItem onClick={() => verifyProduct(product.id, table.options.meta)}>
-                    Verify Product
+                    Xác minh sản phẩm
                  </DropdownMenuItem>
             )}
             {/* Add Delete if needed */}

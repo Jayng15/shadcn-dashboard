@@ -17,12 +17,12 @@ import api from "@/lib/api";
 import { toast } from "sonner";
 
 // Helper to ban/activate
-const updateUserStatus = async (id: string, status: 'ACTIVE' | 'BAN', tableMeta: any) => {
+const updateUserStatus = async (id: string, status: 'ACTIVE' | 'BAN', tableMeta: { refetch: () => void } | undefined) => {
     try {
         await api.patch(`/user/${id}/status`, { status });
         toast.success(`User status updated to ${status}`);
         tableMeta?.refetch();
-    } catch (e: any) {
+    } catch {
         toast.error("Failed to update status");
     }
 }
@@ -34,6 +34,11 @@ export const columns: ColumnDef<User>[] = [
     cell: ({ row }) => <span className="text-xs text-muted-foreground">{row.getValue("id")}</span>
   },
   {
+    accessorKey: "fullName",
+    header: "Họ và tên",
+    cell: ({ row }) => <span className="font-medium text-primary text-sm">{row.getValue("fullName") || "Chưa cập nhật"}</span>
+  },
+  {
     accessorKey: "email",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Email" />
@@ -41,27 +46,27 @@ export const columns: ColumnDef<User>[] = [
   },
   {
     accessorKey: "role",
-    header: "Role",
+    header: "Vai trò",
     cell: ({ row }) => <Badge variant="outline">{row.getValue("role")}</Badge>
   },
   {
     accessorKey: "isSeller",
-    header: "Seller",
+    header: "Người bán",
     cell: ({ row }) => {
-        return row.original.isSeller ? <Badge className="bg-blue-500">Seller</Badge> : <span className="text-muted-foreground text-sm">User</span>
+        return row.original.isSeller ? <Badge className="bg-blue-500">Người bán</Badge> : <span className="text-muted-foreground text-sm">Người dùng</span>
     }
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: "Trạng thái",
     cell: ({ row }) => {
         const status = row.getValue("status") as string;
-        return <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>{status}</Badge>
+        return <Badge variant={status === 'ACTIVE' ? 'default' : 'destructive'}>{status === 'ACTIVE' ? 'Hoạt động' : 'Bị khóa'}</Badge>
     }
   },
   {
     accessorKey: "createdAt",
-    header: "Joined",
+    header: "Ngày tham gia",
     cell: ({ row }) => {
         return new Date(row.getValue("createdAt")).toLocaleDateString()
     }
@@ -81,32 +86,32 @@ export const columns: ColumnDef<User>[] = [
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
                 <DropdownMenuItem onClick={() => navigator.clipboard.writeText(user.id)}>
-                  Copy ID
+                  Sao chép ID
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() =>
-                    (table.options.meta as any)?.openUserDetail?.(user)
+                    (table.options.meta as { openUserDetail?: (u: User) => void })?.openUserDetail?.(user)
                   }
                 >
-                  View Details
+                  Xem chi tiết
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 {user.role !== 'ADMIN' && (
                     user.status === 'ACTIVE' ? (
-                        <DropdownMenuItem onClick={() => updateUserStatus(user.id, 'BAN', table.options.meta)} className="text-red-500">
-                            Ban User
+                        <DropdownMenuItem onClick={() => updateUserStatus(user.id, 'BAN', table.options.meta as any)} className="text-red-500">
+                            Khóa người dùng
                         </DropdownMenuItem>
                     ) : (
-                        <DropdownMenuItem onClick={() => updateUserStatus(user.id, 'ACTIVE', table.options.meta)}>
-                            Activate User
+                        <DropdownMenuItem onClick={() => updateUserStatus(user.id, 'ACTIVE', table.options.meta as any)}>
+                            Kích hoạt người dùng
                         </DropdownMenuItem>
                     )
                 )}
               </DropdownMenuContent>
-            </DropdownMenu>
+吐            </DropdownMenu>
           )
     },
   }

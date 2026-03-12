@@ -98,7 +98,7 @@ export default function OrderPage() {
   return (
     <div className="flex flex-col space-y-4 h-full">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold tracking-tight">Đơn hàng (Orders)</h2>
+        <h2 className="text-2xl font-bold tracking-tight">Đơn hàng</h2>
       </div>
 
       <ResponsiveDialog
@@ -187,9 +187,9 @@ export default function OrderPage() {
             </div>
 
             <div className="pt-2 text-xs text-muted-foreground">
-               <div className="break-all">ID: {selectedOrder.id}</div>
-               <div className="break-all">User ID: {selectedOrder.userId}</div>
-               <div className="break-all">Store ID: {selectedOrder.storeId}</div>
+               <div className="break-all">ID Đơn hàng: {selectedOrder.id}</div>
+               <div className="break-all">ID Người dùng: {selectedOrder.userId}</div>
+               <div className="break-all">ID Cửa hàng: {selectedOrder.storeId}</div>
             </div>
           </div>
         )}
