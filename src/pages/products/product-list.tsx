@@ -7,7 +7,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DataTable from "@/pages/users/components/data-table";
 import { columns, type Product } from "./components/columns";
@@ -29,6 +29,7 @@ import { exactImageUrl } from "@/lib/utils";
 import { UpdateRequestDialog } from "@/components/update-request-dialog";
 import { Input } from "@/components/ui/input";
 import { Search, X } from "lucide-react";
+import { useSearch } from "@tanstack/react-router";
 
 type ProductDetail = Product;
 
@@ -53,6 +54,7 @@ export default function ProductListPage() {
     null
   );
   const [isVerifyLoading, setIsVerifyLoading] = useState(false);
+  const search = useSearch({ from: '/products' }) as { id?: string };
 
   // Update Request State
   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
@@ -125,6 +127,12 @@ export default function ProductListPage() {
   }), [currentData, sorting, columnFilters, tableMeta]);
 
   const tableInstance = useReactTable(table);
+
+  useEffect(() => {
+    if (search.id) {
+       tableMeta.openProductDetail({ id: search.id } as Product);
+    }
+  }, []);
 
   const requestColumns = useMemo(() => [
     {

@@ -29,6 +29,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Search, X } from "lucide-react"
+import { useSearch } from "@tanstack/react-router"
 
 
 
@@ -108,6 +109,7 @@ export default function FinancePage() {
   const [isDetailLoading, setIsDetailLoading] = useState(false)
   const [selectedTx, setSelectedTx] = useState<FinanceTransaction | null>(null)
   const [isVerifyLoading, setIsVerifyLoading] = useState(false)
+  const search = useSearch({ from: '/finance' }) as { id?: string }
 
   const [withdrawalFee, setWithdrawalFee] = useState<WithdrawalFeePayload>({
     amount: 0,
@@ -171,6 +173,12 @@ export default function FinancePage() {
       },
     },
   })
+
+  useEffect(() => {
+    if (search.id) {
+       (table.options.meta as { openFinanceDetail: (tx: FinanceTransaction) => Promise<void> }).openFinanceDetail({ id: search.id, txCode: 'Đang tải...' } as FinanceTransaction);
+    }
+  }, []);
 
   if (error) {
     return (
@@ -345,8 +353,7 @@ export default function FinancePage() {
                             }
                           : prev
                       )
-                      refetch()
-                    } catch (_) {
+                    } catch (err) {
                       toast.error("Xác minh giao dịch thất bại")
                     } finally {
                       setIsVerifyLoading(false)

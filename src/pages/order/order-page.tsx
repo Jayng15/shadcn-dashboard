@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import DataTable from "@/pages/users/components/data-table"
 import {
@@ -26,6 +26,7 @@ import { type Order, columns } from "./components/columns"
 import { Input } from "@/components/ui/input"
 import { Search, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useSearch } from "@tanstack/react-router"
 
 export default function OrderPage() {
   const [sorting, setSorting] = useState<SortingState>([])
@@ -35,6 +36,7 @@ export default function OrderPage() {
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isDetailLoading, setIsDetailLoading] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
+  const search = useSearch({ from: '/orders' }) as { id?: string }
 
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["admin-orders", sorting, columnFilters],
@@ -86,6 +88,12 @@ export default function OrderPage() {
       },
     },
   })
+
+  useEffect(() => {
+    if (search.id) {
+      (table.options.meta as { openOrderDetail: (order: Order) => Promise<void> }).openOrderDetail({ id: search.id, orderCode: 'Đang tải...' } as Order);
+    }
+  }, []);
 
   if (error) {
     return (
