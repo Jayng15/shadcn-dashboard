@@ -1,37 +1,55 @@
 
-import { User, Store, ShoppingBag, Activity } from "lucide-react";
+import { User, Store, ShoppingBag, Activity, AlertCircle, PackageCheck, CreditCard, ClipboardList } from "lucide-react";
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 
 import CardStatistic from "./components/card-statistic";
-// import OverviewChart from "./components/overview-chart";
-// import LegendChart from "./components/legend-chart";
-// import InteractiveChart from "./components/interactive-chart";
 
 export default function MainDashoard() {
   const [stats, setStats] = useState({
     users: 0,
     stores: 0,
     products: 0,
-    activeStores: 0
+    activeStores: 0,
+    storesToVerify: 0,
+    productsToVerify: 0,
+    transactionsToVerify: 0,
+    newOrders: 0
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [usersResponse, storesResponse, activeStoresResponse, productsResponse] = await Promise.all([
+        const [
+          usersResponse,
+          storesResponse,
+          activeStoresResponse,
+          productsResponse,
+          storesToVerifyResponse,
+          productsToVerifyResponse,
+          transactionsToVerifyResponse,
+          newOrdersResponse
+        ] = await Promise.all([
           api.get('/user/list', { params: { limit: 1 } }),
           api.get('/store', { params: { limit: 1 } }),
           api.get('/store', { params: { limit: 1, status: 'ACTIVE' } }),
-          api.get('/product', { params: { limit: 1 } })
+          api.get('/product', { params: { limit: 1 } }),
+          api.get('/store', { params: { limit: 1, status: 'REQUESTED' } }),
+          api.get('/product', { params: { limit: 1, isVerified: false } }),
+          api.get('/finance/admin/transactions', { params: { limit: 1, verifiedStatus: 'PENDING' } }),
+          api.get('/order/admin', { params: { limit: 1, status: 'PENDING' } })
         ]);
 
         setStats({
           users: usersResponse.data.pagination.total,
           stores: storesResponse.data.pagination.total,
           products: productsResponse.data.pagination.total,
-          activeStores: activeStoresResponse.data.pagination.total
+          activeStores: activeStoresResponse.data.pagination.total,
+          storesToVerify: storesToVerifyResponse.data.pagination.total,
+          productsToVerify: productsToVerifyResponse.data.pagination.total,
+          transactionsToVerify: transactionsToVerifyResponse.data.pagination.total,
+          newOrders: newOrdersResponse.data.pagination.total
         });
       } catch (error) {
         console.error("Failed to fetch dashboard stats", error);
@@ -67,6 +85,30 @@ export default function MainDashoard() {
       icon: ShoppingBag,
       value: loading ? "..." : stats.products,
       description: "Sản phẩm trên tất cả các cửa hàng"
+    },
+    {
+      title: "Cửa hàng chờ duyệt",
+      icon: AlertCircle,
+      value: loading ? "..." : stats.storesToVerify,
+      description: "Cửa hàng cần xác minh"
+    },
+    {
+      title: "Sản phẩm chờ duyệt",
+      icon: PackageCheck,
+      value: loading ? "..." : stats.productsToVerify,
+      description: "Sản phẩm cần xác minh"
+    },
+    {
+      title: "Giao dịch chờ duyệt",
+      icon: CreditCard,
+      value: loading ? "..." : stats.transactionsToVerify,
+      description: "Giao dịch tài chính chờ xử lý"
+    },
+    {
+      title: "Đơn hàng mới",
+      icon: ClipboardList,
+      value: loading ? "..." : stats.newOrders,
+      description: "Đơn hàng đang chờ xử lý"
     }
   ]
 
@@ -80,13 +122,6 @@ export default function MainDashoard() {
           <CardStatistic key={item.title} className="bg-sidebar rounded-lg" items={item} />
         ))}
       </div>
-      {/*
-      <div className="min-h-[100vh] flex-1 md:min-h-min grid md:grid-cols-2 lg:grid-cols-7 gap-2">
-        <OverviewChart className="md:col-span-1 lg:col-span-4 bg-sidebar rounded-lg" />
-        <LegendChart className="md:col-span-1 lg:col-span-3 bg-sidebar rounded-lg" />
-      </div>
-      <InteractiveChart />
-      */}
     </>
   )
 }
