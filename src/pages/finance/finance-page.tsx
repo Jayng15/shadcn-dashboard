@@ -165,8 +165,17 @@ export default function FinancePage() {
         setIsDetailOpen(true)
         setIsDetailLoading(true)
         try {
-          // Reuse data we already have; if backend later has a detail API, call it here.
-          setSelectedTx(tx)
+          // If partial data (missing currency/amount), try to fetch by ID
+          if (!tx.currency || tx.txCode === 'Đang tải...') {
+             try {
+                const res = await api.get(`/finance/admin/transactions/${tx.id}`);
+                setSelectedTx(res.data.transaction || res.data);
+             } catch {
+                setSelectedTx({ ...tx, currency: tx.currency || 'VND' });
+             }
+          } else {
+            setSelectedTx(tx)
+          }
         } finally {
           setIsDetailLoading(false)
         }
@@ -176,9 +185,10 @@ export default function FinancePage() {
 
   useEffect(() => {
     if (search.id) {
-       (table.options.meta as { openFinanceDetail: (tx: FinanceTransaction) => Promise<void> }).openFinanceDetail({ id: search.id, txCode: 'Đang tải...' } as FinanceTransaction);
+       const meta = table.options.meta as { openFinanceDetail: (tx: FinanceTransaction) => Promise<void> };
+       meta.openFinanceDetail({ id: search.id, txCode: 'Đang tải...' } as FinanceTransaction);
     }
-  }, []);
+  }, [search.id]);
 
   if (error) {
     return (

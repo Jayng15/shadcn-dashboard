@@ -81,6 +81,15 @@ export default function OrderPage() {
         setIsDetailOpen(true)
         setIsDetailLoading(true)
         try {
+          // If the order object is partial (only has ID from redirection), fetch the full detail
+          if (!order.orderCode || order.orderCode === 'Đang tải...') {
+             const res = await api.get(`/order/admin/${order.id}`);
+             setSelectedOrder(res.data.order || res.data);
+          } else {
+             setSelectedOrder(order)
+          }
+        } catch (err) {
+          console.error("Failed to fetch order detail", err);
           setSelectedOrder(order)
         } finally {
           setIsDetailLoading(false)
@@ -91,9 +100,10 @@ export default function OrderPage() {
 
   useEffect(() => {
     if (search.id) {
-      (table.options.meta as { openOrderDetail: (order: Order) => Promise<void> }).openOrderDetail({ id: search.id, orderCode: 'Đang tải...' } as Order);
+      const meta = table.options.meta as { openOrderDetail: (order: Order) => Promise<void> };
+      meta.openOrderDetail({ id: search.id, orderCode: 'Đang tải...' } as Order);
     }
-  }, []);
+  }, [search.id]);
 
   if (error) {
     return (
