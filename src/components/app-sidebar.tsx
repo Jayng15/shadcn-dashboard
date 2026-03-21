@@ -8,6 +8,8 @@ import {
   Banknote,
   Package,
   Star,
+  FileText,
+  CircleHelp,
 } from "lucide-react"
 import {
   Sidebar,
@@ -62,6 +64,16 @@ const items = [
     title: "Idols",
     url: "/idols",
     icon: Star,
+  },
+  {
+    title: "Policy",
+    url: "/policy",
+    icon: FileText,
+  },
+  {
+    title: "FAQ",
+    url: "/faq",
+    icon: CircleHelp,
   },
 ]
 

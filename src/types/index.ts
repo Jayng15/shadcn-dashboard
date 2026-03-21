@@ -81,3 +81,21 @@ export type Member = {
   createdAt: string;
   updatedAt: string;
 }
+
+export type Policy = {
+  id: string;
+  title: string;
+  description: string;
+  isActive: "TRUE" | "FALSE";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type FAQ = {
+  id: string;
+  question: string;
+  answer: string;
+  isActive: "TRUE" | "FALSE";
+  createdAt: string;
+  updatedAt: string;
+}

@@ -19,9 +19,11 @@ import { Route as LoginImport } from './routes/login'
 
 const TaskLazyImport = createFileRoute('/task')()
 const ProductsLazyImport = createFileRoute('/products')()
+const PolicyLazyImport = createFileRoute('/policy')()
 const OrdersLazyImport = createFileRoute('/orders')()
 const InventoryLazyImport = createFileRoute('/inventory')()
 const FinanceLazyImport = createFileRoute('/finance')()
+const FaqLazyImport = createFileRoute('/faq')()
 const CalendarLazyImport = createFileRoute('/calendar')()
 const IndexLazyImport = createFileRoute('/')()
 const UsersIndexLazyImport = createFileRoute('/users/')()
@@ -45,6 +47,12 @@ const ProductsLazyRoute = ProductsLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/products.lazy').then((d) => d.Route))
 
+const PolicyLazyRoute = PolicyLazyImport.update({
+  id: '/policy',
+  path: '/policy',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/policy.lazy').then((d) => d.Route))
+
 const OrdersLazyRoute = OrdersLazyImport.update({
   id: '/orders',
   path: '/orders',
@@ -62,6 +70,12 @@ const FinanceLazyRoute = FinanceLazyImport.update({
   path: '/finance',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/finance.lazy').then((d) => d.Route))
+
+const FaqLazyRoute = FaqLazyImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/faq.lazy').then((d) => d.Route))
 
 const CalendarLazyRoute = CalendarLazyImport.update({
   id: '/calendar',
@@ -144,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalendarLazyImport
       parentRoute: typeof rootRoute
     }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/finance': {
       id: '/finance'
       path: '/finance'
@@ -163,6 +184,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersLazyImport
+      parentRoute: typeof rootRoute
+    }
+    '/policy': {
+      id: '/policy'
+      path: '/policy'
+      fullPath: '/policy'
+      preLoaderRoute: typeof PolicyLazyImport
       parentRoute: typeof rootRoute
     }
     '/products': {
@@ -230,9 +258,11 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
   '/login': typeof LoginRoute
   '/calendar': typeof CalendarLazyRoute
+  '/faq': typeof FaqLazyRoute
   '/finance': typeof FinanceLazyRoute
   '/inventory': typeof InventoryLazyRoute
   '/orders': typeof OrdersLazyRoute
+  '/policy': typeof PolicyLazyRoute
   '/products': typeof ProductsLazyRoute
   '/task': typeof TaskLazyRoute
   '/idols/$teamId': typeof IdolsTeamIdLazyRoute
@@ -241,15 +271,19 @@ export interface FileRoutesByFullPath {
   '/idols': typeof IdolsIndexLazyRoute
   '/stores': typeof StoresIndexLazyRoute
   '/users': typeof UsersIndexLazyRoute
+  '/policy': typeof PolicyLazyRoute
+  '/faq': typeof FaqLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
   '/login': typeof LoginRoute
   '/calendar': typeof CalendarLazyRoute
+  '/faq': typeof FaqLazyRoute
   '/finance': typeof FinanceLazyRoute
   '/inventory': typeof InventoryLazyRoute
   '/orders': typeof OrdersLazyRoute
+  '/policy': typeof PolicyLazyRoute
   '/products': typeof ProductsLazyRoute
   '/task': typeof TaskLazyRoute
   '/idols/$teamId': typeof IdolsTeamIdLazyRoute
@@ -258,6 +292,8 @@ export interface FileRoutesByTo {
   '/idols': typeof IdolsIndexLazyRoute
   '/stores': typeof StoresIndexLazyRoute
   '/users': typeof UsersIndexLazyRoute
+  '/policy': typeof PolicyLazyRoute
+  '/faq': typeof FaqLazyRoute
 }
 
 export interface FileRoutesById {
@@ -265,9 +301,11 @@ export interface FileRoutesById {
   '/': typeof IndexLazyRoute
   '/login': typeof LoginRoute
   '/calendar': typeof CalendarLazyRoute
+  '/faq': typeof FaqLazyRoute
   '/finance': typeof FinanceLazyRoute
   '/inventory': typeof InventoryLazyRoute
   '/orders': typeof OrdersLazyRoute
+  '/policy': typeof PolicyLazyRoute
   '/products': typeof ProductsLazyRoute
   '/task': typeof TaskLazyRoute
   '/idols/$teamId': typeof IdolsTeamIdLazyRoute
@@ -276,6 +314,8 @@ export interface FileRoutesById {
   '/idols/': typeof IdolsIndexLazyRoute
   '/stores/': typeof StoresIndexLazyRoute
   '/users/': typeof UsersIndexLazyRoute
+  '/policy': typeof PolicyLazyRoute
+  '/faq': typeof FaqLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -284,9 +324,11 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/calendar'
+    | '/faq'
     | '/finance'
     | '/inventory'
     | '/orders'
+    | '/policy'
     | '/products'
     | '/task'
     | '/idols/$teamId'
@@ -295,14 +337,18 @@ export interface FileRouteTypes {
     | '/idols'
     | '/stores'
     | '/users'
+    | '/policy'
+    | '/faq'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/calendar'
+    | '/faq'
     | '/finance'
     | '/inventory'
     | '/orders'
+    | '/policy'
     | '/products'
     | '/task'
     | '/idols/$teamId'
@@ -311,14 +357,18 @@ export interface FileRouteTypes {
     | '/idols'
     | '/stores'
     | '/users'
+    | '/policy'
+    | '/faq'
   id:
     | '__root__'
     | '/'
     | '/login'
     | '/calendar'
+    | '/faq'
     | '/finance'
     | '/inventory'
     | '/orders'
+    | '/policy'
     | '/products'
     | '/task'
     | '/idols/$teamId'
@@ -327,6 +377,8 @@ export interface FileRouteTypes {
     | '/idols/'
     | '/stores/'
     | '/users/'
+    | '/policy'
+    | '/faq'
   fileRoutesById: FileRoutesById
 }
 
@@ -334,9 +386,11 @@ export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
   LoginRoute: typeof LoginRoute
   CalendarLazyRoute: typeof CalendarLazyRoute
+  FaqLazyRoute: typeof FaqLazyRoute
   FinanceLazyRoute: typeof FinanceLazyRoute
   InventoryLazyRoute: typeof InventoryLazyRoute
   OrdersLazyRoute: typeof OrdersLazyRoute
+  PolicyLazyRoute: typeof PolicyLazyRoute
   ProductsLazyRoute: typeof ProductsLazyRoute
   TaskLazyRoute: typeof TaskLazyRoute
   IdolsTeamIdLazyRoute: typeof IdolsTeamIdLazyRoute
@@ -351,9 +405,11 @@ const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
   LoginRoute: LoginRoute,
   CalendarLazyRoute: CalendarLazyRoute,
+  FaqLazyRoute: FaqLazyRoute,
   FinanceLazyRoute: FinanceLazyRoute,
   InventoryLazyRoute: InventoryLazyRoute,
   OrdersLazyRoute: OrdersLazyRoute,
+  PolicyLazyRoute: PolicyLazyRoute,
   ProductsLazyRoute: ProductsLazyRoute,
   TaskLazyRoute: TaskLazyRoute,
   IdolsTeamIdLazyRoute: IdolsTeamIdLazyRoute,
@@ -377,9 +433,11 @@ export const routeTree = rootRoute
         "/",
         "/login",
         "/calendar",
+        "/faq",
         "/finance",
         "/inventory",
         "/orders",
+        "/policy",
         "/products",
         "/task",
         "/idols/$teamId",
@@ -399,6 +457,9 @@ export const routeTree = rootRoute
     "/calendar": {
       "filePath": "calendar.lazy.tsx"
     },
+    "/faq": {
+      "filePath": "faq.lazy.tsx"
+    },
     "/finance": {
       "filePath": "finance.lazy.tsx"
     },
@@ -407,6 +468,9 @@ export const routeTree = rootRoute
     },
     "/orders": {
       "filePath": "orders.lazy.tsx"
+    },
+    "/policy": {
+      "filePath": "policy.lazy.tsx"
     },
     "/products": {
       "filePath": "products.lazy.tsx"

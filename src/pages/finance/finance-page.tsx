@@ -28,7 +28,7 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
-import { Search, X } from "lucide-react"
+import { Search, X, Upload } from "lucide-react"
 import { useSearch } from "@tanstack/react-router"
 import { User } from "@/types"
 
@@ -37,6 +37,18 @@ import { User } from "@/types"
 type WithdrawalFeePayload = {
   amount: number
   type: "FIXED" | "PERCENTAGE"
+  description?: string
+}
+
+type AdminBankInfo = {
+  bankName: string
+  accountNumber: string
+  accountOwner: string
+  qrCodeUrl: string | null
+}
+
+type MinDepositAmount = {
+  amount: number
   description?: string
 }
 
@@ -118,6 +130,20 @@ export default function FinancePage() {
     description: "",
   })
 
+  const [bankInfo, setBankInfo] = useState<AdminBankInfo>({
+    bankName: "",
+    accountNumber: "",
+    accountOwner: "",
+    qrCodeUrl: null,
+  })
+  const [qrFile, setQrFile] = useState<File | null>(null)
+  const [qrPreview, setQrPreview] = useState<string | null>(null)
+
+  const [minDeposit, setMinDeposit] = useState<MinDepositAmount>({
+    amount: 0,
+    description: "",
+  })
+
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["finance-transactions", sorting, columnFilters],
     queryFn: async () => {
@@ -135,6 +161,79 @@ export default function FinancePage() {
     },
     onError: (err: any) => {
       toast.error(err?.response?.data?.message || "Cập nhật phí rút tiền thất bại")
+    },
+  })
+
+  const { data: bankData, refetch: refetchBank } = useQuery({
+    queryKey: ["admin-bank-info"],
+    queryFn: async () => {
+      const res = await api.get("/finance/admin-bank")
+      return res.data
+    },
+  })
+
+  useEffect(() => {
+    if (bankData?.info) {
+      setBankInfo({
+        bankName: bankData.info.bankName,
+        accountNumber: bankData.info.accountNumber,
+        accountOwner: bankData.info.accountOwner,
+        qrCodeUrl: bankData.info.qrCodeUrl,
+      })
+    }
+  }, [bankData])
+
+  const bankMutation = useMutation({
+    mutationFn: async (payload: { bankName: string; accountNumber: string; accountOwner: string; qrCode?: File }) => {
+      const formData = new FormData()
+      formData.append("bankName", payload.bankName)
+      formData.append("accountNumber", payload.accountNumber)
+      formData.append("accountOwner", payload.accountOwner)
+      if (payload.qrCode) {
+        formData.append("qrCode", payload.qrCode)
+      }
+      await api.post("/finance/admin-bank", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      })
+    },
+    onSuccess: () => {
+      toast.success("Thông tin ngân hàng đã được cập nhật")
+      refetchBank()
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Cập nhật thông tin ngân hàng thất bại")
+    },
+  })
+
+  const { data: minDepositData, refetch: refetchMinDeposit } = useQuery({
+    queryKey: ["min-deposit-amount"],
+    queryFn: async () => {
+      const res = await api.get("/finance/deposit-min-amount")
+      return res.data
+    },
+  })
+
+  useEffect(() => {
+    if (minDepositData?.info) {
+      setMinDeposit({
+        amount: Number(minDepositData.info.amount),
+        description: minDepositData.info.description || "",
+      })
+    }
+  }, [minDepositData])
+
+  const minDepositMutation = useMutation({
+    mutationFn: async (payload: MinDepositAmount) => {
+      await api.post("/finance/deposit-min-amount", payload)
+    },
+    onSuccess: () => {
+      toast.success("Tiền nạp tối thiểu đã được cập nhật")
+      refetchMinDeposit()
+    },
+    onError: (err: any) => {
+      toast.error(err?.response?.data?.message || "Cập nhật tiền nạp tối thiểu thất bại")
     },
   })
 
@@ -212,63 +311,212 @@ export default function FinancePage() {
         <h2 className="text-2xl font-bold tracking-tight">Tài chính</h2>
       </div>
 
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Phí rút tiền</CardTitle>
+            <CardDescription>Cập nhật phí áp dụng cho các giao dịch rút tiền.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="fee-amount">Số tiền</Label>
+                <Input
+                  id="fee-amount"
+                  type="number"
+                  value={withdrawalFee.amount}
+                  onChange={(e) =>
+                    setWithdrawalFee((prev) => ({
+                      ...prev,
+                      amount: Number(e.target.value),
+                    }))
+                  }
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="fee-type">Loại</Label>
+                <Select
+                  value={withdrawalFee.type}
+                  onValueChange={(val: "FIXED" | "PERCENTAGE") =>
+                    setWithdrawalFee((prev) => ({ ...prev, type: val }))
+                  }
+                >
+                  <SelectTrigger id="fee-type">
+                    <SelectValue placeholder="Chọn loại" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FIXED">Cố định</SelectItem>
+                    <SelectItem value="PERCENTAGE">Phần trăm</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="fee-description">Mô tả</Label>
+              <Input
+                id="fee-description"
+                value={withdrawalFee.description}
+                onChange={(e) =>
+                  setWithdrawalFee((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button
+              disabled={feeMutation.isPending}
+              onClick={() => feeMutation.mutate(withdrawalFee)}
+            >
+              Lưu phí rút tiền
+            </Button>
+          </CardFooter>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Tiền nạp tối thiểu</CardTitle>
+            <CardDescription>Cấu hình số tiền nạp tối thiểu cho mỗi lần giao dịch.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="min-amount">Số tiền tối thiểu</Label>
+              <Input
+                id="min-amount"
+                type="number"
+                value={minDeposit.amount}
+                onChange={(e) =>
+                  setMinDeposit((prev) => ({
+                    ...prev,
+                    amount: Number(e.target.value),
+                  }))
+                }
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="min-description">Mô tả</Label>
+              <Input
+                id="min-description"
+                placeholder="Ví dụ: Nạp tối thiểu 50,000đ"
+                value={minDeposit.description}
+                onChange={(e) =>
+                  setMinDeposit((prev) => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+              />
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button
+              disabled={minDepositMutation.isPending}
+              onClick={() => minDepositMutation.mutate(minDeposit)}
+            >
+              Lưu tiền nạp tối thiểu
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+
       <Card>
         <CardHeader>
-          <CardTitle>Phí rút tiền</CardTitle>
-          <CardDescription>Cập nhật phí áp dụng cho các giao dịch rút tiền.</CardDescription>
+          <CardTitle>Thông tin ngân hàng</CardTitle>
+          <CardDescription>Cập nhật thông tin ngân hàng nhận tiền nạp.</CardDescription>
         </CardHeader>
-        <CardContent className="grid gap-4 md:grid-cols-3">
-          <div className="space-y-2">
-            <Label htmlFor="fee-amount">Số tiền</Label>
-            <Input
-              id="fee-amount"
-              type="number"
-              value={withdrawalFee.amount}
-              onChange={(e) =>
-                setWithdrawalFee((prev) => ({
-                  ...prev,
-                  amount: Number(e.target.value),
-                }))
-              }
-            />
+        <CardContent className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="bank-name">Tên ngân hàng</Label>
+              <Input
+                id="bank-name"
+                placeholder="Ví dụ: Vietcombank, MB Bank..."
+                value={bankInfo.bankName}
+                onChange={(e) => setBankInfo(p => ({ ...p, bankName: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="acc-number">Số tài khoản</Label>
+              <Input
+                id="acc-number"
+                placeholder="Nhập số tài khoản"
+                value={bankInfo.accountNumber}
+                onChange={(e) => setBankInfo(p => ({ ...p, accountNumber: e.target.value }))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="acc-owner">Chủ tài khoản</Label>
+              <Input
+                id="acc-owner"
+                placeholder="Nhập tên chủ tài khoản"
+                value={bankInfo.accountOwner}
+                onChange={(e) => setBankInfo(p => ({ ...p, accountOwner: e.target.value }))}
+              />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="fee-type">Loại</Label>
-            <Select
-              value={withdrawalFee.type}
-              onValueChange={(val: "FIXED" | "PERCENTAGE") =>
-                setWithdrawalFee((prev) => ({ ...prev, type: val }))
-              }
-            >
-              <SelectTrigger id="fee-type">
-                <SelectValue placeholder="Chọn loại" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="FIXED">Cố định</SelectItem>
-                <SelectItem value="PERCENTAGE">Phần trăm</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2 md:col-span-1">
-            <Label htmlFor="fee-description">Mô tả</Label>
-            <Input
-              id="fee-description"
-              value={withdrawalFee.description}
-              onChange={(e) =>
-                setWithdrawalFee((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
-            />
+          <div className="space-y-4">
+            <Label>QR Code (Nạp tiền)</Label>
+            <div className="flex flex-col items-center gap-4 p-4 border rounded-lg bg-muted/50">
+              <div className="relative aspect-square w-48 overflow-hidden rounded-md border bg-background">
+                {(qrPreview || (bankInfo.qrCodeUrl && !qrFile)) ? (
+                  <img
+                    src={qrPreview || `${import.meta.env.VITE_BASE_URL}${bankInfo.qrCodeUrl}`}
+                    alt="Bank QR Code"
+                    className="h-full w-full object-contain"
+                  />
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center text-muted-foreground">
+                    <Upload className="h-8 w-8 mb-2" />
+                    <span className="text-xs">Chưa có mã QR</span>
+                  </div>
+                )}
+              </div>
+              <div className="flex w-full items-center gap-2">
+                <Input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0]
+                    if (file) {
+                      setQrFile(file)
+                      const reader = new FileReader()
+                      reader.onloadend = () => setQrPreview(reader.result as string)
+                      reader.readAsDataURL(file)
+                    }
+                  }}
+                  className="flex-1 cursor-pointer"
+                />
+                {(qrPreview || bankInfo.qrCodeUrl) && (
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => {
+                      setQrFile(null)
+                      setQrPreview(null)
+                      setBankInfo(p => ({ ...p, qrCodeUrl: null }))
+                    }}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+              <p className="text-[10px] text-muted-foreground text-center">
+                Tải lên hình ảnh mã QR Code của ngân hàng để người dùng dễ dàng chuyển khoản.
+              </p>
+            </div>
           </div>
         </CardContent>
-        <CardFooter>
+        <CardFooter className="flex justify-between items-center bg-muted/30 p-4 border-t">
+          <p className="text-xs text-muted-foreground">
+            Lưu ý: Thông tin này sẽ hiển thị trực tiếp cho người dùng khi họ yêu cầu nạp tiền.
+          </p>
           <Button
-            disabled={feeMutation.isPending}
-            onClick={() => feeMutation.mutate(withdrawalFee)}
+            disabled={bankMutation.isPending}
+            onClick={() => bankMutation.mutate({ ...bankInfo, qrCode: qrFile || undefined })}
           >
-            Lưu phí rút tiền
+            Lưu thông tin ngân hàng
           </Button>
         </CardFooter>
       </Card>
