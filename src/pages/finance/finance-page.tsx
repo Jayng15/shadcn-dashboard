@@ -30,6 +30,7 @@ import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { Search, X } from "lucide-react"
 import { useSearch } from "@tanstack/react-router"
+import { User } from "@/types"
 
 
 
@@ -137,6 +138,19 @@ export default function FinancePage() {
     },
   })
 
+  const { data: usersData } = useQuery({
+    queryKey: ["users-list"],
+    queryFn: async () => {
+      const res = await api.get("/user/list?limit=1000")
+      return res.data
+    },
+  })
+
+  const userMap = (usersData?.users || []).reduce((acc: Record<string, string>, user: User) => {
+    acc[user.id] = user.fullName || user.email
+    return acc
+  }, {})
+
   const allTransactions: FinanceTransaction[] = data?.transactions || []
 
   const filteredByType =
@@ -161,6 +175,7 @@ export default function FinancePage() {
     getFilteredRowModel: getFilteredRowModel(),
     meta: {
       refetch: () => refetch(),
+      userMap,
       openFinanceDetail: async (tx: FinanceTransaction) => {
         setIsDetailOpen(true)
         setIsDetailLoading(true)
@@ -261,7 +276,7 @@ export default function FinancePage() {
       <ResponsiveDialog
         isOpen={isDetailOpen}
         setIsOpen={setIsDetailOpen}
-        title="Transaction Details"
+        title="Chi tiết giao dịch"
       >
         {isDetailLoading && (
           <div className="py-4 text-center text-sm text-muted-foreground">
@@ -276,8 +291,8 @@ export default function FinancePage() {
                 <span>{selectedTx.txCode}</span>
               </div>
               <div>
-                <span className="font-semibold">ID Người dùng: </span>
-                <span>{selectedTx.userId}</span>
+                <span className="font-semibold">Người dùng: </span>
+                <span>{userMap[selectedTx.userId] || selectedTx.userId}</span>
               </div>
               <div>
                 <span className="font-semibold">ID Tài khoản: </span>
@@ -422,7 +437,7 @@ export default function FinancePage() {
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
-                    placeholder="Tìm User ID..."
+                    placeholder="Tìm người dùng..."
                     className="pl-8"
                     value={(table.getColumn("userId")?.getFilterValue() as string) ?? ""}
                     onChange={(e) => table.getColumn("userId")?.setFilterValue(e.target.value)}

@@ -33,28 +33,40 @@ export type FinanceTransaction = {
   createdAt: string
 }
 
+export interface FinanceTableMeta {
+  refetch: () => void
+  userMap?: Record<string, string>
+  openFinanceDetail?: (tx: FinanceTransaction) => void
+}
+
 export const columns: ColumnDef<FinanceTransaction>[] = [
   {
     accessorKey: "txCode",
-    header: "Tx Code",
+    header: "Mã giao dịch",
   },
   {
     accessorKey: "userId",
-    header: "User ID",
+    header: "Người dùng",
+    cell: ({ row, table }) => {
+      const userId = row.getValue("userId") as string
+      const userMap = (table.options.meta as FinanceTableMeta)?.userMap
+      return userMap?.[userId] || userId
+    },
   },
   {
     accessorKey: "type",
-    header: "Type",
+    header: "Loại",
     cell: ({ row }) => {
       const type = row.getValue("type") as FinanceTransaction["type"]
       const variant =
         type === "DEPOSIT" ? "default" : ("destructive" as const)
-      return <Badge variant={variant}>{type}</Badge>
+      const label = type === "DEPOSIT" ? "Nạp tiền" : "Rút tiền"
+      return <Badge variant={variant}>{label}</Badge>
     },
   },
   {
     accessorKey: "amount",
-    header: "Amount",
+    header: "Số tiền",
     cell: ({ row }) => {
       const amount = Number(row.getValue("amount") as string)
       const currency = row.original.currency
@@ -66,33 +78,35 @@ export const columns: ColumnDef<FinanceTransaction>[] = [
   },
   {
     accessorKey: "paymentMethod",
-    header: "Method",
+    header: "Phương thức",
   },
   {
     accessorKey: "verifiedStatus",
-    header: "Verified",
+    header: "Xác minh",
     cell: ({ row }) => {
       const status = row.getValue("verifiedStatus") as string
       let variant: "default" | "secondary" | "destructive" | "outline" =
         "outline"
-
+      let label = status
       switch (status) {
         case "VERIFIED":
           variant = "default"
+          label = "Đã xác minh"
           break
         case "PENDING":
           variant = "secondary"
+          label = "Chờ xử lý"
           break
         default:
           variant = "outline"
       }
 
-      return <Badge variant={variant}>{status}</Badge>
+      return <Badge variant={variant}>{label}</Badge>
     },
   },
   {
     accessorKey: "txAt",
-    header: "Date",
+    header: "Ngày",
     cell: ({ row }) => {
       const txAt = row.getValue("txAt") as string
       return new Date(txAt).toLocaleString()
@@ -112,23 +126,23 @@ export const columns: ColumnDef<FinanceTransaction>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(tx.id)}
             >
-              Copy Tx ID
+              Sao chép ID giao dịch
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(tx.txCode)}
             >
-              Copy Tx Code
+              Sao chép mã giao dịch
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                (table.options.meta as any)?.openFinanceDetail?.(tx)
+                (table.options.meta as FinanceTableMeta)?.openFinanceDetail?.(tx)
               }
             >
-              View Details
+              Xem chi tiết
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
