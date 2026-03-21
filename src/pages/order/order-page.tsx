@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo, useCallback } from "react"
 import { useQuery } from "@tanstack/react-query"
 import DataTable from "@/pages/users/components/data-table"
 import {
@@ -35,6 +35,7 @@ export default function OrderPage() {
 
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [isDetailLoading, setIsDetailLoading] = useState(false)
+  const [isVerifying, setIsVerifying] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const search = useSearch({ from: '/orders' }) as { id?: string }
 
@@ -48,8 +49,8 @@ export default function OrderPage() {
 
   const allOrders: Order[] = data?.orders || []
 
-  const filteredOrders =
-    tabFilter === "ALL"
+  const filteredOrders = useMemo(() => {
+    return tabFilter === "ALL"
       ? allOrders
       : allOrders.filter((order) => {
           if (tabFilter === "PROCESSING") {
@@ -61,6 +62,7 @@ export default function OrderPage() {
           }
           return order.status === tabFilter
       })
+  }, [allOrders, tabFilter])
 
   const table = useReactTable({
     data: filteredOrders,
@@ -77,7 +79,7 @@ export default function OrderPage() {
     getFilteredRowModel: getFilteredRowModel(),
     meta: {
       refetch: () => refetch(),
-      openOrderDetail: async (order: Order) => {
+      openOrderDetail: useCallback(async (order: Order) => {
         setIsDetailOpen(true)
         setIsDetailLoading(true)
         try {
@@ -85,9 +87,24 @@ export default function OrderPage() {
         } finally {
           setIsDetailLoading(false)
         }
-      },
+      }, []),
     },
   })
+
+  const handleCompleteOrder = async () => {
+    if (!selectedOrder) return;
+    setIsVerifying(true);
+    try {
+      await api.post(`/order/${selectedOrder.id}/complete`);
+      alert("Đã duyệt đơn hàng thành công!");
+      refetch();
+      setIsDetailOpen(false);
+    } catch (err: any) {
+      alert("Lỗi khi duyệt đơn hàng: " + (err.response?.data?.message || err.message));
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   useEffect(() => {
     if (search.id && data?.orders) {
@@ -198,11 +215,22 @@ export default function OrderPage() {
                </div>
             </div>
 
-            <div className="pt-2 text-xs text-muted-foreground">
+            <div className="pt-2 text-xs text-muted-foreground border-t">
                <div className="break-all">ID Đơn hàng: {selectedOrder.id}</div>
                <div className="break-all">ID Người dùng: {selectedOrder.userId}</div>
                <div className="break-all">ID Cửa hàng: {selectedOrder.storeId}</div>
             </div>
+
+            {selectedOrder.status === 'DELIVERED' && (
+              <div className="pt-4 flex justify-end gap-2">
+                <Button 
+                  onClick={handleCompleteOrder} 
+                  disabled={isVerifying}
+                >
+                  {isVerifying ? "Đang xử lý..." : "Xác nhận duyệt"}
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </ResponsiveDialog>
@@ -240,7 +268,7 @@ export default function OrderPage() {
           <TabsTrigger value="pending">Chờ xử lý</TabsTrigger>
           <TabsTrigger value="processing">Đang chuẩn bị</TabsTrigger>
           <TabsTrigger value="shipped">Đang giao</TabsTrigger>
-          <TabsTrigger value="delivered">Đã giao</TabsTrigger>
+          <TabsTrigger value="delivered">Chờ duyệt</TabsTrigger>
           <TabsTrigger value="completed">Hoàn thành</TabsTrigger>
           <TabsTrigger value="cancelled">Đã hủy</TabsTrigger>
         </TabsList>
