@@ -14,6 +14,7 @@ export type FinanceTransaction = {
   id: string
   accountId: string
   userId: string
+  orderId?: string | null
   amount: string
   currency: string
   status: string
@@ -58,9 +59,16 @@ export const columns: ColumnDef<FinanceTransaction>[] = [
     header: "Loại",
     cell: ({ row }) => {
       const type = row.getValue("type") as FinanceTransaction["type"]
-      const variant =
-        type === "DEPOSIT" ? "default" : ("destructive" as const)
-      const label = type === "DEPOSIT" ? "Nạp tiền" : "Rút tiền"
+      const label = (() => {
+        switch (type) {
+          case "DEPOSIT": return "Nạp tiền"
+          case "WITHDRAW": return "Rút tiền"
+          case "PURCHASE": return "Thanh toán"
+          case "REFUND": return "Hoàn tiền"
+          default: return type
+        }
+      })()
+      const variant = (type === "DEPOSIT" || type === "REFUND") ? "default" : ("destructive" as const)
       return <Badge variant={variant}>{label}</Badge>
     },
   },
