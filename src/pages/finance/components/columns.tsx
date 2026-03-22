@@ -18,7 +18,7 @@ export type FinanceTransaction = {
   amount: string
   currency: string
   status: string
-  type: "DEPOSIT" | "WITHDRAW"
+  type: "DEPOSIT" | "WITHDRAW" | "PURCHASE" | "REFUND"
   txCode: string
   balanceAfter: string
   paymentMethod: string
