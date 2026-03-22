@@ -271,8 +271,6 @@ export interface FileRoutesByFullPath {
   '/idols': typeof IdolsIndexLazyRoute
   '/stores': typeof StoresIndexLazyRoute
   '/users': typeof UsersIndexLazyRoute
-  '/policy': typeof PolicyLazyRoute
-  '/faq': typeof FaqLazyRoute
 }
 
 export interface FileRoutesByTo {
@@ -292,8 +290,6 @@ export interface FileRoutesByTo {
   '/idols': typeof IdolsIndexLazyRoute
   '/stores': typeof StoresIndexLazyRoute
   '/users': typeof UsersIndexLazyRoute
-  '/policy': typeof PolicyLazyRoute
-  '/faq': typeof FaqLazyRoute
 }
 
 export interface FileRoutesById {
@@ -314,8 +310,6 @@ export interface FileRoutesById {
   '/idols/': typeof IdolsIndexLazyRoute
   '/stores/': typeof StoresIndexLazyRoute
   '/users/': typeof UsersIndexLazyRoute
-  '/policy': typeof PolicyLazyRoute
-  '/faq': typeof FaqLazyRoute
 }
 
 export interface FileRouteTypes {
@@ -337,8 +331,6 @@ export interface FileRouteTypes {
     | '/idols'
     | '/stores'
     | '/users'
-    | '/policy'
-    | '/faq'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -357,8 +349,6 @@ export interface FileRouteTypes {
     | '/idols'
     | '/stores'
     | '/users'
-    | '/policy'
-    | '/faq'
   id:
     | '__root__'
     | '/'
@@ -377,8 +367,6 @@ export interface FileRouteTypes {
     | '/idols/'
     | '/stores/'
     | '/users/'
-    | '/policy'
-    | '/faq'
   fileRoutesById: FileRoutesById
 }
 

@@ -6,8 +6,8 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useState, useEffect } from "react"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState, useEffect, useMemo } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import DataTable from "@/pages/users/components/data-table"
 import {
@@ -245,19 +245,19 @@ export default function FinancePage() {
     },
   })
 
-  const userMap = (usersData?.users || []).reduce((acc: Record<string, string>, user: User) => {
-    acc[user.id] = user.fullName || user.email
-    return acc
-  }, {})
+  const userMap = useMemo(() => {
+    return (usersData?.users || []).reduce((acc: Record<string, string>, user: User) => {
+      acc[user.id] = user.fullName || user.email
+      return acc
+    }, {})
+  }, [usersData?.users])
 
-  const allTransactions: FinanceTransaction[] = data?.transactions || []
-
-  const filteredByType =
-    tabFilter === "ALL"
-      ? allTransactions
-      : tabFilter === "PENDING"
-      ? allTransactions.filter((tx) => tx.verifiedStatus === "PENDING")
-      : allTransactions.filter((tx) => tx.type === tabFilter)
+  const filteredByType = useMemo(() => {
+    const allTransactions: FinanceTransaction[] = data?.transactions || []
+    if (tabFilter === "ALL") return allTransactions
+    if (tabFilter === "PENDING") return allTransactions.filter((tx) => tx.verifiedStatus === "PENDING")
+    return allTransactions.filter((tx) => tx.type === tabFilter)
+  }, [tabFilter, data?.transactions])
 
   const table = useReactTable({
     data: filteredByType,
@@ -619,7 +619,7 @@ export default function FinancePage() {
                             }
                           : prev
                       )
-                    } catch (err) {
+                    } catch {
                       toast.error("Xác minh giao dịch thất bại")
                     } finally {
                       setIsVerifyLoading(false)
@@ -667,21 +667,31 @@ export default function FinancePage() {
           <TabsTrigger value="pending">Chờ xử lý</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="all" className="h-full">
-          <Card className="bg-sidebar w-full min-h-full flex flex-col">
-            <CardHeader>
-              <CardTitle>Tất cả giao dịch</CardTitle>
-              <CardDescription>Tổng quan về tất cả các giao dịch tài chính.</CardDescription>
-              <div className="flex items-center gap-2 pt-1">
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    placeholder="Tìm mã giao dịch..."
-                    className="pl-8"
-                    value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
-                    onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
-                  />
-                </div>
+        <Card className="bg-sidebar w-full mt-4 flex flex-col">
+          <CardHeader>
+            <CardTitle>
+              {tabFilter === "ALL" && "Tất cả giao dịch"}
+              {tabFilter === "DEPOSIT" && "Nạp tiền"}
+              {tabFilter === "WITHDRAW" && "Rút tiền"}
+              {tabFilter === "PENDING" && "Giao dịch chờ xử lý"}
+            </CardTitle>
+            <CardDescription>
+              {tabFilter === "ALL" && "Tổng quan về tất cả các giao dịch tài chính."}
+              {tabFilter === "DEPOSIT" && "Chỉ các giao dịch nạp tiền."}
+              {tabFilter === "WITHDRAW" && "Chỉ các giao dịch rút tiền."}
+              {tabFilter === "PENDING" && "Các giao dịch đang chờ xác minh."}
+            </CardDescription>
+            <div className="flex items-center gap-2 pt-1">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  placeholder="Tìm mã giao dịch..."
+                  className="pl-8"
+                  value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
+                  onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
+                />
+              </div>
+              {tabFilter === "ALL" && (
                 <div className="relative flex-1 max-w-sm">
                   <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
@@ -691,126 +701,24 @@ export default function FinancePage() {
                     onChange={(e) => table.getColumn("userId")?.setFilterValue(e.target.value)}
                   />
                 </div>
-                {table.getState().columnFilters.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
-                    <X className="h-4 w-4 mr-1" />
-                    Xóa bộ lọc
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1">
-              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
-            </CardContent>
-            <CardFooter>
-              {!isPending && (
-                <DataTablePagination table={table} className="w-full" />
               )}
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="deposits" className="h-full">
-          <Card className="bg-sidebar w-full min-h-full flex flex-col">
-            <CardHeader>
-              <CardTitle>Nạp tiền</CardTitle>
-              <CardDescription>Chỉ các giao dịch nạp tiền.</CardDescription>
-              <div className="flex items-center gap-2 pt-1">
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    placeholder="Tìm mã giao dịch..."
-                    className="pl-8"
-                    value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
-                    onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
-                  />
-                </div>
-                {table.getState().columnFilters.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
-                    <X className="h-4 w-4 mr-1" />
-                    Xóa bộ lọc
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1">
-              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
-            </CardContent>
-            <CardFooter>
-              {!isPending && (
-                <DataTablePagination table={table} className="w-full" />
+              {table.getState().columnFilters.length > 0 && (
+                <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                  <X className="h-4 w-4 mr-1" />
+                  Xóa bộ lọc
+                </Button>
               )}
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="withdrawals" className="h-full">
-          <Card className="bg-sidebar w-full min-h-full flex flex-col">
-            <CardHeader>
-              <CardTitle>Rút tiền</CardTitle>
-              <CardDescription>Chỉ các giao dịch rút tiền.</CardDescription>
-              <div className="flex items-center gap-2 pt-1">
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    placeholder="Tìm mã giao dịch..."
-                    className="pl-8"
-                    value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
-                    onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
-                  />
-                </div>
-                {table.getState().columnFilters.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
-                    <X className="h-4 w-4 mr-1" />
-                    Xóa bộ lọc
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1">
-              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
-            </CardContent>
-            <CardFooter>
-              {!isPending && (
-                <DataTablePagination table={table} className="w-full" />
-              )}
-            </CardFooter>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="pending" className="h-full">
-          <Card className="bg-sidebar w-full min-h-full flex flex-col">
-            <CardHeader>
-              <CardTitle>Giao dịch chờ xử lý</CardTitle>
-              <CardDescription>Các giao dịch đang chờ xác minh.</CardDescription>
-              <div className="flex items-center gap-2 pt-1">
-                <div className="relative flex-1 max-w-sm">
-                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-                  <Input
-                    placeholder="Tìm mã giao dịch..."
-                    className="pl-8"
-                    value={(table.getColumn("txCode")?.getFilterValue() as string) ?? ""}
-                    onChange={(e) => table.getColumn("txCode")?.setFilterValue(e.target.value)}
-                  />
-                </div>
-                {table.getState().columnFilters.length > 0 && (
-                  <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
-                    <X className="h-4 w-4 mr-1" />
-                    Xóa bộ lọc
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="flex-1">
-              {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
-            </CardContent>
-            <CardFooter>
-              {!isPending && (
-                <DataTablePagination table={table} className="w-full" />
-              )}
-            </CardFooter>
-          </Card>
-        </TabsContent>
+            </div>
+          </CardHeader>
+          <CardContent className="flex-1">
+            {isPending ? "Đang tải..." : <DataTable table={table} columns={columns} />}
+          </CardContent>
+          <CardFooter>
+            {!isPending && (
+              <DataTablePagination table={table} className="w-full" />
+            )}
+          </CardFooter>
+        </Card>
       </Tabs>
     </div>
   )
