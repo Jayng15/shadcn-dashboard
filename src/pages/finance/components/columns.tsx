@@ -59,7 +59,9 @@ export const columns: ColumnDef<FinanceTransaction>[] = [
     header: "Loại",
     cell: ({ row }) => {
       const type = row.getValue("type") as FinanceTransaction["type"]
+      const orderId = row.original.orderId
       const label = (() => {
+        if (type === "DEPOSIT" && orderId) return "Doanh thu"
         switch (type) {
           case "DEPOSIT": return "Nạp tiền"
           case "WITHDRAW": return "Rút tiền"
