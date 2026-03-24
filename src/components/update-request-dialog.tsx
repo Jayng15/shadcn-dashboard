@@ -15,11 +15,20 @@ import api from "@/lib/api"
 import { Loader2, Info, Calendar, Edit3, ArrowRight, CheckCircle2, XCircle, AlertCircle, Package, Store } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { exactImageUrl } from "@/lib/utils"
+import { SafeImage } from "@/components/safe-image"
+
+export interface UpdateRequest {
+  id: string
+  targetId: string
+  createdAt: string
+  payload: Record<string, unknown> | null
+  [key: string]: unknown
+}
 
 interface UpdateRequestDialogProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
-  request: any
+  request: UpdateRequest | null
   onSuccess: () => void
   type: "STORE" | "PRODUCT"
 }
@@ -36,6 +45,7 @@ export function UpdateRequestDialog({
   const [showRejectInput, setShowRejectInput] = useState(false)
 
   const handleApprove = async () => {
+    if (!request) return;
     try {
       setIsLoading(true)
       const endpoint = type === "STORE"
@@ -46,14 +56,16 @@ export function UpdateRequestDialog({
       toast.success("Đã phê duyệt thay đổi")
       setIsOpen(false)
       onSuccess()
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Không thể phê duyệt yêu cầu")
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message || "Không thể phê duyệt yêu cầu")
     } finally {
       setIsLoading(false)
     }
   }
 
   const handleReject = async () => {
+    if (!request) return;
     if (!showRejectInput) {
       setShowRejectInput(true)
       return
@@ -74,8 +86,9 @@ export function UpdateRequestDialog({
       toast.success("Đã từ chối yêu cầu")
       setIsOpen(false)
       onSuccess()
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Không thể từ chối yêu cầu")
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      toast.error(err?.response?.data?.message || "Không thể từ chối yêu cầu")
     } finally {
       setIsLoading(false)
       setShowRejectInput(false)
@@ -147,11 +160,13 @@ export function UpdateRequestDialog({
               <div className="space-y-1 rounded-xl border overflow-hidden bg-background shadow-inner">
                 {(() => {
                   let payload = request.payload;
-                  try {
-                    if (typeof payload === 'string') {
-                      payload = JSON.parse(payload);
+                    try {
+                      if (typeof payload === 'string') {
+                        payload = JSON.parse(payload);
+                      }
+                    } catch {
+                      // Silently skip if not JSON
                     }
-                  } catch (e) {}
 
                   if (typeof payload !== 'object' || payload === null) {
                     return <div className="p-4 text-sm italic bg-muted/10 text-muted-foreground">{String(payload)}</div>
@@ -184,11 +199,13 @@ export function UpdateRequestDialog({
                       .replace(/^./, (str) => str.toUpperCase());
                   };
 
-                  const renderValue = (value: any, key: string): React.ReactNode => {
-                    if (Array.isArray(value)) {
+                  const renderValue = (value: unknown, key: string): React.ReactNode => {
+                    const val = value as any;
+                    const strVal = String(value);
+                    if (Array.isArray(val)) {
                       return (
                         <div className="flex flex-wrap gap-2 mt-1">
-                          {value.map((v, i) => (
+                          {val.map((v, i) => (
                             <div key={i} className="rounded-md border p-1 bg-muted/10">
                               {renderValue(v, key)}
                             </div>
@@ -196,10 +213,10 @@ export function UpdateRequestDialog({
                         </div>
                       )
                     }
-                    if (typeof value === 'object' && value !== null) {
+                    if (typeof val === 'object' && val !== null) {
                       return (
                         <div className="pl-3 border-l-2 border-primary/20 mt-1 space-y-2 py-1 ml-1">
-                          {Object.entries(value).map(([subKey, subValue]) => (
+                          {Object.entries(val as Record<string, unknown>).map(([subKey, subValue]) => (
                             <div key={subKey} className="flex flex-col gap-0.5 text-left">
                               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">{formatKey(subKey)}</span>
                               <div className="text-sm text-foreground">{renderValue(subValue, subKey)}</div>
@@ -209,16 +226,14 @@ export function UpdateRequestDialog({
                       )
                     }
 
-                    const strVal = String(value);
-                    if (strVal.match(/\.(jpeg|jpg|gif|png|webp|svg)$/i) || strVal.startsWith('/uploads') || strVal.startsWith('http')) {
+                    if (typeof val === 'string' && (val.startsWith('http') || val.startsWith('/'))) {
                       return (
-                        <div className="relative group mt-1 inline-block">
-                          <img
-                            src={exactImageUrl(strVal)}
-                            alt="Preview"
-                            className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg border shadow-sm transition-transform group-hover:scale-105"
+                        <div className="mt-1 relative group overflow-hidden rounded-lg border bg-muted/20 w-full max-w-[200px] aspect-video">
+                          <SafeImage 
+                            src={exactImageUrl(val)} 
+                            alt={key}
+                            className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                           />
-                          <div className="absolute inset-0 bg-black/5 rounded-lg pointer-events-none" />
                         </div>
                       )
                     }

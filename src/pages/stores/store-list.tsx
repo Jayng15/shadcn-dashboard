@@ -27,7 +27,7 @@ import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { UpdateRequestDialog } from "@/components/update-request-dialog";
+import { UpdateRequestDialog, type UpdateRequest } from "@/components/update-request-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Star, X, Search, Store as StoreIcon, User, Phone, Mail, MapPin, CreditCard, ShieldCheck, History, CheckCircle2, Ban } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -72,7 +72,7 @@ export default function StoreListPage() {
 
   // Update Request State
   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
-  const [selectedRequest, setSelectedRequest] = useState<any | null>(null);
+  const [selectedRequest, setSelectedRequest] = useState<UpdateRequest | null>(null);
   const [tabFilter, setTabFilter] = useState("all");
 
   // Reviews & Reports State
@@ -448,6 +448,7 @@ export default function StoreListPage() {
   const table = useReactTable({
     data: stores,
     columns,
+    meta: tableMeta,
     state: {
       sorting,
       columnFilters,
@@ -458,7 +459,6 @@ export default function StoreListPage() {
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
-    meta: tableMeta,
   });
 
   const requestTable = useReactTable({
@@ -678,7 +678,7 @@ export default function StoreListPage() {
                         setIsActionLoading(true);
                         await api.post(`/store/${selectedStore.id}/verify`);
                         toast.success("Xác minh cửa hàng thành công");
-                        setSelectedStore((prev) => prev ? { ...prev, isVerified: true } : prev);
+                        setSelectedStore((prev: StoreDetail | null) => prev ? { ...prev, isVerified: true } : prev);
                         refetchStores();
                       } catch {
                         toast.error("Xác minh thất bại");
@@ -699,7 +699,7 @@ export default function StoreListPage() {
                         setIsActionLoading(true);
                         await api.patch(`/store/${selectedStore.id}/status`, { status: "REJECTED" });
                         toast.success("Cửa hàng đã bị từ chối");
-                        setSelectedStore((prev) => prev ? { ...prev, status: "REJECTED" } : prev);
+                        setSelectedStore((prev: StoreDetail | null) => prev ? { ...prev, status: "REJECTED" } : prev);
                         refetchStores();
                       } catch {
                         toast.error("Từ chối thất bại");

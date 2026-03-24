@@ -159,7 +159,7 @@ export default function FinancePage() {
         onSuccess: () => {
             toast.success("Phí rút tiền đã được cập nhật")
         },
-        onError: (err: any) => {
+        onError: (err: { response?: { data?: { message?: string } } }) => {
             toast.error(err?.response?.data?.message || "Cập nhật phí rút tiền thất bại")
         },
     })
@@ -202,7 +202,7 @@ export default function FinancePage() {
             toast.success("Thông tin ngân hàng đã được cập nhật")
             refetchBank()
         },
-        onError: (err: any) => {
+        onError: (err: { response?: { data?: { message?: string } } }) => {
             toast.error(err?.response?.data?.message || "Cập nhật thông tin ngân hàng thất bại")
         },
     })
@@ -232,7 +232,7 @@ export default function FinancePage() {
             toast.success("Tiền nạp tối thiểu đã được cập nhật")
             refetchMinDeposit()
         },
-        onError: (err: any) => {
+        onError: (err: { response?: { data?: { message?: string } } }) => {
             toast.error(err?.response?.data?.message || "Cập nhật tiền nạp tối thiểu thất bại")
         },
     })

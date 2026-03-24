@@ -15,8 +15,6 @@ import {
 import { toast } from "sonner"
 import api from "@/lib/api"
 
-// Define the shape of our Store data
-// Define the shape of our Store data
 export type Store = {
   id: string
   userId: string
@@ -29,32 +27,35 @@ export type Store = {
   createdAt: string
 }
 
+export interface StoreTableMeta {
+  refetch: () => void;
+  openStoreDetail?: (store: Store) => void;
+  openStoreReviews?: (store: Store) => void;
+  openStoreReports?: (store: Store) => void;
+}
+
 // Helper functions (outside component to avoid recreation, passing tableMeta)
-const verifyStore = async (id: string, tableMeta: any) => {
+const verifyStore = async (id: string, tableMeta?: StoreTableMeta) => {
     try {
         await api.post(`/store/${id}/verify`);
         toast.success("Đã xác minh cửa hàng");
         tableMeta?.refetch();
-    } catch (e: any) {
-        toast.error("Không thể xác minh cửa hàng");
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } } };
+        toast.error(err.response?.data?.message || "Xác minh thất bại");
     }
-};
+}
 
-const updateStoreStatus = async (id: string, status: 'ACTIVE' | 'BANNED' | 'REJECTED' | 'REQUESTED', tableMeta: any) => {
+const updateStoreStatus = async (id: string, status: string, tableMeta?: StoreTableMeta) => {
     try {
         await api.patch(`/store/${id}/status`, { status });
-        const statusMap = {
-            ACTIVE: "Đang hoạt động",
-            BANNED: "Đã bị cấm",
-            REJECTED: "Đã từ chối",
-            REQUESTED: "Đang chờ duyệt"
-        };
-        toast.success(`Đã cập nhật trạng thái cửa hàng thành ${statusMap[status]}`);
+        toast.success(`Cập nhật trạng thái thành: ${status}`);
         tableMeta?.refetch();
-    } catch (e: any) {
-        toast.error("Không thể cập nhật trạng thái");
+    } catch (error: unknown) {
+        const err = error as { response?: { data?: { message?: string } } };
+        toast.error(err.response?.data?.message || "Cập nhật trạng thái thất bại");
     }
-};
+}
 
 export const columns: ColumnDef<Store>[] = [
   {
@@ -82,48 +83,43 @@ export const columns: ColumnDef<Store>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          >
-            Tên cửa hàng
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Tên cửa hàng
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      )
+    },
+    cell: ({ row }) => <div className="font-bold pl-4">{row.getValue("name")}</div>,
   },
   {
-    accessorKey: "userId",
-    header: "ID Người dùng",
-    cell: ({ row }) => <div className="max-w-[100px] truncate" title={row.getValue("userId")}>{row.getValue("userId")}</div>
+    accessorKey: "ownerName",
+    header: "Chủ cửa hàng",
   },
   {
-      accessorKey: "contactPhone",
-      header: "Điện thoại",
-      cell: ({ row }) => row.getValue("contactPhone") || "Chưa có"
-  },
-  {
-      accessorKey: "contactEmail",
-      header: "Email",
+    accessorKey: "contactPhone",
+    header: "Số điện thoại",
   },
   {
     accessorKey: "status",
     header: "Trạng thái",
     cell: ({ row }) => {
-      const status = row.getValue("status") as string
-      let variant: "default" | "secondary" | "destructive" | "outline" = "outline"
-      let label = status
-
-      switch(status) {
-          case 'ACTIVE': variant = 'default'; label = "Đang hoạt động"; break;
-          case 'REQUESTED': variant = 'secondary'; label = "Chờ duyệt"; break;
-          case 'BANNED': variant = 'destructive'; label = "Đã cấm"; break;
-          case 'REJECTED': variant = 'destructive'; label = "Từ chối"; break;
-      }
-
-      return <Badge variant={variant}>{label}</Badge>
-    },
+        const status = row.getValue("status") as string
+        return (
+            <Badge variant={
+                status === 'ACTIVE' ? 'default' : 
+                status === 'REQUESTED' ? 'secondary' : 
+                'destructive'
+            }>
+                {status === 'ACTIVE' ? 'Hoạt động' : 
+                 status === 'REQUESTED' ? 'Chờ duyệt' : 
+                 status === 'REJECTED' ? 'Từ chối' : status}
+            </Badge>
+        )
+    }
   },
   {
     accessorKey: "isVerified",
@@ -137,7 +133,7 @@ export const columns: ColumnDef<Store>[] = [
     id: "actions",
     cell: ({ row, table }) => {
       const store = row.original
-      const meta = table.options.meta
+      const meta = table.options.meta as StoreTableMeta
 
       return (
         <DropdownMenu>
@@ -162,21 +158,21 @@ export const columns: ColumnDef<Store>[] = [
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() =>
-                (meta as any)?.openStoreDetail?.(store)
+                meta?.openStoreDetail?.(store)
               }
             >
               Xem thông tin
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                (meta as any)?.openStoreReviews?.(store)
+                meta?.openStoreReviews?.(store)
               }
             >
               Xem đánh giá
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
-                (meta as any)?.openStoreReports?.(store)
+                meta?.openStoreReports?.(store)
               }
             >
               Xem báo cáo
@@ -186,30 +182,40 @@ export const columns: ColumnDef<Store>[] = [
             <DropdownMenuSeparator />
 
             {!store.isVerified && (
-                 <DropdownMenuItem onClick={() => verifyStore(store.id, meta)}>
+                 <DropdownMenuItem onClick={async () => {
+                    await verifyStore(row.original.id, meta);
+                 }}>
                     Xác minh cửa hàng
                  </DropdownMenuItem>
             )}
 
             {store.status === 'REQUESTED' && (
-                <>
-                    <DropdownMenuItem onClick={() => updateStoreStatus(store.id, 'ACTIVE', meta)}>
-                        Phê duyệt (Kích hoạt)
-                    </DropdownMenuItem>
-                     <DropdownMenuItem onClick={() => updateStoreStatus(store.id, 'REJECTED', meta)} className="text-red-500">
-                        Từ chối
-                    </DropdownMenuItem>
-                </>
+                 <>
+                     <DropdownMenuItem onClick={async () => {
+                         await updateStoreStatus(row.original.id, 'ACTIVE', meta);
+                     }}>
+                         Phê duyệt (Kích hoạt)
+                     </DropdownMenuItem>
+                      <DropdownMenuItem onClick={async () => {
+                         await updateStoreStatus(row.original.id, 'REJECTED', meta);
+                     }} className="text-red-500">
+                         Từ chối
+                     </DropdownMenuItem>
+                 </>
             )}
 
             {store.status === 'ACTIVE' && (
-                 <DropdownMenuItem onClick={() => updateStoreStatus(store.id, 'BANNED', meta)} className="text-red-500">
+                 <DropdownMenuItem onClick={async () => {
+                    await updateStoreStatus(row.original.id, 'BANNED', meta);
+                 }} className="text-red-500">
                     Cấm cửa hàng
                  </DropdownMenuItem>
             )}
 
              {store.status === 'BANNED' && (
-                 <DropdownMenuItem onClick={() => updateStoreStatus(store.id, 'ACTIVE', meta)}>
+                 <DropdownMenuItem onClick={async () => {
+                    await updateStoreStatus(row.original.id, 'ACTIVE', meta);
+                 }}>
                     Bỏ cấm (Kích hoạt)
                  </DropdownMenuItem>
             )}

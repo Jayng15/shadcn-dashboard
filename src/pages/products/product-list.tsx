@@ -28,23 +28,14 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { exactImageUrl } from "@/lib/utils";
-import { UpdateRequestDialog } from "@/components/update-request-dialog";
+import { UpdateRequestDialog, type UpdateRequest } from "@/components/update-request-dialog";
 import { Input } from "@/components/ui/input";
 import { Search, X, Package, Users, Heart, Eye, ShoppingBag, Info, LayoutDashboard, CheckCircle2 } from "lucide-react";
 import { useSearch } from "@tanstack/react-router";
 
 type ProductDetail = Product;
 
-interface UpdateRequest {
-  id: string;
-  targetId: string;
-  payload: unknown;
-  status: string;
-  targetType: string;
-  createdAt: string;
-  name?: string;
-  storeName?: string;
-}
+
 
 export default function ProductListPage() {
   const [sorting, setSorting] = useState<SortingState>([]);

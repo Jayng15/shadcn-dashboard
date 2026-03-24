@@ -14,22 +14,64 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { SafeImage } from "@/components/safe-image";
 import { toast } from "sonner";
-import { ArrowLeft, CheckCircle, XCircle, Ban, Phone, Mail, MapPin, Info, CreditCard, ShieldCheck, User, Store as StoreIcon, History } from "lucide-react";
+import { ArrowLeft, CheckCircle, Phone, MapPin, Info, CreditCard, ShieldCheck, User, Store as StoreIcon, History, Star } from "lucide-react";
+
+interface Store {
+    id: string;
+    userId: string;
+    name: string;
+    ownerName: string;
+    slug: string;
+    description: string;
+    contactPhone: string;
+    contactEmail: string;
+    address: string;
+    avatarUrl: string | null;
+    status: string;
+    isActive: boolean;
+    isVerified: boolean;
+    verifiedAt: string | null;
+    createdAt: string;
+    updatedAt: string;
+    deletedAt: string | null;
+    payment?: {
+        storeId: string;
+        bankCode: string;
+        bankName: string;
+        accountNumber: string;
+        accountHolderName: string;
+        paymentQrUrl: string | null;
+        createdAt: string;
+        updatedAt: string;
+    };
+    kyc?: {
+        storeId: string;
+        frontImageUrl: string | null;
+        backImageUrl: string | null;
+        status: string;
+        submittedAt: string | null;
+        details: any;
+        createdAt: string;
+        updatedAt: string;
+    };
+    followCount: number;
+    completedOrderAmount: number;
+    rating: number;
+    productAmount: number;
+    reviewAmount: number;
+}
+
+interface StoreDetail extends Store {}
 
 export default function StoreDetailPage() {
-    // Correct way to get params in TanStack Router depends on the route definition.
-    // Assuming file route 'stores/$storeId' provides params.
-    // However, createLazyFileRoute used in index won't strictly type access here unless generated.
-    // We can use `useParams({ from: ... })` if we knew the route ID, OR just generic useParams.
     const { storeId } = useParams({ strict: false }) as { storeId: string };
-    // const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const { isPending, error, data } = useQuery({
         queryKey: ["store", storeId],
         queryFn: async () => {
             const res = await api.get(`/store/detail/${storeId}`);
-            return res.data.store;
+            return res.data.store as StoreDetail;
         },
         enabled: !!storeId,
     });
@@ -39,11 +81,12 @@ export default function StoreDetailPage() {
             await api.post(`/store/${storeId}/verify`);
         },
         onSuccess: () => {
-            toast.success("Store verified successfully");
+            toast.success("Đã xác minh cửa hàng");
             queryClient.invalidateQueries({ queryKey: ["store", storeId] });
         },
-        onError: (err: any) => {
-            toast.error(err.response?.data?.message || "Verification failed");
+        onError: (error: unknown) => {
+            const err = error as { response?: { data?: { message?: string } } };
+            toast.error(err.response?.data?.message || "Xác minh thất bại");
         }
     });
 
@@ -52,20 +95,25 @@ export default function StoreDetailPage() {
             await api.patch(`/store/${storeId}/status`, { status });
         },
         onSuccess: (_, status) => {
-            toast.success(`Store status updated to ${status}`);
+            toast.success(`Cập nhật trạng thái thành: ${status}`);
             queryClient.invalidateQueries({ queryKey: ["store", storeId] });
         },
-        onError: (err: any) => {
-            toast.error(err.response?.data?.message || "Status update failed");
+        onError: (error: unknown) => {
+            const err = error as { response?: { data?: { message?: string } } };
+            toast.error(err.response?.data?.message || "Cập nhật trạng thái thất bại");
         }
     });
 
-    if (isPending) return <div className="p-8">Loading store details...</div>;
-    if (error) return <div className="p-8 text-red-500">Error: {(error as Error).message}</div>;
-    if (!data) return <div className="p-8">Store not found</div>;
+    if (isPending) return <div className="p-8">Đang tải thông tin cửa hàng...</div>;
+    if (error) return <div className="p-8 text-red-500">Lỗi: {(error as Error).message}</div>;
+    if (!data) return <div className="p-8">Không tìm thấy cửa hàng</div>;
 
     const store = data;
-    const mediaBaseUrl = `/store/${storeId}/media`;
+
+    // Based on user feedback, use these endpoints for sensitive media
+    const kycFrontUrl = `/api/store/${store.id}/media/kyc-front`;
+    const kycBackUrl = `/api/store/${store.id}/media/kyc-back`;
+    const paymentQrUrl = `/api/store/${store.id}/media/payment-qr`;
 
     return (
         <div className="min-h-screen bg-muted/30 pb-20">
@@ -90,12 +138,20 @@ export default function StoreDetailPage() {
 
                 <div className="absolute bottom-0 left-0 w-full p-6 md:p-12 z-10">
                     <div className="max-w-7xl mx-auto flex flex-col md:flex-row md:items-end gap-6">
-                        {/* Store Avatar/Logo Placeholder */}
+                        {/* Store Avatar/Logo */}
                         <div className="relative shrink-0">
                             <div className="h-24 w-24 md:h-32 md:w-32 rounded-3xl bg-white p-1.5 shadow-2xl border-4 border-background overflow-hidden transform transition-transform hover:scale-105 duration-300">
-                                <div className="h-full w-full rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
-                                    <StoreIcon className="h-12 w-12 md:h-16 md:w-16 text-primary" />
-                                </div>
+                                {store.avatarUrl ? (
+                                  <SafeImage 
+                                    src={store.avatarUrl} 
+                                    alt={store.name} 
+                                    className="h-full w-full rounded-2xl object-cover" 
+                                  />
+                                ) : (
+                                  <div className="h-full w-full rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+                                      <StoreIcon className="h-12 w-12 md:h-16 md:w-16 text-primary" />
+                                  </div>
+                                )}
                             </div>
                             {store.isVerified && (
                                 <div className="absolute -bottom-2 -right-2 bg-green-500 text-white p-1.5 rounded-full border-4 border-background shadow-lg">
@@ -123,7 +179,11 @@ export default function StoreDetailPage() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <MapPin className="h-4 w-4 opacity-70" />
-                                    <span className="max-w-[300px] truncate">{store.address || 'Hà Nội, Việt Nam'}</span>
+                                    <span className="max-w-[300px] truncate">{store.address || 'Chưa cập nhật địa chỉ'}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <History className="h-4 w-4 opacity-70" />
+                                    <span>Tham gia: {new Date(store.createdAt).toLocaleDateString('vi-VN')}</span>
                                 </div>
                              </div>
                         </div>
@@ -172,10 +232,10 @@ export default function StoreDetailPage() {
                         {/* Highlights Grid */}
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                             {[
-                                { label: 'Đơn hàng', value: '42K', icon: History, color: 'text-blue-500', bg: 'bg-blue-500/10' },
-                                { label: 'Sản phẩm', value: '1.2K', icon: StoreIcon, color: 'text-purple-500', bg: 'bg-purple-500/10' },
-                                { label: 'Đánh giá', value: '4.9', icon: CheckCircle, color: 'text-amber-500', bg: 'bg-amber-500/10' },
-                                { label: 'Xác minh', value: 'Level 2', icon: ShieldCheck, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
+                                { label: 'Đơn hàng', value: store.completedOrderAmount?.toLocaleString() || '0', icon: History, color: 'text-blue-500', bg: 'bg-blue-500/10' },
+                                { label: 'Sản phẩm', value: store.productAmount?.toLocaleString() || '0', icon: StoreIcon, color: 'text-purple-500', bg: 'bg-purple-500/10' },
+                                { label: 'Đánh giá', value: store.rating?.toFixed(1) || '0.0', icon: Star, color: 'text-amber-500', bg: 'bg-amber-500/10' },
+                                { label: 'Theo dõi', value: store.followCount?.toLocaleString() || '0', icon: User, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
                             ].map((stat, i) => (
                                 <Card key={i} className="border-none shadow-xl shadow-black/5 bg-white/70 backdrop-blur-xl transition-transform hover:scale-[1.02]">
                                     <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-2">
@@ -209,7 +269,7 @@ export default function StoreDetailPage() {
                                         </h3>
                                         <div className="space-y-1">
                                             <p className="text-xl font-bold">{store.contactPhone || 'N/A'}</p>
-                                            <p className="text-muted-foreground font-medium">{store.contactEmail || 'contact@store.com'}</p>
+                                            <p className="text-muted-foreground font-medium">{store.contactEmail || 'N/A'}</p>
                                         </div>
                                     </div>
                                     <div className="p-8 space-y-4 border-b border-muted/50 hover:bg-muted/30 transition-colors">
@@ -217,8 +277,8 @@ export default function StoreDetailPage() {
                                             <ShieldCheck className="h-4 w-4 text-primary/40" strokeWidth={3} /> Bảo mật & ID
                                         </h3>
                                         <div className="space-y-1">
-                                            <p className="text-xl font-mono font-bold text-primary">ID: {store.userId}</p>
-                                            <p className="text-muted-foreground font-medium italic">Ngày đăng ký: 12/10/2023</p>
+                                            <p className="text-lg font-mono font-bold text-primary">ID: {store.id}</p>
+                                            <p className="text-muted-foreground font-medium italic">ID Chủ: {store.userId}</p>
                                         </div>
                                     </div>
                                     <div className="p-8 md:col-span-2 space-y-6">
@@ -227,7 +287,7 @@ export default function StoreDetailPage() {
                                                 <StoreIcon className="h-4 w-4 text-primary/40" /> Câu chuyện thương hiệu
                                             </h3>
                                             <p className="text-lg leading-relaxed text-muted-foreground font-medium max-w-3xl">
-                                                {store.description || 'Chưa cung cấp mô tả chi tiết cho cửa hàng này. Nội dung này sẽ giúp khách hàng hiểu rõ hơn về giá trị và sản phẩm của bạn.'}
+                                                {store.description || 'Chưa cung cấp mô tả chi tiết cho cửa hàng này.'}
                                             </p>
                                         </div>
                                         <Separator className="bg-muted/50" />
@@ -263,8 +323,8 @@ export default function StoreDetailPage() {
                                         <div className="space-y-4">
                                             <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40">Tên ngân hàng</p>
                                             <div className="space-y-1">
-                                                <h4 className="text-4xl font-black tracking-tight">{store.bankName || 'TP BANK'}</h4>
-                                                <p className="text-indigo-300 font-black tracking-[0.2em] text-sm uppercase">{store.bankCode || 'TPB'}</p>
+                                                <h4 className="text-4xl font-black tracking-tight">{store.payment?.bankName || 'Chưa cập nhật'}</h4>
+                                                <p className="text-indigo-300 font-black tracking-[0.2em] text-sm uppercase">{store.payment?.bankCode || 'N/A'}</p>
                                             </div>
                                         </div>
                                         <div className="flex items-end">
@@ -279,12 +339,12 @@ export default function StoreDetailPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12 pt-12 border-t border-white/5">
                                         <div className="space-y-4">
                                             <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40">Chủ tài khoản</p>
-                                            <p className="text-2xl md:text-3xl font-black tracking-tight uppercase drop-shadow-lg">{store.accountHolderName || 'NGUYEN VAN A'}</p>
+                                            <p className="text-2xl md:text-3xl font-black tracking-tight uppercase drop-shadow-lg">{store.payment?.accountHolderName || 'N/A'}</p>
                                         </div>
                                         <div className="space-y-4">
                                             <p className="text-xs font-black uppercase tracking-[0.4em] opacity-40">Số tài khoản</p>
-                                            <p className="text-3xl md:text-5xl font-black font-mono tracking-widest text-indigo-400 tabular-nums drop-shadow-glow">
-                                                {store.accountNumber || '•••• 8888 9999'}
+                                            <p className="text-2xl md:text-4xl font-black font-mono tracking-widest text-indigo-400 tabular-nums drop-shadow-glow">
+                                                {store.payment?.accountNumber || '•••• •••• ••••'}
                                             </p>
                                         </div>
                                     </div>
@@ -306,17 +366,17 @@ export default function StoreDetailPage() {
                             <CardContent className="p-8 space-y-10">
                                 <div className="space-y-8">
                                     {[
-                                        { label: 'CCCD Mặt trước', id: 'kyc-front', tag: 'ID-F' },
-                                        { label: 'CCCD Mặt sau', id: 'kyc-back', tag: 'ID-B' }
-                                    ].map((item) => (
-                                        <div key={item.id} className="space-y-4">
+                                        { label: 'CCCD Mặt trước', url: kycFrontUrl, tag: 'ID-F' },
+                                        { label: 'CCCD Mặt sau', url: kycBackUrl, tag: 'ID-B' }
+                                    ].map((item, idx) => (
+                                        <div key={idx} className="space-y-4">
                                             <div className="flex justify-between items-center px-1">
                                                 <h3 className="text-xs font-black uppercase text-muted-foreground tracking-widest">{item.label}</h3>
                                                 <Badge variant="secondary" className="text-[10px] font-black">{item.tag}</Badge>
                                             </div>
                                             <div className="relative group rounded-3xl overflow-hidden border-2 border-muted transition-all hover:border-emerald-500 shadow-xl cursor-zoom-in">
                                                 <SafeImage
-                                                    src={`${mediaBaseUrl}/${item.id}`}
+                                                    src={item.url}
                                                     alt={item.label}
                                                     className="w-full h-56 object-cover bg-muted/40 transition-transform duration-500 group-hover:scale-110"
                                                 />
@@ -338,7 +398,7 @@ export default function StoreDetailPage() {
                                             <div className="w-full h-full p-6 bg-white rounded-3xl shadow-inner relative overflow-hidden flex items-center justify-center">
                                                 <div className="absolute -top-12 -right-12 h-32 w-32 bg-primary/5 rounded-full blur-2xl"></div>
                                                 <SafeImage
-                                                    src={`${mediaBaseUrl}/payment-qr`}
+                                                    src={paymentQrUrl}
                                                     alt="Payment QR"
                                                     className="w-full h-full object-contain relative z-10"
                                                 />
@@ -360,9 +420,9 @@ export default function StoreDetailPage() {
                                 </div>
                                 <div className="space-y-6">
                                     {[
-                                        { event: 'Cập nhật tài khoản', time: '10 phút trước', icon: CreditCard, color: 'indigo' },
-                                        { event: 'Duyệt hồ sơ KYC', time: '2 giờ trước', icon: ShieldCheck, color: 'emerald' },
-                                        { event: 'Đăng ký cửa hàng', time: '5 tháng trước', icon: StoreIcon, color: 'purple' },
+                                        { event: 'Cập nhật tài khoản', time: 'Mới đây', icon: CreditCard, color: 'indigo' },
+                                        { event: 'Duyệt hồ sơ KYC', time: 'Gần đây', icon: ShieldCheck, color: 'emerald' },
+                                        { event: 'Đăng ký cửa hàng', time: 'Trước đó', icon: StoreIcon, color: 'purple' },
                                     ].map((activity, i) => (
                                         <div key={i} className="flex gap-4 relative">
                                             {i !== 2 && <div className="absolute left-[11px] top-8 bottom-[-24px] w-0.5 bg-slate-200"></div>}
@@ -382,7 +442,7 @@ export default function StoreDetailPage() {
                 </div>
             </div>
 
-            {/* Global Aesthetics - Tailwind Config Extension would be better, but we use inline styles for rich animations */}
+            {/* Global Aesthetics */}
             <style dangerouslySetInnerHTML={{ __html: `
                 @keyframes gradient-x {
                     0% { background-position: 0% 50%; }
@@ -398,7 +458,5 @@ export default function StoreDetailPage() {
                 }
             `}} />
         </div>
-
-
     );
 }
