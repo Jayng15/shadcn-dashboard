@@ -13,6 +13,7 @@ import { useParams } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { SafeImage } from "@/components/safe-image";
+import { exactImageUrl } from "@/lib/utils";
 import { toast } from "sonner";
 import { ArrowLeft, CheckCircle, Phone, MapPin, Info, CreditCard, ShieldCheck, User, Store as StoreIcon, History, Star } from "lucide-react";
 
@@ -109,9 +110,9 @@ export default function StoreDetailPage() {
     const store = data;
 
     // Based on user feedback, use these endpoints for sensitive media
-    const kycFrontUrl = `/api/store/${store.id}/media/kyc-front`;
-    const kycBackUrl = `/api/store/${store.id}/media/kyc-back`;
-    const paymentQrUrl = `/api/store/${store.id}/media/payment-qr`;
+    const kycFrontUrl = `/store/${store.id}/media/kyc-front`;
+    const kycBackUrl = `/store/${store.id}/media/kyc-back`;
+    const paymentQrUrl = `/store/${store.id}/media/payment-qr`;
 
     return (
         <div className="min-h-screen bg-muted/30 pb-20">
@@ -141,7 +142,7 @@ export default function StoreDetailPage() {
                             <div className="h-24 w-24 md:h-32 md:w-32 rounded-3xl bg-white p-1.5 shadow-2xl border-4 border-background overflow-hidden transform transition-transform hover:scale-105 duration-300">
                                 {store.avatarUrl ? (
                                   <SafeImage 
-                                    src={store.avatarUrl} 
+                                    src={exactImageUrl(store.avatarUrl)} 
                                     alt={store.name} 
                                     className="h-full w-full rounded-2xl object-cover" 
                                   />
@@ -170,17 +171,17 @@ export default function StoreDetailPage() {
                                      store.status === 'REJECTED' ? 'Đã từ chối' : store.status}
                                 </Badge>
                              </div>
-                             <div className="flex items-center gap-6 text-white/80 font-medium">
+                             <div className="flex items-center gap-6 text-white font-semibold">
                                 <div className="flex items-center gap-2">
-                                    <User className="h-4 w-4 opacity-70" />
+                                    <User className="h-4 w-4 opacity-90" />
                                     <span>{store.ownerName}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <MapPin className="h-4 w-4 opacity-70" />
+                                    <MapPin className="h-4 w-4 opacity-90" />
                                     <span className="max-w-[300px] truncate">{store.address || 'Chưa cập nhật địa chỉ'}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <History className="h-4 w-4 opacity-70" />
+                                    <History className="h-4 w-4 opacity-90" />
                                     <span>Tham gia: {new Date(store.createdAt).toLocaleDateString('vi-VN')}</span>
                                 </div>
                              </div>
@@ -235,14 +236,14 @@ export default function StoreDetailPage() {
                                 { label: 'Đánh giá', value: store.rating?.toFixed(1) || '0.0', icon: Star, color: 'text-amber-500', bg: 'bg-amber-500/10' },
                                 { label: 'Theo dõi', value: store.followCount?.toLocaleString() || '0', icon: User, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
                             ].map((stat, i) => (
-                                <Card key={i} className="border-none shadow-xl shadow-black/5 bg-white/70 backdrop-blur-xl transition-transform hover:scale-[1.02]">
+                                <Card key={i} className="border-none shadow-xl shadow-black/5 bg-white/90 backdrop-blur-xl transition-transform hover:scale-[1.02]">
                                     <CardContent className="p-6 flex flex-col items-center justify-center text-center space-y-2">
                                         <div className={`p-3 rounded-2xl ${stat.bg}`}>
                                             <stat.icon className={`h-6 w-6 ${stat.color}`} />
                                         </div>
                                         <div>
-                                            <p className="text-2xl font-black tracking-tighter">{stat.value}</p>
-                                            <p className="text-[11px] font-black uppercase text-muted-foreground tracking-widest">{stat.label}</p>
+                                            <p className="text-2xl font-black tracking-tighter text-slate-900">{stat.value}</p>
+                                            <p className="text-[11px] font-black uppercase text-slate-500 tracking-widest">{stat.label}</p>
                                         </div>
                                     </CardContent>
                                 </Card>
@@ -250,7 +251,7 @@ export default function StoreDetailPage() {
                         </div>
 
                         {/* About Card */}
-                        <Card className="border-none shadow-2xl shadow-primary/5 bg-white/80 backdrop-blur-md overflow-hidden rounded-[2rem]">
+                        <Card className="border-none shadow-2xl shadow-primary/5 bg-white/95 backdrop-blur-md overflow-hidden rounded-[2rem]">
                             <CardHeader className="flex flex-row items-center justify-between border-b border-muted/50 p-8">
                                 <CardTitle className="text-2xl font-black flex items-center gap-4">
                                     <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
@@ -262,29 +263,29 @@ export default function StoreDetailPage() {
                             <CardContent className="p-0">
                                 <div className="grid grid-cols-1 md:grid-cols-2">
                                     <div className="p-8 space-y-4 border-b md:border-r border-muted/50 hover:bg-muted/30 transition-colors">
-                                        <h3 className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
+                                        <h3 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2">
                                             <Phone className="h-4 w-4 text-primary/40" /> Thông tin liên hệ
                                         </h3>
                                         <div className="space-y-1">
-                                            <p className="text-xl font-bold">{store.contactPhone || 'N/A'}</p>
-                                            <p className="text-muted-foreground font-medium">{store.contactEmail || 'N/A'}</p>
+                                            <p className="text-xl font-bold text-slate-900">{store.contactPhone || 'N/A'}</p>
+                                            <p className="text-slate-600 font-medium">{store.contactEmail || 'N/A'}</p>
                                         </div>
                                     </div>
                                     <div className="p-8 space-y-4 border-b border-muted/50 hover:bg-muted/30 transition-colors">
-                                        <h3 className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
+                                        <h3 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2">
                                             <ShieldCheck className="h-4 w-4 text-primary/40" strokeWidth={3} /> Bảo mật & ID
                                         </h3>
                                         <div className="space-y-1">
                                             <p className="text-lg font-mono font-bold text-primary">ID: {store.id}</p>
-                                            <p className="text-muted-foreground font-medium italic">ID Chủ: {store.userId}</p>
+                                            <p className="text-slate-600 font-medium italic">ID Chủ: {store.userId}</p>
                                         </div>
                                     </div>
                                     <div className="p-8 md:col-span-2 space-y-6">
                                         <div className="space-y-3">
-                                            <h3 className="text-xs font-black uppercase text-muted-foreground tracking-[0.2em] flex items-center gap-2">
+                                            <h3 className="text-xs font-black uppercase text-slate-500 tracking-[0.2em] flex items-center gap-2">
                                                 <StoreIcon className="h-4 w-4 text-primary/40" /> Câu chuyện thương hiệu
                                             </h3>
-                                            <p className="text-lg leading-relaxed text-muted-foreground font-medium max-w-3xl">
+                                            <p className="text-lg leading-relaxed text-slate-700 font-medium max-w-3xl">
                                                 {store.description || 'Chưa cung cấp mô tả chi tiết cho cửa hàng này.'}
                                             </p>
                                         </div>

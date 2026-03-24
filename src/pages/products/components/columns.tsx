@@ -136,7 +136,7 @@ export const columns: ColumnDef<Product>[] = [
               Xem thông tin
             </DropdownMenuItem>
             {!product.isVerified && (
-                 <DropdownMenuItem onClick={() => verifyProduct(product.id, table.options.meta as any)}>
+                 <DropdownMenuItem onClick={() => verifyProduct(product.id, (table.options.meta as { refetch: () => void }))}>
                     Xác minh sản phẩm
                  </DropdownMenuItem>
             )}

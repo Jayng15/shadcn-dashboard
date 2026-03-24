@@ -200,7 +200,7 @@ export function UpdateRequestDialog({
                   };
 
                   const renderValue = (value: unknown, key: string): React.ReactNode => {
-                    const val = value as any;
+                    const val = value as unknown;
                     const strVal = String(value);
                     if (Array.isArray(val)) {
                       return (
