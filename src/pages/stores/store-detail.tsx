@@ -50,7 +50,7 @@ interface Store {
         backImageUrl: string | null;
         status: string;
         submittedAt: string | null;
-        details: any;
+        details: unknown;
         createdAt: string;
         updatedAt: string;
     };
@@ -61,8 +61,6 @@ interface Store {
     reviewAmount: number;
 }
 
-interface StoreDetail extends Store {}
-
 export default function StoreDetailPage() {
     const { storeId } = useParams({ strict: false }) as { storeId: string };
     const queryClient = useQueryClient();
@@ -71,7 +69,7 @@ export default function StoreDetailPage() {
         queryKey: ["store", storeId],
         queryFn: async () => {
             const res = await api.get(`/store/detail/${storeId}`);
-            return res.data.store as StoreDetail;
+            return res.data.store as Store;
         },
         enabled: !!storeId,
     });

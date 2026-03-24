@@ -21,54 +21,20 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import DataTablePagination from "@/pages/users/components/data-table-pagination"; // Reuse
-// import DataTableToolBar from "@/pages/users/components/data-table-toolbar"; // Reuse
 import api from "@/lib/api";
-import { ResponsiveDialog } from "@/components/responsive-dialog";
-import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { UpdateRequestDialog, type UpdateRequest } from "@/components/update-request-dialog";
+import { useNavigate } from "@tanstack/react-router";
 import { Badge } from "@/components/ui/badge";
-import { Star, X, Search, Store as StoreIcon, User, Phone, Mail, MapPin, CreditCard, ShieldCheck, History, CheckCircle2, Ban } from "lucide-react";
+import { Star, X, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { exactImageUrl } from "@/lib/utils";
-
-type StoreDetail = Store & {
-  description?: string;
-  address?: string;
-  avatarUrl?: string;
-  isActive?: boolean;
-  verifiedAt?: string;
-  followCount?: number;
-  payment?: {
-    storeId: string;
-    bankCode: string;
-    bankName: string;
-    accountNumber: string;
-    accountHolderName: string;
-    paymentQrUrl: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-  kyc?: {
-    storeId: string;
-    frontImageUrl: string;
-    backImageUrl: string;
-    status: string;
-    submittedAt: string;
-    details: string;
-    createdAt: string;
-    updatedAt: string;
-  };
-};
+import { toast } from "sonner";
 
 export default function StoreListPage() {
+  const navigate = useNavigate();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [isDetailLoading, setIsDetailLoading] = useState(false);
-  const [selectedStore, setSelectedStore] = useState<StoreDetail | null>(null);
-  const [isActionLoading, setIsActionLoading] = useState(false);
 
   // Update Request State
   const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);
@@ -130,7 +96,7 @@ export default function StoreListPage() {
   const stores = useMemo(() => {
     const allStores = storeData?.stores || [];
     if (tabFilter === "requested") {
-      return allStores.filter((s: any) => s.status === "REQUESTED");
+      return allStores.filter((s: Store) => s.status === "REQUESTED");
     }
     return allStores;
   }, [storeData, tabFilter]);
@@ -143,7 +109,7 @@ export default function StoreListPage() {
     {
       accessorKey: "id",
       header: "ID Yêu cầu",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { getValue: (key: string) => unknown } }) => {
         const id = row.getValue("id") as string;
         return <div className="font-medium">{id ? `${id.substring(0, 8)}...` : "N/A"}</div>;
       },
@@ -151,13 +117,13 @@ export default function StoreListPage() {
     {
       accessorKey: "targetId",
       header: "ID Cửa hàng",
-      cell: ({ row }: any) => <div className="font-mono text-xs">{row.getValue("targetId")}</div>,
+      cell: ({ row }: { row: { getValue: (key: string) => unknown } }) => <div className="font-mono text-xs">{row.getValue("targetId") as string}</div>,
     },
     {
         accessorKey: "createdAt",
         header: "Yêu cầu lúc",
-        cell: ({ row }: any) => {
-          const date = row.getValue("createdAt");
+        cell: ({ row }: { row: { getValue: (key: string) => unknown } }) => {
+          const date = row.getValue("createdAt") as string;
           if (!date) return <div>-</div>;
           try {
             return <div>{new Date(date).toLocaleString()}</div>;
@@ -168,7 +134,7 @@ export default function StoreListPage() {
     },
     {
       id: "actions",
-      cell: ({ row }: { row: any }) => {
+      cell: ({ row }: { row: { original: UpdateRequest } }) => {
         return (
           <Button
             variant="outline"
@@ -189,7 +155,7 @@ export default function StoreListPage() {
     {
       accessorKey: "review.id",
       header: "ID",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReview } }) => {
         const id = row.original.review?.id;
         return <div className="font-mono text-xs">{id ? `${id.substring(0, 10)}...` : "N/A"}</div>;
       },
@@ -197,7 +163,7 @@ export default function StoreListPage() {
     {
       accessorKey: "reviewer.fullName",
       header: "Người đánh giá",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReview } }) => {
         const reviewer = row.original.reviewer;
         return (
           <div className="flex items-center gap-2">
@@ -212,7 +178,7 @@ export default function StoreListPage() {
     {
       accessorKey: "product.name",
       header: "Sản phẩm",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReview } }) => {
         const product = row.original.product;
         return (
           <div className="max-w-[150px] truncate text-xs" title={product?.name}>
@@ -224,7 +190,7 @@ export default function StoreListPage() {
     {
       accessorKey: "review.rating",
       header: "Đánh giá",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReview } }) => {
         const rating = row.original.review?.rating;
         return (
           <div className="flex items-center gap-1">
@@ -237,7 +203,7 @@ export default function StoreListPage() {
     {
       accessorKey: "review.description",
       header: "Nội dung",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReview } }) => {
         const description = row.original.review?.description;
         return (
           <div className="max-w-[150px] truncate" title={description}>
@@ -249,7 +215,7 @@ export default function StoreListPage() {
     {
       accessorKey: "review.createdAt",
       header: "Thời gian",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReview } }) => {
         const date = row.original.review?.createdAt;
         if (!date) return <div className="text-xs">-</div>;
         try {
@@ -262,7 +228,7 @@ export default function StoreListPage() {
     {
       accessorKey: "review.deletedAt",
       header: "Trạng thái",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReview } }) => {
         const deletedAt = row.original.review?.deletedAt;
         return deletedAt
           ? <Badge variant="destructive" className="text-xs">Đã vô hiệu</Badge>
@@ -272,7 +238,7 @@ export default function StoreListPage() {
     {
       id: "actions",
       header: "Hành động",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReview } }) => {
         const review = row.original.review;
         if (!review || review.deletedAt) return null;
         return (
@@ -305,7 +271,7 @@ export default function StoreListPage() {
     {
       accessorKey: "report.id",
       header: "ID",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReport } }) => {
         const id = row.original.report?.id || row.original.id;
         return <div className="font-mono text-xs">{id ? `${id.substring(0, 10)}...` : "N/A"}</div>;
       },
@@ -313,7 +279,7 @@ export default function StoreListPage() {
     {
       accessorKey: "reporter.fullName",
       header: "Người báo cáo",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReport } }) => {
         const reporter = row.original.reporter;
         return (
           <div className="flex items-center gap-2">
@@ -328,7 +294,7 @@ export default function StoreListPage() {
     {
       accessorKey: "order.orderCode",
       header: "Đơn hàng",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReport } }) => {
         const order = row.original.order;
         return <div className="text-xs font-mono">{order?.orderCode || "N/A"}</div>;
       },
@@ -336,7 +302,7 @@ export default function StoreListPage() {
     {
       accessorKey: "report.title",
       header: "Tiêu đề",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReport } }) => {
         const title = row.original.report?.title || row.original.title;
         return (
           <div className="max-w-[120px] truncate font-medium text-xs" title={title}>
@@ -348,7 +314,7 @@ export default function StoreListPage() {
     {
       accessorKey: "report.description",
       header: "Mô tả",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReport } }) => {
         const description = row.original.report?.description || row.original.description;
         return (
           <div className="max-w-[150px] truncate text-xs" title={description}>
@@ -360,7 +326,7 @@ export default function StoreListPage() {
     {
       accessorKey: "createdAt",
       header: "Thời gian",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReport } }) => {
         const date = row.original.createdAt || row.original.report?.createdAt;
         if (!date) return <div className="text-xs">-</div>;
         try {
@@ -373,7 +339,7 @@ export default function StoreListPage() {
     {
       accessorKey: "deletedAt",
       header: "Trạng thái",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReport } }) => {
         const deletedAt = row.original.deletedAt || row.original.report?.deletedAt;
         return deletedAt
           ? <Badge variant="destructive" className="text-xs">Đã vô hiệu</Badge>
@@ -383,7 +349,7 @@ export default function StoreListPage() {
     {
       id: "actions",
       header: "Hành động",
-      cell: ({ row }: any) => {
+      cell: ({ row }: { row: { original: StoreReport } }) => {
         const report = row.original.report || row.original;
         if (!report || report.deletedAt) return null;
         return (
@@ -393,7 +359,7 @@ export default function StoreListPage() {
             disabled={isInvalidatingReport === report.id}
             onClick={async () => {
               const reportId = report.id;
-              setIsInvalidatingReport(reportId);
+              setIsInvalidatingReport(reportId ?? null);
               try {
                 await api.post(`/store/admin/reports/${reportId}/invalidate`);
                 toast.success("Đã vô hiệu hóa báo cáo");
@@ -412,28 +378,10 @@ export default function StoreListPage() {
     },
   ], [isInvalidatingReport, refetchReports]);
 
-
   const tableMeta = useMemo(() => ({
     refetch: () => refetchStores(),
-    openStoreDetail: async (store: Store) => {
-      setIsDetailOpen(true);
-      setIsDetailLoading(true);
-      try {
-        const res = await api.get(`/store/detail/${store.id}`);
-        const detail = res.data.store;
-        const combined: StoreDetail = {
-          ...store,
-          ...detail,
-          payment: detail.payment,
-          kyc: detail.kyc,
-        };
-        setSelectedStore(combined);
-      } catch {
-        toast.error("Không thể tải chi tiết cửa hàng");
-        setSelectedStore(store as StoreDetail);
-      } finally {
-        setIsDetailLoading(false);
-      }
+    openStoreDetail: (store: Store) => {
+      navigate({ to: '/stores/$storeId', params: { storeId: store.id } });
     },
     openStoreReviews: (store: Store) => {
       setSelectedStoreForReviews(store);
@@ -443,7 +391,7 @@ export default function StoreListPage() {
       setSelectedStoreForReports(store);
       setTabFilter("reports");
     },
-  }), [refetchStores]);
+  }), [refetchStores, navigate]);
 
   const table = useReactTable({
     data: stores,
@@ -495,8 +443,6 @@ export default function StoreListPage() {
   });
 
   if (storeError)
-
-
     return (
       <div className="p-4 text-red-500">
         Đã xảy ra lỗi: {(storeError as Error).message}
@@ -508,269 +454,14 @@ export default function StoreListPage() {
       <CardHeader>
         <CardTitle>Quản lý cửa hàng</CardTitle>
       </CardHeader>
-      <ResponsiveDialog
-        isOpen={isDetailOpen}
-        setIsOpen={setIsDetailOpen}
-        title="Chi tiết cửa hàng"
-      >
-        {isDetailLoading && (
-          <div className="py-4 text-center text-sm text-muted-foreground">
-            Đang tải chi tiết cửa hàng...
-          </div>
-        )}
-        {!isDetailLoading && selectedStore && (
-          <div className="space-y-6 text-sm">
-            {/* Store Header Info */}
-            <div className="flex gap-4 p-4 rounded-lg bg-muted/30 border">
-              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-full border-2 border-primary/20 bg-background">
-                {selectedStore.avatarUrl ? (
-                  <img
-                    src={exactImageUrl(selectedStore.avatarUrl)}
-                    alt={selectedStore.name}
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground uppercase text-2xl font-bold">
-                    {selectedStore.name.substring(0, 1)}
-                  </div>
-                )}
-              </div>
-              <div className="flex flex-col justify-center space-y-2">
-                <h3 className="text-xl font-bold leading-none tracking-tight">
-                  {selectedStore.name}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  <Badge variant={selectedStore.status === 'ACTIVE' ? 'default' : 'secondary'}>
-                    {selectedStore.status === 'ACTIVE' ? 'Đang hoạt động' :
-                     selectedStore.status === 'REQUESTED' ? 'Đang chờ duyệt' :
-                     selectedStore.status === 'BANNED' ? 'Đã bị cấm' :
-                     selectedStore.status === 'REJECTED' ? 'Đã từ chối' : selectedStore.status}
-                  </Badge>
-                  {selectedStore.isVerified && (
-                    <Badge variant="outline" className="border-green-500 text-green-500 bg-green-50/50">
-                      <CheckCircle2 className="mr-1 h-3 w-3" /> Đã xác minh
-                    </Badge>
-                  )}
-                  <Badge variant="secondary" className="font-normal text-muted-foreground">
-                    <User className="mr-1 h-3 w-3" /> ID: {selectedStore.userId.substring(0, 8)}
-                  </Badge>
-                </div>
-              </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Basic & Contact Info */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2 font-semibold text-primary">
-                  <StoreIcon className="h-4 w-4" />
-                  <span>Thông tin cửa hàng</span>
-                </div>
-                <div className="space-y-3 rounded-md border p-3 bg-card overflow-hidden">
-                  <div className="flex flex-col border-b border-muted pb-2 last:border-0 last:pb-0 min-w-0">
-                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Mô tả</span>
-                    <span className="mt-1 leading-relaxed text-sm break-words">{selectedStore.description || "Chưa có mô tả"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 border-b border-muted pb-2 last:border-0 last:pb-0">
-                    <div className="h-8 w-8 rounded bg-muted/50 flex items-center justify-center">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold">Điện thoại</span>
-                      <span className="font-medium">{selectedStore.contactPhone || "Chưa cập nhật"}</span>
-                    </div>
-                  </div>
-                  <div className="items-center gap-3 border-b border-muted pb-2 last:border-0 last:pb-0 flex">
-                    <div className="h-8 w-8 rounded bg-muted/50 flex items-center justify-center">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold">Email</span>
-                      <span className="font-medium">{selectedStore.contactEmail || "Chưa cập nhật"}</span>
-                    </div>
-                  </div>
-                  <div className="items-center gap-3 border-b border-muted pb-2 last:border-0 last:pb-0 flex">
-                    <div className="h-8 w-8 rounded bg-muted/50 flex items-center justify-center">
-                      <MapPin className="h-4 w-4 text-muted-foreground" />
-                    </div>
-                    <div className="flex flex-col min-w-0">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold">Địa chỉ</span>
-                      <span className="font-medium leading-tight text-xs break-words">{selectedStore.address || "Chưa cập nhật"}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Payment & Verification */}
-              <div className="space-y-4">
-                {/* Payment Section */}
-                {selectedStore.payment ? (
-                  <>
-                    <div className="flex items-center gap-2 font-semibold text-primary">
-                      <CreditCard className="h-4 w-4" />
-                      <span>Thanh toán & Ngân hàng</span>
-                    </div>
-                    <div className="space-y-3 rounded-md border p-3 bg-card shadow-sm border-primary/10">
-                      <div className="flex justify-between items-center bg-muted/30 p-2 rounded">
-                        <span className="font-bold text-primary">{selectedStore.payment.bankName}</span>
-                        <Badge variant="outline" className="text-[10px]">{selectedStore.payment.bankCode}</Badge>
-                      </div>
-                      <div className="px-1 space-y-2 overflow-hidden">
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Chủ tài khoản</span>
-                          <span className="font-medium truncate">{selectedStore.payment.accountHolderName}</span>
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Số tài khoản</span>
-                          <span className="font-mono text-lg font-bold text-primary tracking-wider break-all">
-                            {selectedStore.payment.accountNumber}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="p-4 rounded-md border border-dashed text-center text-muted-foreground italic">
-                    Chưa có thông tin thanh toán
-                  </div>
-                )}
-
-                {/* KYC Status */}
-                <div className="flex items-center gap-2 font-semibold text-primary pt-2">
-                  <ShieldCheck className="h-4 w-4" />
-                  <span>Xác minh danh tính (KYC)</span>
-                </div>
-                <div className="rounded-md border p-3 bg-card">
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold">Trạng thái</span>
-                      <span className="font-medium text-orange-600">
-                        {selectedStore.kyc?.status === 'PENDING' ? 'Đang chờ duyệt' :
-                         selectedStore.kyc?.status === 'VERIFIED' ? 'Đã xác minh' :
-                         selectedStore.kyc?.status === 'REJECTED' ? 'Đã bị từ chối' : 'Chưa bắt đầu'}
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-end text-right">
-                      <span className="text-[10px] text-muted-foreground uppercase font-bold flex items-center gap-1">
-                        <History className="h-2 w-2" /> Gửi lúc
-                      </span>
-                      <span className="text-xs">
-                        {selectedStore.kyc?.submittedAt
-                          ? new Date(selectedStore.kyc.submittedAt).toLocaleDateString('vi-VN')
-                          : "-"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <Separator />
-
-            <div className="pt-2 flex flex-wrap gap-3">
-              {selectedStore.status === "REQUESTED" && (
-                <>
-                  <Button
-                    className="flex-1 shadow-md hover:shadow-lg transition-all"
-                    disabled={isActionLoading}
-                    onClick={async () => {
-                      if (!selectedStore) return;
-                      try {
-                        setIsActionLoading(true);
-                        await api.post(`/store/${selectedStore.id}/verify`);
-                        toast.success("Xác minh cửa hàng thành công");
-                        setSelectedStore((prev: StoreDetail | null) => prev ? { ...prev, isVerified: true } : prev);
-                        refetchStores();
-                      } catch {
-                        toast.error("Xác minh thất bại");
-                      } finally {
-                        setIsActionLoading(false);
-                       }
-                    }}
-                  >
-                    <CheckCircle2 className="mr-2 h-4 w-4" /> Phê duyệt cửa hàng
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1 shadow-md"
-                    disabled={isActionLoading}
-                    onClick={async () => {
-                      if (!selectedStore) return;
-                      try {
-                        setIsActionLoading(true);
-                        await api.patch(`/store/${selectedStore.id}/status`, { status: "REJECTED" });
-                        toast.success("Cửa hàng đã bị từ chối");
-                        setSelectedStore((prev: StoreDetail | null) => prev ? { ...prev, status: "REJECTED" } : prev);
-                        refetchStores();
-                      } catch {
-                        toast.error("Từ chối thất bại");
-                      } finally {
-                        setIsActionLoading(false);
-                       }
-                    }}
-                  >
-                    <X className="mr-2 h-4 w-4" /> Từ chối
-                  </Button>
-                </>
-              )}
-
-              {selectedStore.status === "ACTIVE" && (
-                <Button
-                  variant="destructive"
-                  className="w-full shadow-md"
-                  disabled={isActionLoading}
-                  onClick={async () => {
-                    if (!selectedStore) return;
-                    try {
-                      setIsActionLoading(true);
-                      await api.patch(`/store/${selectedStore.id}/status`, { status: "BANNED" });
-                      toast.success("Đã cấm cửa hàng");
-                      setSelectedStore((prev) => prev ? { ...prev, status: "BANNED" } : prev);
-                      refetchStores();
-                    } catch (e) {
-                      toast.error("Thao tác thất bại");
-                    } finally {
-                      setIsActionLoading(false);
-                    }
-                  }}
-                >
-                  <Ban className="mr-2 h-4 w-4" /> Cấm cửa hàng
-                </Button>
-              )}
-
-              {selectedStore.status === "BANNED" && (
-                <Button
-                  variant="outline"
-                  className="w-full border-primary text-primary hover:bg-primary/5 shadow-sm"
-                  disabled={isActionLoading}
-                  onClick={async () => {
-                    if (!selectedStore) return;
-                    try {
-                      setIsActionLoading(true);
-                      await api.patch(`/store/${selectedStore.id}/status`, { status: "ACTIVE" });
-                      toast.success("Đã kích hoạt lại cửa hàng");
-                      setSelectedStore((prev) => prev ? { ...prev, status: "ACTIVE" } : prev);
-                      refetchStores();
-                    } catch (e) {
-                      toast.error("Thao tác thất bại");
-                    } finally {
-                      setIsActionLoading(false);
-                    }
-                  }}
-                >
-                  <CheckCircle2 className="mr-2 h-4 w-4" /> Kích hoạt lại cửa hàng
-                </Button>
-              )}
-            </div>
-          </div>
-        )}
-      </ResponsiveDialog>
-        <UpdateRequestDialog
-            isOpen={isRequestDialogOpen}
-            setIsOpen={setIsRequestDialogOpen}
-            request={selectedRequest}
-            onSuccess={() => refetchRequests()}
-            type="STORE"
-        />
+      <UpdateRequestDialog
+          isOpen={isRequestDialogOpen}
+          setIsOpen={setIsRequestDialogOpen}
+          request={selectedRequest}
+          onSuccess={() => refetchRequests()}
+          type="STORE"
+      />
 
       <div className="flex-1 p-0">
          <Tabs value={tabFilter} onValueChange={setTabFilter} className="w-full h-full flex flex-col">
@@ -779,7 +470,7 @@ export default function StoreListPage() {
                     <TabsTrigger value="all">Tất cả cửa hàng</TabsTrigger>
                     <TabsTrigger value="requested" className="relative">
                       Cửa hàng mới
-                      {storeData?.stores?.filter((s: any) => s.status === "REQUESTED").length > 0 && (
+                      {storeData?.stores?.filter((s: Store) => s.status === "REQUESTED").length > 0 && (
                         <span className="ml-1.5 h-2 w-2 rounded-full bg-primary" />
                       )}
                     </TabsTrigger>
@@ -931,9 +622,47 @@ export default function StoreListPage() {
                   </>
                 )}
             </TabsContent>
-        </Tabs>
+         </Tabs>
       </div>
-
     </Card>
   );
+}
+
+interface StoreReview {
+  review: {
+    id: string;
+    rating: number;
+    description: string;
+    createdAt: string;
+    deletedAt: string | null;
+  };
+  reviewer: {
+    fullName: string;
+    avatarUrl: string | null;
+  };
+  product: {
+    name: string;
+  };
+}
+
+interface StoreReport {
+  report?: {
+    id: string;
+    title: string;
+    description: string;
+    createdAt: string;
+    deletedAt: string | null;
+  };
+  id?: string;
+  title?: string;
+  description?: string;
+  createdAt?: string;
+  deletedAt?: string | null;
+  reporter: {
+    fullName: string;
+    avatarUrl: string | null;
+  };
+  order: {
+    orderCode: string;
+  };
 }

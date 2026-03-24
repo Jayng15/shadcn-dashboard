@@ -40,7 +40,7 @@ export type Product = {
 
 // Helper to verify from column action
 // Helper to verify from column action
-const verifyProduct = async (id: string, tableMeta: any) => {
+const verifyProduct = async (id: string, tableMeta: { refetch: () => void } | undefined) => {
     try {
         await api.post(`/product/${id}/verify`);
         toast.success("Đã xác minh sản phẩm");
@@ -136,7 +136,7 @@ export const columns: ColumnDef<Product>[] = [
               Xem thông tin
             </DropdownMenuItem>
             {!product.isVerified && (
-                 <DropdownMenuItem onClick={() => verifyProduct(product.id, table.options.meta)}>
+                 <DropdownMenuItem onClick={() => verifyProduct(product.id, table.options.meta as any)}>
                     Xác minh sản phẩm
                  </DropdownMenuItem>
             )}
