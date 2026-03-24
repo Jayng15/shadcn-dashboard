@@ -23,12 +23,14 @@ import {
 import DataTablePagination from "@/pages/users/components/data-table-pagination";
 import api from "@/lib/api";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { exactImageUrl } from "@/lib/utils";
 import { UpdateRequestDialog } from "@/components/update-request-dialog";
 import { Input } from "@/components/ui/input";
-import { Search, X } from "lucide-react";
+import { Search, X, Package, Users, Heart, Eye, ShoppingBag, Info, LayoutDashboard, CheckCircle2 } from "lucide-react";
 import { useSearch } from "@tanstack/react-router";
 
 type ProductDetail = Product;
@@ -227,85 +229,133 @@ export default function ProductListPage() {
           </div>
         )}
         {!isDetailLoading && selectedProduct && (
-          <div className="space-y-4 text-sm">
-            <div className="flex items-start gap-4">
-              <img
-                src={exactImageUrl(selectedProduct.thumbnailUrl)}
-                alt={selectedProduct.name}
-                className="w-20 h-20 object-cover rounded"
-              />
-              <div className="space-y-1">
-                <div className="font-semibold text-base">
+          <div className="space-y-6 text-sm">
+            {/* Header Section */}
+            <div className="flex gap-4 p-4 rounded-lg bg-muted/30 border">
+              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border bg-background">
+                <img
+                  src={exactImageUrl(selectedProduct.thumbnailUrl)}
+                  alt={selectedProduct.name}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center space-y-2">
+                <h3 className="text-lg font-bold leading-none tracking-tight">
                   {selectedProduct.name}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant={selectedProduct.status === 'ACTIVE' ? 'default' : 'secondary'}>
+                    {selectedProduct.status === 'ACTIVE' ? 'Đang hoạt động' : 
+                     selectedProduct.status === 'INACTIVE' ? 'Ngưng hoạt động' : selectedProduct.status}
+                  </Badge>
+                  {selectedProduct.isVerified ? (
+                    <Badge variant="outline" className="border-green-500 text-green-500 bg-green-50/50">
+                      <CheckCircle2 className="mr-1 h-3 w-3" /> Đã xác minh
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="border-yellow-500 text-yellow-500 bg-yellow-50/50">
+                      Chờ xác minh
+                    </Badge>
+                  )}
                 </div>
-                <div>
-                  <span className="font-semibold">Giá: </span>
-                  <span>
-                    {(() => {
-                      try {
-                        return new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: selectedProduct.currency || "VND",
-                        }).format(Number(selectedProduct.price) || 0);
-                      } catch {
-                        return `${selectedProduct.price || 0} ${selectedProduct.currency || ""}`;
-                      }
-                    })()}
-                  </span>
-                </div>
-                <div>
-                  <span className="font-semibold">Trạng thái: </span>
-                  <span>{selectedProduct.status}</span>
-                </div>
-                <div>
-                  <span className="font-semibold">Đã xác minh: </span>
-                  <span>{selectedProduct.isVerified ? "Có" : "Không"}</span>
+                <div className="text-xl font-bold text-primary">
+                  {new Intl.NumberFormat("vi-VN", {
+                    style: "currency",
+                    currency: selectedProduct.currency || "VND",
+                  }).format(Number(selectedProduct.price) || 0)}
                 </div>
               </div>
             </div>
 
-            <div className="space-y-1">
-              <div>
-                <span className="font-semibold">ID Cửa hàng: </span>
-                <span>{selectedProduct.storeId}</span>
+            {/* Content Sections */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Product Info */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 font-semibold text-primary">
+                  <Info className="h-4 w-4" />
+                  <span>Thông tin cơ bản</span>
+                </div>
+                <div className="space-y-3 rounded-md border p-3 bg-card">
+                  <div className="flex justify-between items-start border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground">Mô tả:</span>
+                    <span className="text-right max-w-[200px] leading-relaxed">{selectedProduct.description || "Chưa có mô tả"}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><Eye className="h-3.5 w-3.5" /> Lượt xem:</span>
+                    <span className="font-medium">1.2k (giả định)</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><Heart className="h-3.5 w-3.5" /> Yêu thích:</span>
+                    <span className="font-medium text-pink-500">{selectedProduct.favoriteCount ?? 0}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="font-semibold">ID Người dùng: </span>
-                <span>{selectedProduct.userId}</span>
+
+              {/* Inventory Info */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 font-semibold text-primary">
+                  <LayoutDashboard className="h-4 w-4" />
+                  <span>Kho hàng & Doanh số</span>
+                </div>
+                <div className="space-y-3 rounded-md border p-3 bg-card">
+                  <div className="flex justify-between items-center border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><Package className="h-3.5 w-3.5" /> Tổng tồn kho:</span>
+                    <span className="font-medium">{selectedProduct.totalInventory ?? 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground flex items-center gap-1.5"><ShoppingBag className="h-3.5 w-3.5" /> Đã bán:</span>
+                    <span className="font-medium text-green-600">{selectedProduct.soldInventory ?? 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground">Đã đặt trước:</span>
+                    <span className="font-medium text-yellow-600">{selectedProduct.reservedInventory ?? 0}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="font-semibold">Mô tả: </span>
-                <span>{selectedProduct.description}</span>
+
+              {/* Team Info */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 font-semibold text-primary">
+                  <Users className="h-4 w-4" />
+                  <span>Thông tin đội</span>
+                </div>
+                <div className="space-y-3 rounded-md border p-3 bg-card">
+                  <div className="flex justify-between items-center border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground">Tên đội:</span>
+                    <span className="font-medium">{selectedProduct.teamName || "Chưa có"}</span>
+                  </div>
+                  <div className="flex justify-between items-center border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-muted-foreground">Thành viên:</span>
+                    <span className="font-medium">{selectedProduct.teamMember || "0"}</span>
+                  </div>
+                </div>
               </div>
-              <div>
-                <span className="font-semibold">Kho hàng: </span>
-                <span>
-                  Tổng {selectedProduct.totalInventory ?? 0} / Đã bán{" "}
-                  {selectedProduct.soldInventory ?? 0}
-                </span>
-              </div>
-              <div>
-                <span className="font-semibold">Đã đặt trước: </span>
-                <span>{selectedProduct.reservedInventory ?? 0}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Tên đội: </span>
-                <span>{selectedProduct.teamName}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Thành viên đội: </span>
-                <span>{selectedProduct.teamMember}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Yêu thích: </span>
-                <span>{selectedProduct.favoriteCount ?? 0}</span>
+
+              {/* IDs / Metadata */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 font-semibold text-muted-foreground">
+                  <Info className="h-4 w-4" />
+                  <span>Thông tin hệ thống</span>
+                </div>
+                <div className="space-y-2 text-[11px] font-mono p-3 bg-muted/20 border rounded-md overflow-x-auto">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground uppercase">ID Cửa hàng:</span>
+                    <span className="text-primary">{selectedProduct.storeId}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground uppercase">ID Người dùng:</span>
+                    <span className="text-primary">{selectedProduct.userId}</span>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <Separator />
 
             <div className="pt-2">
               {!selectedProduct.isVerified && (
                 <Button
-                  className="w-full"
+                  className="w-full shadow-lg transition-all duration-200"
                   disabled={isVerifyLoading}
                   onClick={async () => {
                     if (!selectedProduct) return;
@@ -326,12 +376,12 @@ export default function ProductListPage() {
                     }
                   }}
                 >
-                  Xác minh sản phẩm
+                  <CheckCircle2 className="mr-2 h-4 w-4" /> Xác minh sản phẩm
                 </Button>
               )}
               {selectedProduct.isVerified && (
-                <div className="text-xs text-muted-foreground text-center">
-                  Sản phẩm này đã được xác minh.
+                <div className="flex items-center justify-center p-3 rounded-md bg-green-50 border border-green-200 text-green-700 font-medium">
+                  <CheckCircle2 className="mr-2 h-4 w-4" /> Sản phẩm này đã được xác minh và hiển thị công khai.
                 </div>
               )}
             </div>

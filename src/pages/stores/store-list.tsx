@@ -24,11 +24,12 @@ import DataTablePagination from "@/pages/users/components/data-table-pagination"
 // import DataTableToolBar from "@/pages/users/components/data-table-toolbar"; // Reuse
 import api from "@/lib/api";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { UpdateRequestDialog } from "@/components/update-request-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Star, X, Search } from "lucide-react";
+import { Star, X, Search, Store as StoreIcon, User, Phone, Mail, MapPin, CreditCard, ShieldCheck, History, CheckCircle2, Ban } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { exactImageUrl } from "@/lib/utils";
 
@@ -511,93 +512,158 @@ export default function StoreListPage() {
           </div>
         )}
         {!isDetailLoading && selectedStore && (
-          <div className="space-y-4 text-sm">
-            <div className="space-y-2">
-              <div>
-                <span className="font-semibold">Tên: </span>
-                <span>{selectedStore.name}</span>
+          <div className="space-y-6 text-sm">
+            {/* Store Header Info */}
+            <div className="flex gap-4 p-4 rounded-lg bg-muted/30 border">
+              <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-full border-2 border-primary/20 bg-background">
+                {selectedStore.avatarUrl ? (
+                  <img
+                    src={exactImageUrl(selectedStore.avatarUrl)}
+                    alt={selectedStore.name}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground uppercase text-2xl font-bold">
+                    {selectedStore.name.substring(0, 1)}
+                  </div>
+                )}
               </div>
-              <div>
-                <span className="font-semibold">ID Chủ sở hữu: </span>
-                <span>{selectedStore.userId}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Trạng thái: </span>
-                <span>{selectedStore.status}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Đã xác minh: </span>
-                <span>{selectedStore.isVerified ? "Có" : "Không"}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Lượt theo dõi: </span>
-                <span>{selectedStore.followCount ?? 0}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Số điện thoại liên hệ: </span>
-                <span>{selectedStore.contactPhone}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Email liên hệ: </span>
-                <span>{selectedStore.contactEmail}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Địa chỉ: </span>
-                <span>{selectedStore.address}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Mô tả: </span>
-                <span>{selectedStore.description}</span>
+              <div className="flex flex-col justify-center space-y-2">
+                <h3 className="text-xl font-bold leading-none tracking-tight">
+                  {selectedStore.name}
+                </h3>
+                <div className="flex flex-wrap gap-2">
+                  <Badge variant={selectedStore.status === 'ACTIVE' ? 'default' : 'secondary'}>
+                    {selectedStore.status === 'ACTIVE' ? 'Đang hoạt động' : 
+                     selectedStore.status === 'REQUESTED' ? 'Đang chờ duyệt' :
+                     selectedStore.status === 'BANNED' ? 'Đã bị cấm' :
+                     selectedStore.status === 'REJECTED' ? 'Đã từ chối' : selectedStore.status}
+                  </Badge>
+                  {selectedStore.isVerified && (
+                    <Badge variant="outline" className="border-green-500 text-green-500 bg-green-50/50">
+                      <CheckCircle2 className="mr-1 h-3 w-3" /> Đã xác minh
+                    </Badge>
+                  )}
+                  <Badge variant="secondary" className="font-normal text-muted-foreground">
+                    <User className="mr-1 h-3 w-3" /> ID: {selectedStore.userId.substring(0, 8)}
+                  </Badge>
+                </div>
               </div>
             </div>
 
-            {selectedStore.payment && (
-              <div className="space-y-2">
-                <div className="font-semibold">Thông tin thanh toán</div>
-                <div>
-                  <span className="font-semibold">Tên ngân hàng: </span>
-                  <span>{selectedStore.payment.bankName}</span>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Basic & Contact Info */}
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 font-semibold text-primary">
+                  <StoreIcon className="h-4 w-4" />
+                  <span>Thông tin cửa hàng</span>
                 </div>
-                <div>
-                  <span className="font-semibold">Mã ngân hàng: </span>
-                  <span>{selectedStore.payment.bankCode}</span>
-                </div>
-                <div>
-                  <span className="font-semibold">Chủ tài khoản: </span>
-                  <span>{selectedStore.payment.accountHolderName}</span>
-                </div>
-                <div>
-                  <span className="font-semibold">Số tài khoản: </span>
-                  <span>{selectedStore.payment.accountNumber}</span>
+                <div className="space-y-3 rounded-md border p-3 bg-card">
+                  <div className="flex flex-col border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Mô tả</span>
+                    <span className="mt-1 leading-relaxed text-balance">{selectedStore.description || "Chưa có mô tả"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 border-b border-muted pb-2 last:border-0 last:pb-0">
+                    <div className="h-8 w-8 rounded bg-muted/50 flex items-center justify-center">
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold">Điện thoại</span>
+                      <span className="font-medium">{selectedStore.contactPhone || "Chưa cập nhật"}</span>
+                    </div>
+                  </div>
+                  <div className="items-center gap-3 border-b border-muted pb-2 last:border-0 last:pb-0 flex">
+                    <div className="h-8 w-8 rounded bg-muted/50 flex items-center justify-center">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold">Email</span>
+                      <span className="font-medium">{selectedStore.contactEmail || "Chưa cập nhật"}</span>
+                    </div>
+                  </div>
+                  <div className="items-center gap-3 border-b border-muted pb-2 last:border-0 last:pb-0 flex">
+                    <div className="h-8 w-8 rounded bg-muted/50 flex items-center justify-center">
+                      <MapPin className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold">Địa chỉ</span>
+                      <span className="font-medium leading-tight">{selectedStore.address || "Chưa cập nhật"}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
 
-            {selectedStore.kyc && (
-              <div className="space-y-2">
-                <div className="font-semibold">Thông tin KYC</div>
-                <div>
-                  <span className="font-semibold">Status: </span>
-                  <span>{selectedStore.kyc.status}</span>
+              {/* Payment & Verification */}
+              <div className="space-y-4">
+                {/* Payment Section */}
+                {selectedStore.payment ? (
+                  <>
+                    <div className="flex items-center gap-2 font-semibold text-primary">
+                      <CreditCard className="h-4 w-4" />
+                      <span>Thanh toán & Ngân hàng</span>
+                    </div>
+                    <div className="space-y-3 rounded-md border p-3 bg-card shadow-sm border-primary/10">
+                      <div className="flex justify-between items-center bg-muted/30 p-2 rounded">
+                        <span className="font-bold text-primary">{selectedStore.payment.bankName}</span>
+                        <Badge variant="outline" className="text-[10px]">{selectedStore.payment.bankCode}</Badge>
+                      </div>
+                      <div className="px-1 space-y-2">
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Chủ tài khoản</span>
+                          <span className="font-medium">{selectedStore.payment.accountHolderName}</span>
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] text-muted-foreground uppercase font-bold">Số tài khoản</span>
+                          <span className="font-mono text-lg font-bold text-primary tracking-wider">
+                            {selectedStore.payment.accountNumber}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="p-4 rounded-md border border-dashed text-center text-muted-foreground italic">
+                    Chưa có thông tin thanh toán
+                  </div>
+                )}
+
+                {/* KYC Status */}
+                <div className="flex items-center gap-2 font-semibold text-primary pt-2">
+                  <ShieldCheck className="h-4 w-4" />
+                  <span>Xác minh danh tính (KYC)</span>
                 </div>
-                <div>
-                  <span className="font-semibold">Đã gửi lúc: </span>
-                  <span>
-                    {selectedStore.kyc.submittedAt
-                      ? new Date(
-                          selectedStore.kyc.submittedAt
-                        ).toLocaleString()
-                      : "-"}
-                  </span>
+                <div className="rounded-md border p-3 bg-card">
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold">Trạng thái</span>
+                      <span className="font-medium text-orange-600">
+                        {selectedStore.kyc?.status === 'PENDING' ? 'Đang chờ duyệt' :
+                         selectedStore.kyc?.status === 'VERIFIED' ? 'Đã xác minh' :
+                         selectedStore.kyc?.status === 'REJECTED' ? 'Đã bị từ chối' : 'Chưa bắt đầu'}
+                      </span>
+                    </div>
+                    <div className="flex flex-col items-end text-right">
+                      <span className="text-[10px] text-muted-foreground uppercase font-bold flex items-center gap-1">
+                        <History className="h-2 w-2" /> Gửi lúc
+                      </span>
+                      <span className="text-xs">
+                        {selectedStore.kyc?.submittedAt
+                          ? new Date(selectedStore.kyc.submittedAt).toLocaleDateString('vi-VN')
+                          : "-"}
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            )}
+            </div>
 
-            <div className="pt-2 flex flex-wrap gap-2">
+            <Separator />
+
+            <div className="pt-2 flex flex-wrap gap-3">
               {selectedStore.status === "REQUESTED" && (
                 <>
                   <Button
-                    size="sm"
+                    className="flex-1 shadow-md hover:shadow-lg transition-all"
                     disabled={isActionLoading}
                     onClick={async () => {
                       if (!selectedStore) return;
@@ -605,14 +671,7 @@ export default function StoreListPage() {
                         setIsActionLoading(true);
                         await api.post(`/store/${selectedStore.id}/verify`);
                         toast.success("Xác minh cửa hàng thành công");
-                        setSelectedStore((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                isVerified: true,
-                              }
-                            : prev
-                        );
+                        setSelectedStore((prev) => prev ? { ...prev, isVerified: true } : prev);
                         refetchStores();
                       } catch {
                         toast.error("Xác minh thất bại");
@@ -621,28 +680,19 @@ export default function StoreListPage() {
                        }
                     }}
                   >
-                    Xác minh cửa hàng
+                    <CheckCircle2 className="mr-2 h-4 w-4" /> Phê duyệt cửa hàng
                   </Button>
                   <Button
-                    size="sm"
                     variant="destructive"
+                    className="flex-1 shadow-md"
                     disabled={isActionLoading}
                     onClick={async () => {
                       if (!selectedStore) return;
                       try {
                         setIsActionLoading(true);
-                        await api.patch(`/store/${selectedStore.id}/status`, {
-                          status: "REJECTED",
-                        });
-                        toast.success("Trạng thái cửa hàng đã cập nhật thành TỪ CHỐI");
-                        setSelectedStore((prev) =>
-                          prev
-                            ? {
-                                ...prev,
-                                status: "REJECTED",
-                              }
-                            : prev
-                        );
+                        await api.patch(`/store/${selectedStore.id}/status`, { status: "REJECTED" });
+                        toast.success("Cửa hàng đã bị từ chối");
+                        setSelectedStore((prev) => prev ? { ...prev, status: "REJECTED" } : prev);
                         refetchStores();
                       } catch {
                         toast.error("Từ chối thất bại");
@@ -651,74 +701,56 @@ export default function StoreListPage() {
                        }
                     }}
                   >
-                    Từ chối
+                    <X className="mr-2 h-4 w-4" /> Từ chối
                   </Button>
                 </>
               )}
 
               {selectedStore.status === "ACTIVE" && (
                 <Button
-                  size="sm"
                   variant="destructive"
+                  className="w-full shadow-md"
                   disabled={isActionLoading}
                   onClick={async () => {
                     if (!selectedStore) return;
                     try {
                       setIsActionLoading(true);
-                      await api.patch(`/store/${selectedStore.id}/status`, {
-                        status: "BANNED",
-                      });
-                      toast.success("Trạng thái cửa hàng đã cập nhật thành BỊ CẤM");
-                      setSelectedStore((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              status: "BANNED",
-                            }
-                          : prev
-                      );
+                      await api.patch(`/store/${selectedStore.id}/status`, { status: "BANNED" });
+                      toast.success("Đã cấm cửa hàng");
+                      setSelectedStore((prev) => prev ? { ...prev, status: "BANNED" } : prev);
                       refetchStores();
                     } catch (e) {
-                      toast.error("Cập nhật trạng thái thất bại");
+                      toast.error("Thao tác thất bại");
                     } finally {
                       setIsActionLoading(false);
                     }
                   }}
                 >
-                  Cấm cửa hàng
+                  <Ban className="mr-2 h-4 w-4" /> Cấm cửa hàng
                 </Button>
               )}
 
               {selectedStore.status === "BANNED" && (
                 <Button
-                  size="sm"
                   variant="outline"
+                  className="w-full border-primary text-primary hover:bg-primary/5 shadow-sm"
                   disabled={isActionLoading}
                   onClick={async () => {
                     if (!selectedStore) return;
                     try {
                       setIsActionLoading(true);
-                      await api.patch(`/store/${selectedStore.id}/status`, {
-                        status: "ACTIVE",
-                      });
-                      toast.success("Trạng thái cửa hàng đã cập nhật thành HOẠT ĐỘNG");
-                      setSelectedStore((prev) =>
-                        prev
-                          ? {
-                              ...prev,
-                              status: "ACTIVE",
-                            }
-                          : prev
-                      );
+                      await api.patch(`/store/${selectedStore.id}/status`, { status: "ACTIVE" });
+                      toast.success("Đã kích hoạt lại cửa hàng");
+                      setSelectedStore((prev) => prev ? { ...prev, status: "ACTIVE" } : prev);
                       refetchStores();
                     } catch (e) {
-                      toast.error("Cập nhật trạng thái thất bại");
+                      toast.error("Thao tác thất bại");
                     } finally {
                       setIsActionLoading(false);
                     }
                   }}
                 >
-                  Bỏ cấm cửa hàng
+                  <CheckCircle2 className="mr-2 h-4 w-4" /> Kích hoạt lại cửa hàng
                 </Button>
               )}
             </div>

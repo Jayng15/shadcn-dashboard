@@ -116,7 +116,7 @@ function AuthorizedImage({
 export default function FinancePage() {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-    const [tabFilter, setTabFilter] = useState<"ALL" | "DEPOSIT" | "WITHDRAW" | "PENDING">("ALL")
+    const [tabFilter, setTabFilter] = useState<"ALL" | "DEPOSIT" | "WITHDRAW" | "PENDING" | "REVENUE" | "PAYMENT">("ALL")
 
     const [isDetailOpen, setIsDetailOpen] = useState(false)
     const [isDetailLoading, setIsDetailLoading] = useState(false)
@@ -256,6 +256,10 @@ export default function FinancePage() {
         const allTransactions: FinanceTransaction[] = data?.transactions || []
         if (tabFilter === "ALL") return allTransactions
         if (tabFilter === "PENDING") return allTransactions.filter((tx) => tx.verifiedStatus === "PENDING")
+        if (tabFilter === "REVENUE") return allTransactions.filter((tx) => tx.type === "DEPOSIT" && tx.orderId)
+        if (tabFilter === "PAYMENT") return allTransactions.filter((tx) => tx.type === "PURCHASE")
+        if (tabFilter === "DEPOSIT") return allTransactions.filter((tx) => tx.type === "DEPOSIT" && !tx.orderId)
+        if (tabFilter === "WITHDRAW") return allTransactions.filter((tx) => tx.type === "WITHDRAW" && !tx.orderId)
         return allTransactions.filter((tx) => tx.type === tabFilter)
     }, [tabFilter, data?.transactions])
 
@@ -667,6 +671,12 @@ export default function FinancePage() {
                         case "pending":
                             setTabFilter("PENDING")
                             break
+                        case "revenue":
+                            setTabFilter("REVENUE")
+                            break
+                        case "payment":
+                            setTabFilter("PAYMENT")
+                            break
                         default:
                             setTabFilter("ALL")
                     }
@@ -677,6 +687,8 @@ export default function FinancePage() {
                     <TabsTrigger value="deposits">Nạp tiền</TabsTrigger>
                     <TabsTrigger value="withdrawals">Rút tiền</TabsTrigger>
                     <TabsTrigger value="pending">Chờ xử lý</TabsTrigger>
+                    <TabsTrigger value="revenue">Doanh thu</TabsTrigger>
+                    <TabsTrigger value="payment">Thanh toán</TabsTrigger>
                 </TabsList>
 
                 <Card className="bg-sidebar w-full mt-4 flex flex-col">
@@ -686,12 +698,16 @@ export default function FinancePage() {
                             {tabFilter === "DEPOSIT" && "Nạp tiền"}
                             {tabFilter === "WITHDRAW" && "Rút tiền"}
                             {tabFilter === "PENDING" && "Giao dịch chờ xử lý"}
+                            {tabFilter === "REVENUE" && "Doanh thu"}
+                            {tabFilter === "PAYMENT" && "Thanh toán"}
                         </CardTitle>
                         <CardDescription>
                             {tabFilter === "ALL" && "Tổng quan về tất cả các giao dịch tài chính."}
-                            {tabFilter === "DEPOSIT" && "Chỉ các giao dịch nạp tiền."}
-                            {tabFilter === "WITHDRAW" && "Chỉ các giao dịch rút tiền."}
+                            {tabFilter === "DEPOSIT" && "Chỉ các giao dịch nạp tiền manual."}
+                            {tabFilter === "WITHDRAW" && "Chỉ các giao dịch rút tiền manual."}
                             {tabFilter === "PENDING" && "Các giao dịch đang chờ xác minh."}
+                            {tabFilter === "REVENUE" && "Doanh thu từ các đơn hàng."}
+                            {tabFilter === "PAYMENT" && "Các giao dịch thanh toán đơn hàng."}
                         </CardDescription>
                         <div className="flex items-center gap-2 pt-1">
                             <div className="relative flex-1 max-w-sm">
