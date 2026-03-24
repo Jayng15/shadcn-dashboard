@@ -43,11 +43,11 @@ export type Product = {
 const verifyProduct = async (id: string, tableMeta: any) => {
     try {
         await api.post(`/product/${id}/verify`);
-        toast.success("Product verified");
+        toast.success("Đã xác minh sản phẩm");
         // Trigger refetch
         tableMeta?.refetch();
     } catch {
-        toast.error("Failed to verify product");
+        toast.error("Không thể xác minh sản phẩm");
     }
 }
 
@@ -133,7 +133,7 @@ export const columns: ColumnDef<Product>[] = [
                 (table.options.meta as { openProductDetail?: (p: Product) => void })?.openProductDetail?.(product)
               }
             >
-              Xem chi tiết
+              Xem thông tin
             </DropdownMenuItem>
             {!product.isVerified && (
                  <DropdownMenuItem onClick={() => verifyProduct(product.id, table.options.meta)}>

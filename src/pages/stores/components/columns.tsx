@@ -33,20 +33,26 @@ export type Store = {
 const verifyStore = async (id: string, tableMeta: any) => {
     try {
         await api.post(`/store/${id}/verify`);
-        toast.success("Store verified");
+        toast.success("Đã xác minh cửa hàng");
         tableMeta?.refetch();
     } catch (e: any) {
-        toast.error("Failed to verify store");
+        toast.error("Không thể xác minh cửa hàng");
     }
 };
 
 const updateStoreStatus = async (id: string, status: 'ACTIVE' | 'BANNED' | 'REJECTED' | 'REQUESTED', tableMeta: any) => {
     try {
         await api.patch(`/store/${id}/status`, { status });
-        toast.success(`Store status updated to ${status}`);
+        const statusMap = {
+            ACTIVE: "Đang hoạt động",
+            BANNED: "Đã bị cấm",
+            REJECTED: "Đã từ chối",
+            REQUESTED: "Đang chờ duyệt"
+        };
+        toast.success(`Đã cập nhật trạng thái cửa hàng thành ${statusMap[status]}`);
         tableMeta?.refetch();
     } catch (e: any) {
-        toast.error("Failed to update status");
+        toast.error("Không thể cập nhật trạng thái");
     }
 };
 
@@ -81,7 +87,7 @@ export const columns: ColumnDef<Store>[] = [
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            Name
+            Tên cửa hàng
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -89,13 +95,13 @@ export const columns: ColumnDef<Store>[] = [
   },
   {
     accessorKey: "userId",
-    header: "User ID",
+    header: "ID Người dùng",
     cell: ({ row }) => <div className="max-w-[100px] truncate" title={row.getValue("userId")}>{row.getValue("userId")}</div>
   },
   {
       accessorKey: "contactPhone",
-      header: "Phone",
-      cell: ({ row }) => row.getValue("contactPhone") || "N/A"
+      header: "Điện thoại",
+      cell: ({ row }) => row.getValue("contactPhone") || "Chưa có"
   },
   {
       accessorKey: "contactEmail",
@@ -103,27 +109,28 @@ export const columns: ColumnDef<Store>[] = [
   },
   {
     accessorKey: "status",
-    header: "Status",
+    header: "Trạng thái",
     cell: ({ row }) => {
       const status = row.getValue("status") as string
       let variant: "default" | "secondary" | "destructive" | "outline" = "outline"
+      let label = status
 
       switch(status) {
-          case 'ACTIVE': variant = 'default'; break;
-          case 'REQUESTED': variant = 'secondary'; break;
-          case 'BANNED': variant = 'destructive'; break;
-          case 'REJECTED': variant = 'destructive'; break;
+          case 'ACTIVE': variant = 'default'; label = "Đang hoạt động"; break;
+          case 'REQUESTED': variant = 'secondary'; label = "Chờ duyệt"; break;
+          case 'BANNED': variant = 'destructive'; label = "Đã cấm"; break;
+          case 'REJECTED': variant = 'destructive'; label = "Từ chối"; break;
       }
 
-      return <Badge variant={variant}>{status}</Badge>
+      return <Badge variant={variant}>{label}</Badge>
     },
   },
   {
     accessorKey: "isVerified",
-    header: "Verified",
+    header: "Xác minh",
     cell: ({ row }) => {
         const isVerified = row.getValue("isVerified") as boolean
-        return isVerified ? <Badge variant="outline" className="border-green-500 text-green-500">Yes</Badge> : <span className="text-muted-foreground text-sm">No</span>
+        return isVerified ? <Badge variant="outline" className="border-green-500 text-green-500">Đã xác minh</Badge> : <span className="text-muted-foreground text-sm font-medium">Chưa</span>
     }
   },
   {
@@ -141,16 +148,16 @@ export const columns: ColumnDef<Store>[] = [
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(store.id)}
             >
-              Copy Store ID
+              Sao chép ID Cửa hàng
             </DropdownMenuItem>
              <DropdownMenuItem
               onClick={() => navigator.clipboard.writeText(store.userId)}
             >
-              Copy User ID
+              Sao chép ID Người dùng
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
@@ -158,7 +165,7 @@ export const columns: ColumnDef<Store>[] = [
                 (meta as any)?.openStoreDetail?.(store)
               }
             >
-              View Details
+              Xem thông tin
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>
@@ -180,30 +187,30 @@ export const columns: ColumnDef<Store>[] = [
 
             {!store.isVerified && (
                  <DropdownMenuItem onClick={() => verifyStore(store.id, meta)}>
-                    Verify Store
+                    Xác minh cửa hàng
                  </DropdownMenuItem>
             )}
 
             {store.status === 'REQUESTED' && (
                 <>
                     <DropdownMenuItem onClick={() => updateStoreStatus(store.id, 'ACTIVE', meta)}>
-                        Approve (Activate)
+                        Phê duyệt (Kích hoạt)
                     </DropdownMenuItem>
                      <DropdownMenuItem onClick={() => updateStoreStatus(store.id, 'REJECTED', meta)} className="text-red-500">
-                        Reject
+                        Từ chối
                     </DropdownMenuItem>
                 </>
             )}
 
             {store.status === 'ACTIVE' && (
                  <DropdownMenuItem onClick={() => updateStoreStatus(store.id, 'BANNED', meta)} className="text-red-500">
-                    Ban Store
+                    Cấm cửa hàng
                  </DropdownMenuItem>
             )}
 
              {store.status === 'BANNED' && (
                  <DropdownMenuItem onClick={() => updateStoreStatus(store.id, 'ACTIVE', meta)}>
-                    Unban (Activate)
+                    Bỏ cấm (Kích hoạt)
                  </DropdownMenuItem>
             )}
 

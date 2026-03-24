@@ -127,7 +127,14 @@ export default function StoreListPage() {
     enabled: tabFilter === "reports",
   });
 
-  const stores = useMemo(() => storeData?.stores || [], [storeData]);
+  const stores = useMemo(() => {
+    const allStores = storeData?.stores || [];
+    if (tabFilter === "requested") {
+      return allStores.filter((s: any) => s.status === "REQUESTED");
+    }
+    return allStores;
+  }, [storeData, tabFilter]);
+
   const requests = useMemo(() => requestData?.requests || [], [requestData]);
   const reviews = useMemo(() => reviewsData?.reviews || [], [reviewsData]);
   const reports = useMemo(() => reportsData?.reports || [], [reportsData]);
@@ -534,7 +541,7 @@ export default function StoreListPage() {
                 </h3>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant={selectedStore.status === 'ACTIVE' ? 'default' : 'secondary'}>
-                    {selectedStore.status === 'ACTIVE' ? 'Đang hoạt động' : 
+                    {selectedStore.status === 'ACTIVE' ? 'Đang hoạt động' :
                      selectedStore.status === 'REQUESTED' ? 'Đang chờ duyệt' :
                      selectedStore.status === 'BANNED' ? 'Đã bị cấm' :
                      selectedStore.status === 'REJECTED' ? 'Đã từ chối' : selectedStore.status}
@@ -558,10 +565,10 @@ export default function StoreListPage() {
                   <StoreIcon className="h-4 w-4" />
                   <span>Thông tin cửa hàng</span>
                 </div>
-                <div className="space-y-3 rounded-md border p-3 bg-card">
-                  <div className="flex flex-col border-b border-muted pb-2 last:border-0 last:pb-0">
+                <div className="space-y-3 rounded-md border p-3 bg-card overflow-hidden">
+                  <div className="flex flex-col border-b border-muted pb-2 last:border-0 last:pb-0 min-w-0">
                     <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider">Mô tả</span>
-                    <span className="mt-1 leading-relaxed text-balance">{selectedStore.description || "Chưa có mô tả"}</span>
+                    <span className="mt-1 leading-relaxed text-sm break-words">{selectedStore.description || "Chưa có mô tả"}</span>
                   </div>
                   <div className="flex items-center gap-3 border-b border-muted pb-2 last:border-0 last:pb-0">
                     <div className="h-8 w-8 rounded bg-muted/50 flex items-center justify-center">
@@ -585,9 +592,9 @@ export default function StoreListPage() {
                     <div className="h-8 w-8 rounded bg-muted/50 flex items-center justify-center">
                       <MapPin className="h-4 w-4 text-muted-foreground" />
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col min-w-0">
                       <span className="text-[10px] text-muted-foreground uppercase font-bold">Địa chỉ</span>
-                      <span className="font-medium leading-tight">{selectedStore.address || "Chưa cập nhật"}</span>
+                      <span className="font-medium leading-tight text-xs break-words">{selectedStore.address || "Chưa cập nhật"}</span>
                     </div>
                   </div>
                 </div>
@@ -607,14 +614,14 @@ export default function StoreListPage() {
                         <span className="font-bold text-primary">{selectedStore.payment.bankName}</span>
                         <Badge variant="outline" className="text-[10px]">{selectedStore.payment.bankCode}</Badge>
                       </div>
-                      <div className="px-1 space-y-2">
-                        <div className="flex flex-col">
+                      <div className="px-1 space-y-2 overflow-hidden">
+                        <div className="flex flex-col min-w-0">
                           <span className="text-[10px] text-muted-foreground uppercase font-bold">Chủ tài khoản</span>
-                          <span className="font-medium">{selectedStore.payment.accountHolderName}</span>
+                          <span className="font-medium truncate">{selectedStore.payment.accountHolderName}</span>
                         </div>
-                        <div className="flex flex-col">
+                        <div className="flex flex-col min-w-0">
                           <span className="text-[10px] text-muted-foreground uppercase font-bold">Số tài khoản</span>
-                          <span className="font-mono text-lg font-bold text-primary tracking-wider">
+                          <span className="font-mono text-lg font-bold text-primary tracking-wider break-all">
                             {selectedStore.payment.accountNumber}
                           </span>
                         </div>
@@ -768,8 +775,14 @@ export default function StoreListPage() {
       <div className="flex-1 p-0">
          <Tabs value={tabFilter} onValueChange={setTabFilter} className="w-full h-full flex flex-col">
             <div className="px-6 pt-4">
-                <TabsList>
+                <TabsList className="bg-muted/50">
                     <TabsTrigger value="all">Tất cả cửa hàng</TabsTrigger>
+                    <TabsTrigger value="requested" className="relative">
+                      Cửa hàng mới
+                      {storeData?.stores?.filter((s: any) => s.status === "REQUESTED").length > 0 && (
+                        <span className="ml-1.5 h-2 w-2 rounded-full bg-primary" />
+                      )}
+                    </TabsTrigger>
                     <TabsTrigger value="requests">Yêu cầu cập nhật</TabsTrigger>
                     <TabsTrigger value="reviews">
                       Đánh giá
@@ -807,6 +820,32 @@ export default function StoreListPage() {
                           Xóa bộ lọc
                         </Button>
                       )}
+                    </div>
+                    <CardContent className="flex-1 p-0">
+                        <DataTable table={table} columns={columns} />
+                    </CardContent>
+                    <div className="mt-4">
+                         <DataTablePagination table={table} className="w-full" />
+                    </div>
+                    </>
+                )}
+            </TabsContent>
+
+            <TabsContent value="requested" className="flex-1 flex flex-col p-6 pt-2">
+                {isStorePending ? (
+                    <CardContent>Đang tải...</CardContent>
+                ) : (
+                    <>
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="relative flex-1 max-w-sm">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                          placeholder="Tìm cửa hàng chờ duyệt..."
+                          className="pl-8"
+                          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                          onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                        />
+                      </div>
                     </div>
                     <CardContent className="flex-1 p-0">
                         <DataTable table={table} columns={columns} />
