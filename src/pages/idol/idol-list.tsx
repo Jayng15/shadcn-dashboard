@@ -33,7 +33,7 @@ export default function IdolListPage() {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
-    pageSize: 10,
+    pageSize: 20,
   })
 
   const [isFormOpen, setIsFormOpen] = useState(false)
@@ -127,7 +127,7 @@ export default function IdolListPage() {
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
     manualPagination: true,
-    rowCount: data?.pagination?.totalCount || 0,
+    rowCount: data?.pagination?.total || 0,
     autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
