@@ -5,9 +5,10 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
+import { Search, X, Plus } from "lucide-react"
 import { toast } from "sonner"
 import api from "@/lib/api"
+import { Input } from "@/components/ui/input"
 import {
   ColumnFiltersState,
   SortingState,
@@ -43,9 +44,16 @@ export default function IdolListPage() {
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null)
 
   const { isPending, error, data, refetch } = useQuery({
-    queryKey: ["admin-teams", sorting, columnFilters],
+    queryKey: ["admin-teams", sorting, columnFilters, pagination.pageIndex, pagination.pageSize],
     queryFn: async () => {
-      const res = await api.get("/idol/teams")
+      const searchTerm = columnFilters.find((f) => f.id === "name")?.value as string
+      const res = await api.get("/idol/teams", {
+        params: {
+          page: pagination.pageIndex + 1,
+          limit: pagination.pageSize,
+          query: searchTerm || undefined,
+        },
+      })
       return res.data
     },
   })
@@ -118,6 +126,8 @@ export default function IdolListPage() {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     onPaginationChange: setPagination,
+    manualPagination: true,
+    rowCount: data?.pagination?.totalCount || 0,
     autoResetPageIndex: false,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
@@ -151,6 +161,27 @@ export default function IdolListPage() {
       </div>
 
       <Card className="bg-sidebar w-full min-h-full flex flex-col">
+        <div className="flex items-center gap-2 p-4 border-b">
+          <div className="relative flex-1 max-w-sm">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+            <Input
+              placeholder="Tìm tên nhóm..."
+              className="pl-8"
+              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+              onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+            />
+          </div>
+          {table.getState().columnFilters.length > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => table.resetColumnFilters()}
+            >
+              <X className="h-4 w-4 mr-1" />
+              Xóa bộ lọc
+            </Button>
+          )}
+        </div>
         <CardContent className="flex-1 p-0">
           {isPending ? (
              <div className="p-4">Đang tải...</div>
