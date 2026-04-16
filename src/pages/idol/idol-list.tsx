@@ -17,7 +17,6 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  PaginationState,
 } from "@tanstack/react-table"
 import DataTable from "@/pages/users/components/data-table"
 import DataTablePagination from "@/pages/users/components/data-table-pagination"
@@ -25,16 +24,31 @@ import { columns } from "./components/team-columns"
 import { TeamForm } from "./components/team-form"
 import { ResponsiveDialog } from "@/components/responsive-dialog"
 import { Team } from "@/types"
-import { useNavigate } from "@tanstack/react-router"
+import { useNavigate, useSearch } from "@tanstack/react-router"
+import { IdolSearch } from "@/routes/idols.index"
 
 export default function IdolListPage() {
+  const search = useSearch({ from: '/idols/' }) as IdolSearch
   const navigate = useNavigate()
   const [sorting, setSorting] = useState<SortingState>([{ id: "createdAt", desc: true }])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [pagination, setPagination] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  })
+
+  const pagination = {
+    pageIndex: search.page,
+    pageSize: search.pageSize,
+  }
+
+  const setPagination = (updater: any) => {
+    const next = typeof updater === 'function' ? updater(pagination) : updater
+    navigate({
+      search: ((prev: any) => ({
+        ...prev,
+        page: next.pageIndex,
+        pageSize: next.pageSize,
+      })) as any,
+      replace: true,
+    })
+  }
 
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
@@ -44,13 +58,13 @@ export default function IdolListPage() {
   const [teamToDelete, setTeamToDelete] = useState<Team | null>(null)
 
   const { isPending, error, data, refetch } = useQuery({
-    queryKey: ["admin-teams", sorting, columnFilters, pagination.pageIndex, pagination.pageSize],
+    queryKey: ["admin-teams", sorting, columnFilters, search.page, search.pageSize],
     queryFn: async () => {
       const searchTerm = columnFilters.find((f) => f.id === "name")?.value as string
       const res = await api.get("/idol/teams", {
         params: {
-          page: pagination.pageIndex + 1,
-          limit: pagination.pageSize,
+          page: search.page + 1,
+          limit: search.pageSize,
           query: searchTerm || undefined,
         },
       })

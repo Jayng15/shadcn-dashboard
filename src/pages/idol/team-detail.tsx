@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { useParams, Link } from "@tanstack/react-router"
+import { useParams } from "@tanstack/react-router"
 import {
     Card,
     CardContent,
@@ -147,11 +147,11 @@ export default function TeamDetailPage() {
     return (
         <div className="flex flex-col space-y-4 h-full p-6">
             <div className="flex items-center gap-2 mb-2">
-                <Button variant="ghost" size="icon" asChild>
-                    <Link to={"/idols" as any}><ArrowLeft className="h-4 w-4" /></Link>
-                </Button>
-                <div className="text-muted-foreground">Quay lại danh sách nhóm</div>
-            </div>
+            <Button variant="ghost" size="icon" onClick={() => window.history.back()}>
+                <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div className="text-muted-foreground">Quay lại danh sách nhóm</div>
+        </div>
 
             <div className="flex items-center justify-between">
                 <div>
