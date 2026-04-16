@@ -47,16 +47,12 @@ export const columns: ColumnDef<Order>[] = [
     header: "Mã đơn hàng",
   },
   {
-    accessorKey: "userId",
-    header: "ID Người dùng",
-    cell: ({ row }) => {
-      const id = row.getValue("userId") as string;
-      return <div className="max-w-[100px] truncate" title={id}>{id}</div>
-    }
+    accessorKey: "customerFullName",
+    header: "Tên khách hàng",
   },
   {
     accessorKey: "storeId",
-    header: "ID Cửa hàng",
+    header: "Mã cửa hàng",
     cell: ({ row }) => {
       const id = row.getValue("storeId") as string;
       return <div className="max-w-[100px] truncate" title={id}>{id}</div>
@@ -80,6 +76,20 @@ export const columns: ColumnDef<Order>[] = [
       const status = row.getValue("status") as string
       let variant: "default" | "secondary" | "destructive" | "outline" =
         "outline"
+
+      const statusLabels: Record<string, string> = {
+        PENDING: "Chờ xử lý",
+        CONFIRMED: "Đã xác nhận",
+        AWAITING_PAYMENT: "Chờ thanh toán",
+        PROCESSING: "Đang chuẩn bị",
+        SHIPPED: "Đang giao hàng",
+        IN_TRANSIT: "Đang vận chuyển",
+        DELIVERED: "Đã giao hàng",
+        COMPLETED: "Hoàn thành",
+        CANCELLED: "Đã hủy",
+        RETURNED: "Đã trả hàng",
+        REFUNDED: "Đã hoàn tiền",
+      }
 
       switch (status) {
         case "COMPLETED":
@@ -105,7 +115,7 @@ export const columns: ColumnDef<Order>[] = [
           variant = "outline"
       }
 
-      return <Badge variant={variant}>{status}</Badge>
+      return <Badge variant={variant}>{statusLabels[status] || status}</Badge>
     },
   },
   {
