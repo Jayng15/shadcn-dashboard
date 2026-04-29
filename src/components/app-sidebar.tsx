@@ -10,6 +10,7 @@ import {
   Star,
   FileText,
   CircleHelp,
+  Settings,
 } from "lucide-react"
 import {
   Sidebar,
@@ -74,6 +75,11 @@ const items = [
     title: "FAQ",
     url: "/faq",
     icon: CircleHelp,
+  },
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: Settings,
   },
 ]
 

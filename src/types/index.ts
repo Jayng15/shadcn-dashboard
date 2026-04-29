@@ -99,3 +99,11 @@ export type FAQ = {
   createdAt: string;
   updatedAt: string;
 }
+
+export type Setting = {
+  key: string;
+  value: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
