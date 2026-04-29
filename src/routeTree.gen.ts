@@ -14,10 +14,12 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login'
+import { Route as IdolsIndexImport } from './routes/idols.index'
 
 // Create Virtual Routes
 
 const TaskLazyImport = createFileRoute('/task')()
+const SettingsLazyImport = createFileRoute('/settings')()
 const ProductsLazyImport = createFileRoute('/products')()
 const PolicyLazyImport = createFileRoute('/policy')()
 const OrdersLazyImport = createFileRoute('/orders')()
@@ -28,7 +30,6 @@ const CalendarLazyImport = createFileRoute('/calendar')()
 const IndexLazyImport = createFileRoute('/')()
 const UsersIndexLazyImport = createFileRoute('/users/')()
 const StoresIndexLazyImport = createFileRoute('/stores/')()
-const IdolsIndexLazyImport = createFileRoute('/idols/')()
 const UsersUserIdLazyImport = createFileRoute('/users/$userId')()
 const StoresStoreIdLazyImport = createFileRoute('/stores/$storeId')()
 const IdolsTeamIdLazyImport = createFileRoute('/idols/$teamId')()
@@ -40,6 +41,12 @@ const TaskLazyRoute = TaskLazyImport.update({
   path: '/task',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/task.lazy').then((d) => d.Route))
+
+const SettingsLazyRoute = SettingsLazyImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/settings.lazy').then((d) => d.Route))
 
 const ProductsLazyRoute = ProductsLazyImport.update({
   id: '/products',
@@ -107,7 +114,7 @@ const StoresIndexLazyRoute = StoresIndexLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/stores.index.lazy').then((d) => d.Route))
 
-const IdolsIndexLazyRoute = IdolsIndexLazyImport.update({
+const IdolsIndexRoute = IdolsIndexImport.update({
   id: '/idols/',
   path: '/idols/',
   getParentRoute: () => rootRoute,
@@ -200,6 +207,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProductsLazyImport
       parentRoute: typeof rootRoute
     }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/task': {
       id: '/task'
       path: '/task'
@@ -232,7 +246,7 @@ declare module '@tanstack/react-router' {
       id: '/idols/'
       path: '/idols'
       fullPath: '/idols'
-      preLoaderRoute: typeof IdolsIndexLazyImport
+      preLoaderRoute: typeof IdolsIndexImport
       parentRoute: typeof rootRoute
     }
     '/stores/': {
@@ -264,11 +278,12 @@ export interface FileRoutesByFullPath {
   '/orders': typeof OrdersLazyRoute
   '/policy': typeof PolicyLazyRoute
   '/products': typeof ProductsLazyRoute
+  '/settings': typeof SettingsLazyRoute
   '/task': typeof TaskLazyRoute
   '/idols/$teamId': typeof IdolsTeamIdLazyRoute
   '/stores/$storeId': typeof StoresStoreIdLazyRoute
   '/users/$userId': typeof UsersUserIdLazyRoute
-  '/idols': typeof IdolsIndexLazyRoute
+  '/idols': typeof IdolsIndexRoute
   '/stores': typeof StoresIndexLazyRoute
   '/users': typeof UsersIndexLazyRoute
 }
@@ -283,11 +298,12 @@ export interface FileRoutesByTo {
   '/orders': typeof OrdersLazyRoute
   '/policy': typeof PolicyLazyRoute
   '/products': typeof ProductsLazyRoute
+  '/settings': typeof SettingsLazyRoute
   '/task': typeof TaskLazyRoute
   '/idols/$teamId': typeof IdolsTeamIdLazyRoute
   '/stores/$storeId': typeof StoresStoreIdLazyRoute
   '/users/$userId': typeof UsersUserIdLazyRoute
-  '/idols': typeof IdolsIndexLazyRoute
+  '/idols': typeof IdolsIndexRoute
   '/stores': typeof StoresIndexLazyRoute
   '/users': typeof UsersIndexLazyRoute
 }
@@ -303,11 +319,12 @@ export interface FileRoutesById {
   '/orders': typeof OrdersLazyRoute
   '/policy': typeof PolicyLazyRoute
   '/products': typeof ProductsLazyRoute
+  '/settings': typeof SettingsLazyRoute
   '/task': typeof TaskLazyRoute
   '/idols/$teamId': typeof IdolsTeamIdLazyRoute
   '/stores/$storeId': typeof StoresStoreIdLazyRoute
   '/users/$userId': typeof UsersUserIdLazyRoute
-  '/idols/': typeof IdolsIndexLazyRoute
+  '/idols/': typeof IdolsIndexRoute
   '/stores/': typeof StoresIndexLazyRoute
   '/users/': typeof UsersIndexLazyRoute
 }
@@ -324,6 +341,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/policy'
     | '/products'
+    | '/settings'
     | '/task'
     | '/idols/$teamId'
     | '/stores/$storeId'
@@ -342,6 +360,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/policy'
     | '/products'
+    | '/settings'
     | '/task'
     | '/idols/$teamId'
     | '/stores/$storeId'
@@ -360,6 +379,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/policy'
     | '/products'
+    | '/settings'
     | '/task'
     | '/idols/$teamId'
     | '/stores/$storeId'
@@ -380,11 +400,12 @@ export interface RootRouteChildren {
   OrdersLazyRoute: typeof OrdersLazyRoute
   PolicyLazyRoute: typeof PolicyLazyRoute
   ProductsLazyRoute: typeof ProductsLazyRoute
+  SettingsLazyRoute: typeof SettingsLazyRoute
   TaskLazyRoute: typeof TaskLazyRoute
   IdolsTeamIdLazyRoute: typeof IdolsTeamIdLazyRoute
   StoresStoreIdLazyRoute: typeof StoresStoreIdLazyRoute
   UsersUserIdLazyRoute: typeof UsersUserIdLazyRoute
-  IdolsIndexLazyRoute: typeof IdolsIndexLazyRoute
+  IdolsIndexRoute: typeof IdolsIndexRoute
   StoresIndexLazyRoute: typeof StoresIndexLazyRoute
   UsersIndexLazyRoute: typeof UsersIndexLazyRoute
 }
@@ -399,11 +420,12 @@ const rootRouteChildren: RootRouteChildren = {
   OrdersLazyRoute: OrdersLazyRoute,
   PolicyLazyRoute: PolicyLazyRoute,
   ProductsLazyRoute: ProductsLazyRoute,
+  SettingsLazyRoute: SettingsLazyRoute,
   TaskLazyRoute: TaskLazyRoute,
   IdolsTeamIdLazyRoute: IdolsTeamIdLazyRoute,
   StoresStoreIdLazyRoute: StoresStoreIdLazyRoute,
   UsersUserIdLazyRoute: UsersUserIdLazyRoute,
-  IdolsIndexLazyRoute: IdolsIndexLazyRoute,
+  IdolsIndexRoute: IdolsIndexRoute,
   StoresIndexLazyRoute: StoresIndexLazyRoute,
   UsersIndexLazyRoute: UsersIndexLazyRoute,
 }
@@ -427,6 +449,7 @@ export const routeTree = rootRoute
         "/orders",
         "/policy",
         "/products",
+        "/settings",
         "/task",
         "/idols/$teamId",
         "/stores/$storeId",
@@ -463,6 +486,9 @@ export const routeTree = rootRoute
     "/products": {
       "filePath": "products.lazy.tsx"
     },
+    "/settings": {
+      "filePath": "settings.lazy.tsx"
+    },
     "/task": {
       "filePath": "task.lazy.tsx"
     },
@@ -476,7 +502,7 @@ export const routeTree = rootRoute
       "filePath": "users.$userId.lazy.tsx"
     },
     "/idols/": {
-      "filePath": "idols.index.lazy.tsx"
+      "filePath": "idols.index.tsx"
     },
     "/stores/": {
       "filePath": "stores.index.lazy.tsx"
