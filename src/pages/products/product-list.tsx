@@ -58,7 +58,7 @@ export default function ProductListPage() {
         queryFn: async () => {
             const sort = sorting[0];
             const sortQuery = sort ? `&sortBy=${sort.id}&order=${sort.desc ? 'desc' : 'asc'}` : '';
-            const response = await api.get(`/product?limit=100${sortQuery}`);
+            const response = await api.get(`/product?limit=100&isAdminView=true${sortQuery}`);
             return response.data;
         },
         enabled: statusFilter !== "requests"
