@@ -24,6 +24,7 @@ export type Product = {
   isVerified: boolean;
   thumbnailUrl: string;
   createdAt: string;
+  updatedAt: string;
   // Optional additional fields from detail API
   userId?: string;
   description?: string;
@@ -106,6 +107,22 @@ export const columns: ColumnDef<Product>[] = [
         return row.original.isVerified ?
             <Badge className="bg-green-500 hover:bg-green-600">Có</Badge> :
             <Badge variant="destructive">Chưa</Badge>
+    }
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Ngày tạo",
+    cell: ({ row }) => {
+        const date = row.getValue("createdAt") as string
+        return <div className="text-xs">{date ? new Date(date).toLocaleString('vi-VN') : "N/A"}</div>
+    }
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Ngày cập nhật",
+    cell: ({ row }) => {
+        const date = row.getValue("updatedAt") as string
+        return <div className="text-xs">{date ? new Date(date).toLocaleString('vi-VN') : "N/A"}</div>
     }
   },
   {

@@ -56,7 +56,9 @@ export default function ProductListPage() {
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["products", sorting, columnFilters],
     queryFn: async () => {
-      const response = await api.get("/product?limit=100");
+      const sort = sorting[0];
+      const sortQuery = sort ? `&sortBy=${sort.id}&order=${sort.desc ? 'desc' : 'asc'}` : '';
+      const response = await api.get(`/product?limit=100${sortQuery}`);
       return response.data;
     },
     enabled: statusFilter !== "requests"
@@ -64,9 +66,11 @@ export default function ProductListPage() {
 
   // Fetch Update Requests
   const { isPending: isRequestPending, data: requestData, refetch: refetchRequests } = useQuery({
-    queryKey: ["product-updates"],
+    queryKey: ["product-updates", sorting],
     queryFn: async () => {
-        const res = await api.get("/product/admin/updates?status=PENDING&targetType=PRODUCT");
+        const sort = sorting[0];
+        const sortQuery = sort ? `&sortBy=${sort.id}&order=${sort.desc ? 'desc' : 'asc'}` : '';
+        const res = await api.get(`/product/admin/updates?status=PENDING&targetType=PRODUCT${sortQuery}`);
         return res.data;
     },
     enabled: statusFilter === "requests"
@@ -149,12 +153,25 @@ export default function ProductListPage() {
     },
     {
         accessorKey: "createdAt",
-        header: "Yêu cầu lúc",
+        header: "Ngày yêu cầu",
         cell: ({ row }: { row: { getValue: (key: string) => any } }) => {
           const date = row.getValue("createdAt");
           if (!date) return <div>N/A</div>;
           try {
-            return <div>{new Date(date).toLocaleString()}</div>;
+            return <div>{new Date(date).toLocaleString('vi-VN')}</div>;
+          } catch {
+            return <div>N/A</div>;
+          }
+        },
+    },
+    {
+        accessorKey: "updatedAt",
+        header: "Ngày cập nhật",
+        cell: ({ row }: { row: { getValue: (key: string) => any } }) => {
+          const date = row.getValue("updatedAt");
+          if (!date) return <div>N/A</div>;
+          try {
+            return <div>{new Date(date).toLocaleString('vi-VN')}</div>;
           } catch {
             return <div>N/A</div>;
           }
