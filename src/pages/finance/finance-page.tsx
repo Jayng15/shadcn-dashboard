@@ -31,6 +31,8 @@ import { toast } from "sonner"
 import { Search, X, Upload } from "lucide-react"
 import { useSearch } from "@tanstack/react-router"
 import { User } from "@/types"
+import { DatePickerWithRange } from "@/components/ui/date-range-picker"
+import { DateRange } from "react-day-picker"
 
 
 
@@ -117,6 +119,7 @@ export default function FinancePage() {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
     const [tabFilter, setTabFilter] = useState<"ALL" | "DEPOSIT" | "WITHDRAW" | "PENDING" | "REVENUE" | "PAYMENT">("ALL")
+    const [dateRange, setDateRange] = useState<DateRange | undefined>()
 
     const [isDetailOpen, setIsDetailOpen] = useState(false)
     const [isDetailLoading, setIsDetailLoading] = useState(false)
@@ -145,9 +148,12 @@ export default function FinancePage() {
     })
 
     const { isPending, error, data, refetch } = useQuery({
-        queryKey: ["finance-transactions", sorting, columnFilters],
+        queryKey: ["finance-transactions", sorting, columnFilters, dateRange],
         queryFn: async () => {
-            const res = await api.get("/finance/admin/transactions?limit=100")
+            const params = new URLSearchParams({ limit: "100" })
+            if (dateRange?.from) params.append("startDate", dateRange.from.toISOString())
+            if (dateRange?.to) params.append("endDate", dateRange.to.toISOString())
+            const res = await api.get(`/finance/admin/transactions?${params.toString()}`)
             return res.data
         },
     })
@@ -556,14 +562,14 @@ export default function FinancePage() {
                                     {selectedTx.type === "DEPOSIT" && selectedTx.orderId
                                         ? "Doanh thu"
                                         : selectedTx.type === "DEPOSIT"
-                                        ? "Nạp tiền"
-                                        : selectedTx.type === "WITHDRAW"
-                                        ? "Rút tiền"
-                                        : selectedTx.type === "PURCHASE"
-                                        ? "Thanh toán"
-                                        : selectedTx.type === "REFUND"
-                                        ? "Hoàn tiền"
-                                        : selectedTx.type}
+                                            ? "Nạp tiền"
+                                            : selectedTx.type === "WITHDRAW"
+                                                ? "Rút tiền"
+                                                : selectedTx.type === "PURCHASE"
+                                                    ? "Thanh toán"
+                                                    : selectedTx.type === "REFUND"
+                                                        ? "Hoàn tiền"
+                                                        : selectedTx.type}
                                 </span>
                             </div>
                             <div>
@@ -709,8 +715,8 @@ export default function FinancePage() {
                             {tabFilter === "REVENUE" && "Doanh thu từ các đơn hàng."}
                             {tabFilter === "PAYMENT" && "Các giao dịch thanh toán đơn hàng."}
                         </CardDescription>
-                        <div className="flex items-center gap-2 pt-1">
-                            <div className="relative flex-1 max-w-sm">
+                        <div className="flex items-center gap-2 pt-1 flex-wrap">
+                            <div className="relative flex-1 min-w-[200px] max-w-sm">
                                 <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                                 <Input
                                     placeholder="Tìm mã giao dịch..."
@@ -720,7 +726,7 @@ export default function FinancePage() {
                                 />
                             </div>
                             {tabFilter === "ALL" && (
-                                <div className="relative flex-1 max-w-sm">
+                                <div className="relative flex-1 min-w-[200px] max-w-sm">
                                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                                     <Input
                                         placeholder="Tìm người dùng..."
@@ -730,8 +736,15 @@ export default function FinancePage() {
                                     />
                                 </div>
                             )}
-                            {table.getState().columnFilters.length > 0 && (
-                                <Button variant="ghost" size="sm" onClick={() => table.resetColumnFilters()}>
+                            <DatePickerWithRange
+                                date={dateRange}
+                                setDate={setDateRange}
+                            />
+                            {(table.getState().columnFilters.length > 0 || dateRange) && (
+                                <Button variant="ghost" size="sm" onClick={() => {
+                                    table.resetColumnFilters()
+                                    setDateRange(undefined)
+                                }}>
                                     <X className="h-4 w-4 mr-1" />
                                     Xóa bộ lọc
                                 </Button>
