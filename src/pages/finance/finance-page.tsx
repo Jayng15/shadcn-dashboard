@@ -259,7 +259,16 @@ export default function FinancePage() {
     }, [usersData?.users])
 
     const filteredByType = useMemo(() => {
-        const allTransactions: FinanceTransaction[] = data?.transactions || []
+        let allTransactions: FinanceTransaction[] = data?.transactions || []
+        
+        // Sort: txAt desc (most recent transaction first)
+        allTransactions = [...allTransactions].sort((a: FinanceTransaction, b: FinanceTransaction) => {
+            const dateA = new Date(a.txAt || a.createdAt).getTime();
+            const dateB = new Date(b.txAt || b.createdAt).getTime();
+            if (dateB !== dateA) return dateB - dateA;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
         if (tabFilter === "ALL") return allTransactions
         if (tabFilter === "PENDING") return allTransactions.filter((tx) => tx.verifiedStatus === "PENDING")
         if (tabFilter === "REVENUE") return allTransactions.filter((tx) => tx.type === "DEPOSIT" && tx.orderId)

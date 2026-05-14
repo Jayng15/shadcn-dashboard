@@ -78,8 +78,18 @@ export default function SettingsPage() {
     }
   };
 
+  const sortedSettings = useMemo(() => {
+    const settings = data?.settings || [];
+    return [...settings].sort((a: Setting, b: Setting) => {
+      const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+      const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+      if (dateB !== dateA) return dateB - dateA;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [data?.settings]);
+
   const table = useReactTable({
-    data: data?.settings || [],
+    data: sortedSettings,
     columns,
     state: {
       sorting,

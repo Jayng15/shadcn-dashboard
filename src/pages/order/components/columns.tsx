@@ -127,6 +127,14 @@ export const columns: ColumnDef<Order>[] = [
     },
   },
   {
+    accessorKey: "updatedAt",
+    header: "Cập nhật",
+    cell: ({ row }) => {
+      const updatedAt = row.getValue("updatedAt") as string
+      return new Date(updatedAt).toLocaleString()
+    },
+  },
+  {
     id: "actions",
     cell: ({ row, table }) => {
       const order = row.original

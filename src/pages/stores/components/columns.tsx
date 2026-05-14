@@ -25,6 +25,7 @@ export type Store = {
   status: "REQUESTED" | "ACTIVE" | "REJECTED" | "BANNED"
   isVerified: boolean
   createdAt: string
+  updatedAt: string
 }
 
 export interface StoreTableMeta {
@@ -127,6 +128,22 @@ export const columns: ColumnDef<Store>[] = [
     cell: ({ row }) => {
         const isVerified = row.getValue("isVerified") as boolean
         return isVerified ? <Badge variant="outline" className="border-green-500 text-green-500">Đã xác minh</Badge> : <span className="text-muted-foreground text-sm font-medium">Chưa</span>
+    }
+  },
+  {
+    accessorKey: "createdAt",
+    header: "Ngày tạo",
+    cell: ({ row }) => {
+        const date = row.getValue("createdAt") as string
+        return <div className="text-xs">{date ? new Date(date).toLocaleString('vi-VN') : "N/A"}</div>
+    }
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Cập nhật",
+    cell: ({ row }) => {
+        const date = row.getValue("updatedAt") as string
+        return <div className="text-xs">{date ? new Date(date).toLocaleString('vi-VN') : "N/A"}</div>
     }
   },
   {

@@ -114,8 +114,18 @@ export default function TeamDetailPage() {
         }
     }
 
+    const sortedMembers = useMemo(() => {
+        const members = data?.members || [];
+        return [...members].sort((a: Member, b: Member) => {
+            const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+            const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+            if (dateB !== dateA) return dateB - dateA;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+    }, [data?.members]);
+
     const table = useReactTable({
-        data: data?.members || [],
+        data: sortedMembers,
         columns,
         state: {
             sorting,

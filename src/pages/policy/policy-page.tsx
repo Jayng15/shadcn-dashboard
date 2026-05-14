@@ -113,8 +113,18 @@ export default function PolicyPage() {
     }
   };
 
+  const sortedPolicies = useMemo(() => {
+    const policies = data?.policies || [];
+    return [...policies].sort((a: Policy, b: Policy) => {
+      const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+      const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+      if (dateB !== dateA) return dateB - dateA;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [data?.policies]);
+
   const table = useReactTable({
-    data: data?.policies || [],
+    data: sortedPolicies,
     columns,
     state: {
       sorting,

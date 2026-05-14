@@ -50,7 +50,7 @@ export default function OrderPage() {
   const allOrders: Order[] = data?.orders || []
 
   const filteredOrders = useMemo(() => {
-    return tabFilter === "ALL"
+    const list = tabFilter === "ALL"
       ? allOrders
       : allOrders.filter((order) => {
           if (tabFilter === "PROCESSING") {
@@ -62,6 +62,16 @@ export default function OrderPage() {
           }
           return order.status === tabFilter
       })
+
+    // Sort by updatedAt first (desc), then createdAt (desc)
+    return [...list].sort((a, b) => {
+      const dateA = new Date(a.updatedAt).getTime();
+      const dateB = new Date(b.updatedAt).getTime();
+      if (dateB !== dateA) {
+        return dateB - dateA;
+      }
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
   }, [allOrders, tabFilter])
 
   const table = useReactTable({

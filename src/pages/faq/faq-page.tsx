@@ -113,8 +113,18 @@ export default function FaqPage() {
     }
   };
 
+  const sortedFaqs = useMemo(() => {
+    const faqs = data?.faqs || [];
+    return [...faqs].sort((a: FAQ, b: FAQ) => {
+      const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+      const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+      if (dateB !== dateA) return dateB - dateA;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [data?.faqs]);
+
   const table = useReactTable({
-    data: data?.faqs || [],
+    data: sortedFaqs,
     columns,
     state: {
       sorting,

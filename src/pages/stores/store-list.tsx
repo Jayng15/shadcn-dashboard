@@ -94,7 +94,16 @@ export default function StoreListPage() {
   });
 
   const stores = useMemo(() => {
-    const allStores = storeData?.stores || [];
+    let allStores = storeData?.stores || [];
+    
+    // Sort: updatedAt desc, then createdAt desc
+    allStores = [...allStores].sort((a: Store, b: Store) => {
+      const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+      const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+      if (dateB !== dateA) return dateB - dateA;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
     if (tabFilter === "requested") {
       return allStores.filter((s: Store) => s.status === "REQUESTED");
     }

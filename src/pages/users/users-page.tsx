@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import DataTable from "./components/data-table";
 import { columns } from "./components/columns";
@@ -43,8 +43,22 @@ export default function UsersPage() {
     }
   });
 
+  const users = useMemo(() => {
+    const list = data?.users || [];
+    return [...list].sort((a, b) => {
+      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+      if (dateB !== dateA) {
+        return dateB - dateA;
+      }
+      const createA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const createB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return createB - createA;
+    });
+  }, [data?.users]);
+
   const table = useReactTable({
-    data: data?.users || [],
+    data: users,
     columns,
     state: {
       sorting,

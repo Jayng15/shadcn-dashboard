@@ -129,8 +129,18 @@ export default function IdolListPage() {
     }
   }
 
+  const sortedTeams = useMemo(() => {
+    const teams = data?.teams || [];
+    return [...teams].sort((a: Team, b: Team) => {
+      const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+      const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+      if (dateB !== dateA) return dateB - dateA;
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+  }, [data?.teams]);
+
   const table = useReactTable({
-    data: data?.teams || [],
+    data: sortedTeams,
     columns,
     state: {
       sorting,

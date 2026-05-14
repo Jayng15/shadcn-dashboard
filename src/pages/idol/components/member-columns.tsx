@@ -51,6 +51,14 @@ export const columns: ColumnDef<Member>[] = [
     },
   },
   {
+    accessorKey: "updatedAt",
+    header: "Cập nhật",
+    cell: ({ row }) => {
+      const updatedAt = row.getValue("updatedAt") as string
+      return new Date(updatedAt).toLocaleString()
+    },
+  },
+  {
     id: "actions",
     cell: ({ row, table }) => {
       const member = row.original

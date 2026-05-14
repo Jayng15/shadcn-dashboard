@@ -43,7 +43,14 @@ export const columns: ColumnDef<FAQ>[] = [
     accessorKey: "createdAt",
     header: "Ngày tạo",
     cell: ({ row }) => {
-        return new Date(row.getValue("createdAt")).toLocaleDateString()
+        return new Date(row.getValue("createdAt")).toLocaleString()
+    }
+  },
+  {
+    accessorKey: "updatedAt",
+    header: "Cập nhật",
+    cell: ({ row }) => {
+        return new Date(row.getValue("updatedAt")).toLocaleString()
     }
   },
   {

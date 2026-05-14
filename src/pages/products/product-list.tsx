@@ -76,7 +76,15 @@ export default function ProductListPage() {
         enabled: statusFilter === "requests"
     });
 
-    const allProducts = useMemo(() => data?.products || [], [data]);
+    const allProducts = useMemo(() => {
+        const products = data?.products || [];
+        return [...products].sort((a: Product, b: Product) => {
+            const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+            const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+            if (dateB !== dateA) return dateB - dateA;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+    }, [data]);
     const pendingProducts = useMemo(
         () => allProducts.filter((p: Product) => !p.isVerified && p.status !== "CLOSED"),
         [allProducts]
