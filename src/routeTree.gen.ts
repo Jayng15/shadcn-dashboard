@@ -13,7 +13,7 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as LoginImport } from './routes/login'
+import { Route as LoginImport } from './routes/login-lova'
 import { Route as IdolsIndexImport } from './routes/idols.index'
 
 // Create Virtual Routes
@@ -37,303 +37,303 @@ const IdolsTeamIdLazyImport = createFileRoute('/idols/$teamId')()
 // Create/Update Routes
 
 const TaskLazyRoute = TaskLazyImport.update({
-  id: '/task',
-  path: '/task',
-  getParentRoute: () => rootRoute,
+    id: '/task',
+    path: '/task',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/task.lazy').then((d) => d.Route))
 
 const SettingsLazyRoute = SettingsLazyImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRoute,
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/settings.lazy').then((d) => d.Route))
 
 const ProductsLazyRoute = ProductsLazyImport.update({
-  id: '/products',
-  path: '/products',
-  getParentRoute: () => rootRoute,
+    id: '/products',
+    path: '/products',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/products.lazy').then((d) => d.Route))
 
 const PolicyLazyRoute = PolicyLazyImport.update({
-  id: '/policy',
-  path: '/policy',
-  getParentRoute: () => rootRoute,
+    id: '/policy',
+    path: '/policy',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/policy.lazy').then((d) => d.Route))
 
 const OrdersLazyRoute = OrdersLazyImport.update({
-  id: '/orders',
-  path: '/orders',
-  getParentRoute: () => rootRoute,
+    id: '/orders',
+    path: '/orders',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/orders.lazy').then((d) => d.Route))
 
 const InventoryLazyRoute = InventoryLazyImport.update({
-  id: '/inventory',
-  path: '/inventory',
-  getParentRoute: () => rootRoute,
+    id: '/inventory',
+    path: '/inventory',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/inventory.lazy').then((d) => d.Route))
 
 const FinanceLazyRoute = FinanceLazyImport.update({
-  id: '/finance',
-  path: '/finance',
-  getParentRoute: () => rootRoute,
+    id: '/finance',
+    path: '/finance',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/finance.lazy').then((d) => d.Route))
 
 const FaqLazyRoute = FaqLazyImport.update({
-  id: '/faq',
-  path: '/faq',
-  getParentRoute: () => rootRoute,
+    id: '/faq',
+    path: '/faq',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/faq.lazy').then((d) => d.Route))
 
 const CalendarLazyRoute = CalendarLazyImport.update({
-  id: '/calendar',
-  path: '/calendar',
-  getParentRoute: () => rootRoute,
+    id: '/calendar',
+    path: '/calendar',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/calendar.lazy').then((d) => d.Route))
 
 const LoginRoute = LoginImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRoute,
+    id: '/login',
+    path: '/login',
+    getParentRoute: () => rootRoute,
 } as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRoute,
+    id: '/',
+    path: '/',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
 
 const UsersIndexLazyRoute = UsersIndexLazyImport.update({
-  id: '/users/',
-  path: '/users/',
-  getParentRoute: () => rootRoute,
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/users.index.lazy').then((d) => d.Route))
 
 const StoresIndexLazyRoute = StoresIndexLazyImport.update({
-  id: '/stores/',
-  path: '/stores/',
-  getParentRoute: () => rootRoute,
+    id: '/stores/',
+    path: '/stores/',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/stores.index.lazy').then((d) => d.Route))
 
 const IdolsIndexRoute = IdolsIndexImport.update({
-  id: '/idols/',
-  path: '/idols/',
-  getParentRoute: () => rootRoute,
+    id: '/idols/',
+    path: '/idols/',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/idols.index.lazy').then((d) => d.Route))
 
 const UsersUserIdLazyRoute = UsersUserIdLazyImport.update({
-  id: '/users/$userId',
-  path: '/users/$userId',
-  getParentRoute: () => rootRoute,
+    id: '/users/$userId',
+    path: '/users/$userId',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/users.$userId.lazy').then((d) => d.Route))
 
 const StoresStoreIdLazyRoute = StoresStoreIdLazyImport.update({
-  id: '/stores/$storeId',
-  path: '/stores/$storeId',
-  getParentRoute: () => rootRoute,
+    id: '/stores/$storeId',
+    path: '/stores/$storeId',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() =>
-  import('./routes/stores.$storeId.lazy').then((d) => d.Route),
+    import('./routes/stores.$storeId.lazy').then((d) => d.Route),
 )
 
 const IdolsTeamIdLazyRoute = IdolsTeamIdLazyImport.update({
-  id: '/idols/$teamId',
-  path: '/idols/$teamId',
-  getParentRoute: () => rootRoute,
+    id: '/idols/$teamId',
+    path: '/idols/$teamId',
+    getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/idols.$teamId.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexLazyImport
-      parentRoute: typeof rootRoute
+    interface FileRoutesByPath {
+        '/': {
+            id: '/'
+            path: '/'
+            fullPath: '/'
+            preLoaderRoute: typeof IndexLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/login': {
+            id: '/login'
+            path: '/login'
+            fullPath: '/login'
+            preLoaderRoute: typeof LoginImport
+            parentRoute: typeof rootRoute
+        }
+        '/calendar': {
+            id: '/calendar'
+            path: '/calendar'
+            fullPath: '/calendar'
+            preLoaderRoute: typeof CalendarLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/faq': {
+            id: '/faq'
+            path: '/faq'
+            fullPath: '/faq'
+            preLoaderRoute: typeof FaqLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/finance': {
+            id: '/finance'
+            path: '/finance'
+            fullPath: '/finance'
+            preLoaderRoute: typeof FinanceLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/inventory': {
+            id: '/inventory'
+            path: '/inventory'
+            fullPath: '/inventory'
+            preLoaderRoute: typeof InventoryLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/orders': {
+            id: '/orders'
+            path: '/orders'
+            fullPath: '/orders'
+            preLoaderRoute: typeof OrdersLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/policy': {
+            id: '/policy'
+            path: '/policy'
+            fullPath: '/policy'
+            preLoaderRoute: typeof PolicyLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/products': {
+            id: '/products'
+            path: '/products'
+            fullPath: '/products'
+            preLoaderRoute: typeof ProductsLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/settings': {
+            id: '/settings'
+            path: '/settings'
+            fullPath: '/settings'
+            preLoaderRoute: typeof SettingsLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/task': {
+            id: '/task'
+            path: '/task'
+            fullPath: '/task'
+            preLoaderRoute: typeof TaskLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/idols/$teamId': {
+            id: '/idols/$teamId'
+            path: '/idols/$teamId'
+            fullPath: '/idols/$teamId'
+            preLoaderRoute: typeof IdolsTeamIdLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/stores/$storeId': {
+            id: '/stores/$storeId'
+            path: '/stores/$storeId'
+            fullPath: '/stores/$storeId'
+            preLoaderRoute: typeof StoresStoreIdLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/users/$userId': {
+            id: '/users/$userId'
+            path: '/users/$userId'
+            fullPath: '/users/$userId'
+            preLoaderRoute: typeof UsersUserIdLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/idols/': {
+            id: '/idols/'
+            path: '/idols'
+            fullPath: '/idols'
+            preLoaderRoute: typeof IdolsIndexImport
+            parentRoute: typeof rootRoute
+        }
+        '/stores/': {
+            id: '/stores/'
+            path: '/stores'
+            fullPath: '/stores'
+            preLoaderRoute: typeof StoresIndexLazyImport
+            parentRoute: typeof rootRoute
+        }
+        '/users/': {
+            id: '/users/'
+            path: '/users'
+            fullPath: '/users'
+            preLoaderRoute: typeof UsersIndexLazyImport
+            parentRoute: typeof rootRoute
+        }
     }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginImport
-      parentRoute: typeof rootRoute
-    }
-    '/calendar': {
-      id: '/calendar'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof CalendarLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/faq': {
-      id: '/faq'
-      path: '/faq'
-      fullPath: '/faq'
-      preLoaderRoute: typeof FaqLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/finance': {
-      id: '/finance'
-      path: '/finance'
-      fullPath: '/finance'
-      preLoaderRoute: typeof FinanceLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/inventory': {
-      id: '/inventory'
-      path: '/inventory'
-      fullPath: '/inventory'
-      preLoaderRoute: typeof InventoryLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/orders': {
-      id: '/orders'
-      path: '/orders'
-      fullPath: '/orders'
-      preLoaderRoute: typeof OrdersLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/policy': {
-      id: '/policy'
-      path: '/policy'
-      fullPath: '/policy'
-      preLoaderRoute: typeof PolicyLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/products': {
-      id: '/products'
-      path: '/products'
-      fullPath: '/products'
-      preLoaderRoute: typeof ProductsLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/task': {
-      id: '/task'
-      path: '/task'
-      fullPath: '/task'
-      preLoaderRoute: typeof TaskLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/idols/$teamId': {
-      id: '/idols/$teamId'
-      path: '/idols/$teamId'
-      fullPath: '/idols/$teamId'
-      preLoaderRoute: typeof IdolsTeamIdLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/stores/$storeId': {
-      id: '/stores/$storeId'
-      path: '/stores/$storeId'
-      fullPath: '/stores/$storeId'
-      preLoaderRoute: typeof StoresStoreIdLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/users/$userId': {
-      id: '/users/$userId'
-      path: '/users/$userId'
-      fullPath: '/users/$userId'
-      preLoaderRoute: typeof UsersUserIdLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/idols/': {
-      id: '/idols/'
-      path: '/idols'
-      fullPath: '/idols'
-      preLoaderRoute: typeof IdolsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/stores/': {
-      id: '/stores/'
-      path: '/stores'
-      fullPath: '/stores'
-      preLoaderRoute: typeof StoresIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-    '/users/': {
-      id: '/users/'
-      path: '/users'
-      fullPath: '/users'
-      preLoaderRoute: typeof UsersIndexLazyImport
-      parentRoute: typeof rootRoute
-    }
-  }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexLazyRoute
-  '/login': typeof LoginRoute
-  '/calendar': typeof CalendarLazyRoute
-  '/faq': typeof FaqLazyRoute
-  '/finance': typeof FinanceLazyRoute
-  '/inventory': typeof InventoryLazyRoute
-  '/orders': typeof OrdersLazyRoute
-  '/policy': typeof PolicyLazyRoute
-  '/products': typeof ProductsLazyRoute
-  '/settings': typeof SettingsLazyRoute
-  '/task': typeof TaskLazyRoute
-  '/idols/$teamId': typeof IdolsTeamIdLazyRoute
-  '/stores/$storeId': typeof StoresStoreIdLazyRoute
-  '/users/$userId': typeof UsersUserIdLazyRoute
-  '/idols': typeof IdolsIndexRoute
-  '/stores': typeof StoresIndexLazyRoute
-  '/users': typeof UsersIndexLazyRoute
+    '/': typeof IndexLazyRoute
+    '/login': typeof LoginRoute
+    '/calendar': typeof CalendarLazyRoute
+    '/faq': typeof FaqLazyRoute
+    '/finance': typeof FinanceLazyRoute
+    '/inventory': typeof InventoryLazyRoute
+    '/orders': typeof OrdersLazyRoute
+    '/policy': typeof PolicyLazyRoute
+    '/products': typeof ProductsLazyRoute
+    '/settings': typeof SettingsLazyRoute
+    '/task': typeof TaskLazyRoute
+    '/idols/$teamId': typeof IdolsTeamIdLazyRoute
+    '/stores/$storeId': typeof StoresStoreIdLazyRoute
+    '/users/$userId': typeof UsersUserIdLazyRoute
+    '/idols': typeof IdolsIndexRoute
+    '/stores': typeof StoresIndexLazyRoute
+    '/users': typeof UsersIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexLazyRoute
-  '/login': typeof LoginRoute
-  '/calendar': typeof CalendarLazyRoute
-  '/faq': typeof FaqLazyRoute
-  '/finance': typeof FinanceLazyRoute
-  '/inventory': typeof InventoryLazyRoute
-  '/orders': typeof OrdersLazyRoute
-  '/policy': typeof PolicyLazyRoute
-  '/products': typeof ProductsLazyRoute
-  '/settings': typeof SettingsLazyRoute
-  '/task': typeof TaskLazyRoute
-  '/idols/$teamId': typeof IdolsTeamIdLazyRoute
-  '/stores/$storeId': typeof StoresStoreIdLazyRoute
-  '/users/$userId': typeof UsersUserIdLazyRoute
-  '/idols': typeof IdolsIndexRoute
-  '/stores': typeof StoresIndexLazyRoute
-  '/users': typeof UsersIndexLazyRoute
+    '/': typeof IndexLazyRoute
+    '/login': typeof LoginRoute
+    '/calendar': typeof CalendarLazyRoute
+    '/faq': typeof FaqLazyRoute
+    '/finance': typeof FinanceLazyRoute
+    '/inventory': typeof InventoryLazyRoute
+    '/orders': typeof OrdersLazyRoute
+    '/policy': typeof PolicyLazyRoute
+    '/products': typeof ProductsLazyRoute
+    '/settings': typeof SettingsLazyRoute
+    '/task': typeof TaskLazyRoute
+    '/idols/$teamId': typeof IdolsTeamIdLazyRoute
+    '/stores/$storeId': typeof StoresStoreIdLazyRoute
+    '/users/$userId': typeof UsersUserIdLazyRoute
+    '/idols': typeof IdolsIndexRoute
+    '/stores': typeof StoresIndexLazyRoute
+    '/users': typeof UsersIndexLazyRoute
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexLazyRoute
-  '/login': typeof LoginRoute
-  '/calendar': typeof CalendarLazyRoute
-  '/faq': typeof FaqLazyRoute
-  '/finance': typeof FinanceLazyRoute
-  '/inventory': typeof InventoryLazyRoute
-  '/orders': typeof OrdersLazyRoute
-  '/policy': typeof PolicyLazyRoute
-  '/products': typeof ProductsLazyRoute
-  '/settings': typeof SettingsLazyRoute
-  '/task': typeof TaskLazyRoute
-  '/idols/$teamId': typeof IdolsTeamIdLazyRoute
-  '/stores/$storeId': typeof StoresStoreIdLazyRoute
-  '/users/$userId': typeof UsersUserIdLazyRoute
-  '/idols/': typeof IdolsIndexRoute
-  '/stores/': typeof StoresIndexLazyRoute
-  '/users/': typeof UsersIndexLazyRoute
+    __root__: typeof rootRoute
+    '/': typeof IndexLazyRoute
+    '/login': typeof LoginRoute
+    '/calendar': typeof CalendarLazyRoute
+    '/faq': typeof FaqLazyRoute
+    '/finance': typeof FinanceLazyRoute
+    '/inventory': typeof InventoryLazyRoute
+    '/orders': typeof OrdersLazyRoute
+    '/policy': typeof PolicyLazyRoute
+    '/products': typeof ProductsLazyRoute
+    '/settings': typeof SettingsLazyRoute
+    '/task': typeof TaskLazyRoute
+    '/idols/$teamId': typeof IdolsTeamIdLazyRoute
+    '/stores/$storeId': typeof StoresStoreIdLazyRoute
+    '/users/$userId': typeof UsersUserIdLazyRoute
+    '/idols/': typeof IdolsIndexRoute
+    '/stores/': typeof StoresIndexLazyRoute
+    '/users/': typeof UsersIndexLazyRoute
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
+    fileRoutesByFullPath: FileRoutesByFullPath
+    fullPaths:
     | '/'
-    | '/login'
+    | '/login-lova'
     | '/calendar'
     | '/faq'
     | '/finance'
@@ -349,10 +349,10 @@ export interface FileRouteTypes {
     | '/idols'
     | '/stores'
     | '/users'
-  fileRoutesByTo: FileRoutesByTo
-  to:
+    fileRoutesByTo: FileRoutesByTo
+    to:
     | '/'
-    | '/login'
+    | '/login-lova'
     | '/calendar'
     | '/faq'
     | '/finance'
@@ -368,10 +368,10 @@ export interface FileRouteTypes {
     | '/idols'
     | '/stores'
     | '/users'
-  id:
+    id:
     | '__root__'
     | '/'
-    | '/login'
+    | '/login-lova'
     | '/calendar'
     | '/faq'
     | '/finance'
@@ -387,52 +387,52 @@ export interface FileRouteTypes {
     | '/idols/'
     | '/stores/'
     | '/users/'
-  fileRoutesById: FileRoutesById
+    fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
-  IndexLazyRoute: typeof IndexLazyRoute
-  LoginRoute: typeof LoginRoute
-  CalendarLazyRoute: typeof CalendarLazyRoute
-  FaqLazyRoute: typeof FaqLazyRoute
-  FinanceLazyRoute: typeof FinanceLazyRoute
-  InventoryLazyRoute: typeof InventoryLazyRoute
-  OrdersLazyRoute: typeof OrdersLazyRoute
-  PolicyLazyRoute: typeof PolicyLazyRoute
-  ProductsLazyRoute: typeof ProductsLazyRoute
-  SettingsLazyRoute: typeof SettingsLazyRoute
-  TaskLazyRoute: typeof TaskLazyRoute
-  IdolsTeamIdLazyRoute: typeof IdolsTeamIdLazyRoute
-  StoresStoreIdLazyRoute: typeof StoresStoreIdLazyRoute
-  UsersUserIdLazyRoute: typeof UsersUserIdLazyRoute
-  IdolsIndexRoute: typeof IdolsIndexRoute
-  StoresIndexLazyRoute: typeof StoresIndexLazyRoute
-  UsersIndexLazyRoute: typeof UsersIndexLazyRoute
+    IndexLazyRoute: typeof IndexLazyRoute
+    LoginRoute: typeof LoginRoute
+    CalendarLazyRoute: typeof CalendarLazyRoute
+    FaqLazyRoute: typeof FaqLazyRoute
+    FinanceLazyRoute: typeof FinanceLazyRoute
+    InventoryLazyRoute: typeof InventoryLazyRoute
+    OrdersLazyRoute: typeof OrdersLazyRoute
+    PolicyLazyRoute: typeof PolicyLazyRoute
+    ProductsLazyRoute: typeof ProductsLazyRoute
+    SettingsLazyRoute: typeof SettingsLazyRoute
+    TaskLazyRoute: typeof TaskLazyRoute
+    IdolsTeamIdLazyRoute: typeof IdolsTeamIdLazyRoute
+    StoresStoreIdLazyRoute: typeof StoresStoreIdLazyRoute
+    UsersUserIdLazyRoute: typeof UsersUserIdLazyRoute
+    IdolsIndexRoute: typeof IdolsIndexRoute
+    StoresIndexLazyRoute: typeof StoresIndexLazyRoute
+    UsersIndexLazyRoute: typeof UsersIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexLazyRoute: IndexLazyRoute,
-  LoginRoute: LoginRoute,
-  CalendarLazyRoute: CalendarLazyRoute,
-  FaqLazyRoute: FaqLazyRoute,
-  FinanceLazyRoute: FinanceLazyRoute,
-  InventoryLazyRoute: InventoryLazyRoute,
-  OrdersLazyRoute: OrdersLazyRoute,
-  PolicyLazyRoute: PolicyLazyRoute,
-  ProductsLazyRoute: ProductsLazyRoute,
-  SettingsLazyRoute: SettingsLazyRoute,
-  TaskLazyRoute: TaskLazyRoute,
-  IdolsTeamIdLazyRoute: IdolsTeamIdLazyRoute,
-  StoresStoreIdLazyRoute: StoresStoreIdLazyRoute,
-  UsersUserIdLazyRoute: UsersUserIdLazyRoute,
-  IdolsIndexRoute: IdolsIndexRoute,
-  StoresIndexLazyRoute: StoresIndexLazyRoute,
-  UsersIndexLazyRoute: UsersIndexLazyRoute,
+    IndexLazyRoute: IndexLazyRoute,
+    LoginRoute: LoginRoute,
+    CalendarLazyRoute: CalendarLazyRoute,
+    FaqLazyRoute: FaqLazyRoute,
+    FinanceLazyRoute: FinanceLazyRoute,
+    InventoryLazyRoute: InventoryLazyRoute,
+    OrdersLazyRoute: OrdersLazyRoute,
+    PolicyLazyRoute: PolicyLazyRoute,
+    ProductsLazyRoute: ProductsLazyRoute,
+    SettingsLazyRoute: SettingsLazyRoute,
+    TaskLazyRoute: TaskLazyRoute,
+    IdolsTeamIdLazyRoute: IdolsTeamIdLazyRoute,
+    StoresStoreIdLazyRoute: StoresStoreIdLazyRoute,
+    UsersUserIdLazyRoute: UsersUserIdLazyRoute,
+    IdolsIndexRoute: IdolsIndexRoute,
+    StoresIndexLazyRoute: StoresIndexLazyRoute,
+    UsersIndexLazyRoute: UsersIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+    ._addFileChildren(rootRouteChildren)
+    ._addFileTypes<FileRouteTypes>()
 
 /* ROUTE_MANIFEST_START
 {
@@ -441,7 +441,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/login",
+        "/login-lova",
         "/calendar",
         "/faq",
         "/finance",
@@ -462,8 +462,8 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.lazy.tsx"
     },
-    "/login": {
-      "filePath": "login.tsx"
+    "/login-lova": {
+      "filePath": "login-lova.tsx"
     },
     "/calendar": {
       "filePath": "calendar.lazy.tsx"
