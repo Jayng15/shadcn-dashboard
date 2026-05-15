@@ -91,8 +91,8 @@ const CalendarLazyRoute = CalendarLazyImport.update({
 } as any).lazy(() => import('./routes/calendar.lazy').then((d) => d.Route))
 
 const LoginRoute = LoginImport.update({
-    id: '/login',
-    path: '/login',
+    id: '/login-lova',
+    path: '/login-lova',
     getParentRoute: () => rootRoute,
 } as any)
 
@@ -151,10 +151,10 @@ declare module '@tanstack/react-router' {
             preLoaderRoute: typeof IndexLazyImport
             parentRoute: typeof rootRoute
         }
-        '/login': {
-            id: '/login'
-            path: '/login'
-            fullPath: '/login'
+        '/login-lova': {
+            id: '/login-lova'
+            path: '/login-lova'
+            fullPath: '/login-lova'
             preLoaderRoute: typeof LoginImport
             parentRoute: typeof rootRoute
         }
