@@ -25,6 +25,8 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import BannerManagement from "./components/banner-management";
 
 export default function SettingsPage() {
   const queryClient = useQueryClient();
@@ -114,20 +116,37 @@ export default function SettingsPage() {
         <h2 className="text-2xl font-bold tracking-tight">Cấu hình hệ thống</h2>
       </div>
 
-      <Card className="bg-sidebar w-full min-h-full flex flex-col">
-        {isPending ? (
-          <CardContent className="pt-6">Đang tải...</CardContent>
-        ) : (
-          <>
-            <CardContent className="flex-1 pt-6">
-              <DataTable table={table} columns={columns} />
+      <Tabs defaultValue="system" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="system">Cấu hình chung</TabsTrigger>
+          <TabsTrigger value="banners">Quản lý Banner</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value="system">
+          <Card className="bg-sidebar w-full min-h-full flex flex-col">
+            {isPending ? (
+              <CardContent className="pt-6">Đang tải...</CardContent>
+            ) : (
+              <>
+                <CardContent className="flex-1 pt-6">
+                  <DataTable table={table} columns={columns} />
+                </CardContent>
+                <CardFooter>
+                  <DataTablePagination table={table} className="w-full" />
+                </CardFooter>
+              </>
+            )}
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="banners">
+          <Card className="bg-sidebar w-full min-h-full flex flex-col">
+            <CardContent className="pt-6">
+              <BannerManagement />
             </CardContent>
-            <CardFooter>
-              <DataTablePagination table={table} className="w-full" />
-            </CardFooter>
-          </>
-        )}
-      </Card>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       <ResponsiveDialog
         isOpen={isDialogOpen}

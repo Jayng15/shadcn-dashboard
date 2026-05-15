@@ -10,14 +10,14 @@ export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
     // Allow access to login page without check
     // Using includes to catch both /login and potentially /admin/login if base path exists
-    if (location.pathname.includes('/login')) {
+    if (location.pathname.includes('/login-lova')) {
       return
     }
 
     const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
     if (!isAuthenticated) {
       throw redirect({
-        to: '/login',
+        to: '/login-lova',
       });
     }
 
@@ -42,7 +42,7 @@ export const Route = createRootRoute({
 
       // Redirect to login if check fails
       throw redirect({
-        to: '/login',
+        to: '/login-lova',
       });
     }
   }

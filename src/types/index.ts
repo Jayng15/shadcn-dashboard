@@ -107,3 +107,13 @@ export type Setting = {
   createdAt: string;
   updatedAt: string;
 }
+
+export type Banner = {
+  id: string;
+  imageUrl: string;
+  link: string | null;
+  order: string;
+  isActive: "0" | "1";
+  createdAt: string;
+  updatedAt: string;
+}

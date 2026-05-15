@@ -8,7 +8,7 @@ import Header from "@/components/header";
 export default function MainLayout() {
   const location = useLocation();
   console.log("MainLayout current pathname:", location.pathname);
-  const isLoginPage = location.pathname.startsWith("/login");
+  const isLoginPage = location.pathname.startsWith("/login-lova");
 
   if (isLoginPage) {
     return (

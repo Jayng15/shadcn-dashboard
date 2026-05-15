@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import LoginPage from '@/pages/auth/login'
 import AuthLayout from '@/layouts/auth-layout'
 
-export const Route = createFileRoute('/login')({
+export const Route = createFileRoute('/login-lova')({
   component: () => (
     <AuthLayout>
       <LoginPage />

@@ -50,7 +50,7 @@ export default function NavUser({
       console.error("Logout failed", e);
     } finally {
       localStorage.clear();
-      window.location.href = "/login";
+      window.location.href = "/login-lova";
     }
   };
 
