@@ -75,7 +75,7 @@ export const columns: ColumnDef<Team>[] = [
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Hành động</DropdownMenuLabel>
             <DropdownMenuItem asChild>
-              <Link to="/idols/$teamId" params={{ teamId: team.id } as any}>Quản lý thành viên</Link>
+              <Link to="/admin/idols/$teamId" params={{ teamId: team.id } as any}>Quản lý thành viên</Link>
             </DropdownMenuItem>
             <DropdownMenuItem
               onClick={() =>

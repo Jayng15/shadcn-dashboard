@@ -390,7 +390,7 @@ export default function StoreListPage() {
   const tableMeta = useMemo(() => ({
     refetch: () => refetchStores(),
     openStoreDetail: (store: Store) => {
-      navigate({ to: '/stores/$storeId', params: { storeId: store.id } });
+      navigate({ to: '/admin/stores/$storeId', params: { storeId: store.id } });
     },
     openStoreReviews: (store: Store) => {
       setSelectedStoreForReviews(store);

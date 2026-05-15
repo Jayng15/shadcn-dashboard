@@ -27,7 +27,7 @@ import { ResponsiveDialog } from "@/components/responsive-dialog"
 import { Member, Team } from "@/types"
 
 export default function TeamDetailPage() {
-    const { teamId } = useParams({ from: '/idols/$teamId' as any })
+    const { teamId } = useParams({ from: '/admin/idols/$teamId' as any })
 
     const [sorting, setSorting] = useState<SortingState>([{ id: "createdAt", desc: true }])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])

@@ -20,7 +20,7 @@ export default function NotFoundPage() {
           </p>
         </div>
         <Button asChild>
-          <Link to="/">Quay lại trang chủ</Link>
+          <Link to="/admin/">Quay lại trang chủ</Link>
         </Button>
       </div>
     </div>

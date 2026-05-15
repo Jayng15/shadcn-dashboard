@@ -47,7 +47,7 @@ export default function ProductListPage() {
         null
     );
     const [isVerifyLoading, setIsVerifyLoading] = useState(false);
-    const search = useSearch({ from: '/products' }) as { id?: string };
+    const search = useSearch({ from: '/admin/products' }) as { id?: string };
 
     // Update Request State
     const [isRequestDialogOpen, setIsRequestDialogOpen] = useState(false);

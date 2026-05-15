@@ -37,7 +37,7 @@ export default function OrderPage() {
   const [isDetailLoading, setIsDetailLoading] = useState(false)
   const [isVerifying, setIsVerifying] = useState(false)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
-  const search = useSearch({ from: '/orders' }) as { id?: string }
+  const search = useSearch({ from: '/admin/orders' }) as { id?: string }
 
   const { isPending, error, data, refetch } = useQuery({
     queryKey: ["admin-orders", sorting, columnFilters],

@@ -125,7 +125,7 @@ export default function FinancePage() {
     const [isDetailLoading, setIsDetailLoading] = useState(false)
     const [selectedTx, setSelectedTx] = useState<FinanceTransaction | null>(null)
     const [isVerifyLoading, setIsVerifyLoading] = useState(false)
-    const search = useSearch({ from: '/finance' }) as { id?: string }
+    const search = useSearch({ from: '/admin/finance' }) as { id?: string }
 
     const [withdrawalFee, setWithdrawalFee] = useState<WithdrawalFeePayload>({
         amount: 0,

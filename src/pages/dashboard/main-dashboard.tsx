@@ -115,7 +115,7 @@ export default function MainDashoard() {
                 <div
                     key={item.id}
                     className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-md cursor-pointer transition-colors group"
-                    onClick={() => navigate({ to: '/stores/$storeId', params: { storeId: item.id } })}
+                    onClick={() => navigate({ to: '/admin/stores/$storeId', params: { storeId: item.id } })}
                 >
                     <div className="flex flex-col gap-0.5">
                         <span className="text-sm font-medium leading-none">{item.name}</span>
@@ -133,7 +133,7 @@ export default function MainDashoard() {
                 <div
                     key={item.id}
                     className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-md cursor-pointer transition-colors group"
-                    onClick={() => navigate({ to: '/products', search: { id: item.id } })}
+                    onClick={() => navigate({ to: '/admin/products', search: { id: item.id } })}
                 >
                     <div className="flex flex-col gap-0.5">
                         <span className="text-sm font-medium leading-none">{item.name}</span>
@@ -153,7 +153,7 @@ export default function MainDashoard() {
                 <div
                     key={item.id}
                     className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-md cursor-pointer transition-colors group"
-                    onClick={() => navigate({ to: '/finance', search: { id: item.id } })}
+                    onClick={() => navigate({ to: '/admin/finance', search: { id: item.id } })}
                 >
                     <div className="flex flex-col gap-0.5">
                         <span className="text-sm font-mono leading-none">{item.txCode}</span>
@@ -173,7 +173,7 @@ export default function MainDashoard() {
                 <div
                     key={item.id}
                     className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-md cursor-pointer transition-colors group"
-                    onClick={() => navigate({ to: '/orders', search: { id: item.id } })}
+                    onClick={() => navigate({ to: '/admin/orders', search: { id: item.id } })}
                 >
                     <div className="flex flex-col gap-0.5">
                         <span className="text-sm font-medium leading-none">{item.orderCode}</span>
