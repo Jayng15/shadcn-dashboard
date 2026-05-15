@@ -18,7 +18,7 @@ export const Route = createRootRoute({
     if (!isAuthenticated) {
       throw redirect({
         to: '/login-lova',
-      });
+      } as any);
     }
 
     try {
@@ -43,7 +43,7 @@ export const Route = createRootRoute({
       // Redirect to login if check fails
       throw redirect({
         to: '/login-lova',
-      });
+      } as any);
     }
   }
 })

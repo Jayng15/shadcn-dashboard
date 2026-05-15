@@ -270,7 +270,7 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
     '/': typeof IndexLazyRoute
-    '/login': typeof LoginRoute
+    '/login-lova': typeof LoginRoute
     '/calendar': typeof CalendarLazyRoute
     '/faq': typeof FaqLazyRoute
     '/finance': typeof FinanceLazyRoute
@@ -290,7 +290,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
     '/': typeof IndexLazyRoute
-    '/login': typeof LoginRoute
+    '/login-lova': typeof LoginRoute
     '/calendar': typeof CalendarLazyRoute
     '/faq': typeof FaqLazyRoute
     '/finance': typeof FinanceLazyRoute
@@ -311,7 +311,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
     __root__: typeof rootRoute
     '/': typeof IndexLazyRoute
-    '/login': typeof LoginRoute
+    '/login-lova': typeof LoginRoute
     '/calendar': typeof CalendarLazyRoute
     '/faq': typeof FaqLazyRoute
     '/finance': typeof FinanceLazyRoute
