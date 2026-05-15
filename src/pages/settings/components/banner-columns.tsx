@@ -57,7 +57,13 @@ export const bannerColumns: ColumnDef<Banner>[] = [
     accessorKey: "createdAt",
     header: "Ngày tạo",
     cell: ({ row }) => {
-        return new Date(row.getValue("createdAt")).toLocaleDateString()
+        const date = row.getValue("createdAt");
+        if (!date) return <span className="text-muted-foreground">-</span>;
+        try {
+            return new Date(date as string).toLocaleDateString();
+        } catch (e) {
+            return <span className="text-muted-foreground">N/A</span>;
+        }
     }
   },
   {

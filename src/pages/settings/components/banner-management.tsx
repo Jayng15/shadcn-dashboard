@@ -62,7 +62,7 @@ export default function BannerManagement() {
         onSuccess: () => {
             toast.success("Đã thêm banner");
             queryClient.invalidateQueries({ queryKey: ["banners"] });
-            setIsDialogOpen(false);
+            handleCloseDialog();
         },
         onError: (err: any) => {
             toast.error(err.response?.data?.error || "Thêm banner thất bại");
@@ -78,7 +78,7 @@ export default function BannerManagement() {
         onSuccess: () => {
             toast.success("Đã cập nhật banner");
             queryClient.invalidateQueries({ queryKey: ["banners"] });
-            setIsDialogOpen(false);
+            handleCloseDialog();
         },
         onError: (err: any) => {
             toast.error(err.response?.data?.error || "Cập nhật banner thất bại");
@@ -98,6 +98,13 @@ export default function BannerManagement() {
         },
     });
 
+    const handleCloseDialog = useCallback(() => {
+        setIsDialogOpen(false);
+        setSelectedBanner(null);
+        setFormData({ link: "", order: "0", isActive: "1" });
+        setFile(null);
+    }, []);
+
     const handleOpenAdd = useCallback(() => {
         setSelectedBanner(null);
         setFormData({ link: "", order: "0", isActive: "1" });
@@ -109,7 +116,7 @@ export default function BannerManagement() {
         setSelectedBanner(banner);
         setFormData({
             link: banner.link || "",
-            order: banner.order,
+            order: banner.order.toString(),
             isActive: banner.isActive,
         });
         setFile(null);
@@ -271,7 +278,7 @@ export default function BannerManagement() {
                         <Button
                             type="button"
                             variant="outline"
-                            onClick={() => setIsDialogOpen(false)}
+                            onClick={handleCloseDialog}
                         >
                             Hủy
                         </Button>
