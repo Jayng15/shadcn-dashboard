@@ -4,12 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { Button } from "@/components/ui/button"
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -17,17 +17,18 @@ import { Team } from "@/types"
 import { exactImageUrl } from "@/lib/utils"
 
 const formSchema = z.object({
-  name: z.string().min(1, "Vui lòng nhập tên nhóm"),
-  description: z.string().optional(),
+    name: z.string().min(1, "Vui lòng nhập tên nhóm"),
+    description: z.string().optional(),
 })
 
 interface TeamFormProps {
     initialData?: Team | null;
     onSubmit: (formData: FormData) => void;
+    onCancel?: () => void;
     isLoading: boolean;
 }
 
-export function TeamForm({ initialData, onSubmit, isLoading }: TeamFormProps) {
+export function TeamForm({ initialData, onSubmit, onCancel, isLoading }: TeamFormProps) {
     const [file, setFile] = useState<File | null>(null);
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -99,7 +100,7 @@ export function TeamForm({ initialData, onSubmit, isLoading }: TeamFormProps) {
                 <FormItem>
                     <FormLabel>Ảnh đại diện (Thumbnail)</FormLabel>
                     <FormControl>
-                         <Input
+                        <Input
                             type="file"
                             accept="image/*"
                             onChange={(e) => {
@@ -111,15 +112,18 @@ export function TeamForm({ initialData, onSubmit, isLoading }: TeamFormProps) {
                     </FormControl>
                     {initialData?.thumbnailUrl && !file && (
                         <div className="mt-2 text-sm text-muted-foreground flex items-center gap-2">
-                             Đã có ảnh: <img src={exactImageUrl(initialData.thumbnailUrl)} alt="current" className="h-8 w-8 object-cover rounded" />
+                            Đã có ảnh: <img src={exactImageUrl(initialData.thumbnailUrl)} alt="current" className="h-8 w-8 object-cover rounded" />
                         </div>
                     )}
                 </FormItem>
 
-                <div className="flex justify-end pt-4">
-                     <Button type="submit" disabled={isLoading}>
-                         {isLoading ? "Đang lưu..." : "Lưu nhóm"}
-                     </Button>
+                <div className="flex justify-end pt-4 gap-2">
+                    {onCancel && (
+                        <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>Hủy</Button>
+                    )}
+                    <Button type="submit" disabled={isLoading}>
+                        {isLoading ? "Đang lưu..." : "Lưu nhóm"}
+                    </Button>
                 </div>
             </form>
         </Form>

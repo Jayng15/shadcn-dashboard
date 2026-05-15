@@ -241,6 +241,9 @@ export default function OrderPage() {
                 </Button>
               </div>
             )}
+            <div className="pt-4 flex justify-end">
+               <Button variant="outline" onClick={() => setIsDetailOpen(false)}>Đóng</Button>
+            </div>
           </div>
         )}
       </ResponsiveDialog>

@@ -1,10 +1,10 @@
 
 import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
 } from "@/components/ui/card";
 
 import { useState, useMemo } from "react";
@@ -12,13 +12,13 @@ import { useQuery } from "@tanstack/react-query";
 import DataTable from "./components/data-table";
 import { columns } from "./components/columns";
 import {
-  ColumnFiltersState,
-  SortingState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
+    ColumnFiltersState,
+    SortingState,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
 } from "@tanstack/react-table";
 import DataTablePagination from "./components/data-table-pagination";
 // import DataTableToolBar from "./components/data-table-toolbar";
@@ -29,180 +29,186 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export default function UsersPage() {
-  const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [isDetailLoading, setIsDetailLoading] = useState(false);
+    const [sorting, setSorting] = useState<SortingState>([]);
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+    const [isDetailOpen, setIsDetailOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User | null>(null);
+    const [isDetailLoading, setIsDetailLoading] = useState(false);
 
-  const { isPending, error, data, refetch } = useQuery({
-    queryKey: ["users", sorting, columnFilters],
-    queryFn: async () => {
-        const res = await api.get('/user/list?limit=100');
-        return res.data;
-    }
-  });
-
-  const users = useMemo(() => {
-    const list = data?.users || [];
-    return [...list].sort((a, b) => {
-      const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
-      const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
-      if (dateB !== dateA) {
-        return dateB - dateA;
-      }
-      const createA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-      const createB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-      return createB - createA;
-    });
-  }, [data?.users]);
-
-  const table = useReactTable({
-    data: users,
-    columns,
-    state: {
-      sorting,
-      columnFilters,
-    },
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    meta: {
-      refetch: () => refetch(),
-      openUserDetail: async (user: User) => {
-        setIsDetailOpen(true);
-        setIsDetailLoading(true);
-        try {
-          const res = await api.get(`/user/${user.id}`);
-          // API shape: { success, user, profile }
-          const detail = res.data;
-          const combined: User = {
-            ...user,             // base row data
-            ...detail.user,      // core user fields from API
-            ...detail.profile,   // profile fields (fullName, contactPhone, etc.)
-          };
-          setSelectedUser(combined);
-        } catch (_) {
-          toast.error("Không thể tải chi tiết người dùng");
-          // fall back to at least showing the row data
-          setSelectedUser(user);
-        } finally {
-          setIsDetailLoading(false);
+    const { isPending, error, data, refetch } = useQuery({
+        queryKey: ["users", sorting, columnFilters],
+        queryFn: async () => {
+            const res = await api.get('/user/list?limit=100');
+            return res.data;
         }
-      },
-    }
-  });
+    });
 
-  if (error) return <div className="p-4 text-red-500">Đã xảy ra lỗi: {(error as Error).message}</div>;
+    const users = useMemo(() => {
+        const list = data?.users || [];
+        return [...list].sort((a, b) => {
+            const dateA = a.updatedAt ? new Date(a.updatedAt).getTime() : 0;
+            const dateB = b.updatedAt ? new Date(b.updatedAt).getTime() : 0;
+            if (dateB !== dateA) {
+                return dateB - dateA;
+            }
+            const createA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+            const createB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+            return createB - createA;
+        });
+    }, [data?.users]);
 
-  return (
-    <Card className="bg-sidebar w-full min-h-full flex flex-col">
-      <CardHeader>
-        <CardTitle>Quản lý tài khoản người dùng</CardTitle>
-      </CardHeader>
-      <ResponsiveDialog
-        isOpen={isDetailOpen}
-        setIsOpen={setIsDetailOpen}
-        title="Chi tiết người dùng"
-      >
-        {isDetailLoading && (
-          <div className="py-4 text-center text-sm text-muted-foreground">
-            Đang tải chi tiết người dùng...
-          </div>
-        )}
-        {!isDetailLoading && selectedUser && (
-          <div className="space-y-4 text-sm">
-            <div className="space-y-2">
-              <div>
-                <span className="font-semibold">Họ và tên: </span>
-                <span>{selectedUser.fullName}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Email: </span>
-                <span>{selectedUser.email}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Vai trò: </span>
-                <span>{selectedUser.role}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Trạng thái: </span>
-                <span>{selectedUser.status}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Người bán: </span>
-                <span>{selectedUser.isSeller ? "Có" : "Không"}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Số điện thoại liên hệ: </span>
-                <span>{selectedUser.contactPhone}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Email liên hệ: </span>
-                <span>{selectedUser.contactEmail}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Giới tính: </span>
-                <span>{selectedUser.gender}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Ngày sinh: </span>
-                <span>
-                  {selectedUser.birthdate
-                    ? new Date(selectedUser.birthdate).toLocaleDateString()
-                    : "-"}
-                </span>
-              </div>
-              <div>
-                <span className="font-semibold">Địa chỉ: </span>
-                <span>{selectedUser.address}</span>
-              </div>
-              <div>
-                <span className="font-semibold">Tiểu sử: </span>
-                <span>{selectedUser.bio}</span>
-              </div>
-            </div>
-            <div className="pt-2">
-              <Button
-                variant={selectedUser.status === "ACTIVE" ? "destructive" : "default"}
-                className="w-full"
-                onClick={async () => {
-                  if (!selectedUser) return;
-                  const newStatus = selectedUser.status === "ACTIVE" ? "BAN" : "ACTIVE";
-                  try {
-                    await api.patch(`/user/${selectedUser.id}/status`, {
-                      status: newStatus,
-                    });
-                    toast.success(`Trạng thái người dùng đã cập nhật thành ${newStatus}`);
-                    setSelectedUser({ ...selectedUser, status: newStatus });
-                    refetch();
-                  } catch {
-                    toast.error("Cập nhật trạng thái thất bại");
-                  }
-                }}
-              >
-                {selectedUser.status === "ACTIVE" ? "Cấm người dùng" : "Kích hoạt người dùng"}
-              </Button>
-            </div>
-          </div>
-        )}
-      </ResponsiveDialog>
-      {isPending ? (
-        <CardContent>Đang tải...</CardContent>
-      ) : (
-        <>
-          <CardContent className="flex-1">
-            {/* <DataTableToolBar table={table} />  Toolbar might break if field names changed, disable for now or update */}
-            <DataTable table={table} columns={columns} />
-          </CardContent>
-          <CardFooter>
-            <DataTablePagination table={table} className="w-full" />
-          </CardFooter>
-        </>
-      )}
-    </Card>
-  );
+    const table = useReactTable({
+        data: users,
+        columns,
+        state: {
+            sorting,
+            columnFilters,
+        },
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        meta: {
+            refetch: () => refetch(),
+            openUserDetail: async (user: User) => {
+                setIsDetailOpen(true);
+                setIsDetailLoading(true);
+                try {
+                    const res = await api.get(`/user/${user.id}`);
+                    // API shape: { success, user, profile }
+                    const detail = res.data;
+                    const combined: User = {
+                        ...user,             // base row data
+                        ...detail.user,      // core user fields from API
+                        ...detail.profile,   // profile fields (fullName, contactPhone, etc.)
+                    };
+                    setSelectedUser(combined);
+                } catch (_) {
+                    toast.error("Không thể tải chi tiết người dùng");
+                    // fall back to at least showing the row data
+                    setSelectedUser(user);
+                } finally {
+                    setIsDetailLoading(false);
+                }
+            },
+        }
+    });
+
+    if (error) return <div className="p-4 text-red-500">Đã xảy ra lỗi: {(error as Error).message}</div>;
+
+    return (
+        <Card className="bg-sidebar w-full min-h-full flex flex-col">
+            <CardHeader>
+                <CardTitle>Quản lý tài khoản người dùng</CardTitle>
+            </CardHeader>
+            <ResponsiveDialog
+                isOpen={isDetailOpen}
+                setIsOpen={setIsDetailOpen}
+                title="Chi tiết người dùng"
+            >
+                {isDetailLoading && (
+                    <div className="py-4 text-center text-sm text-muted-foreground">
+                        Đang tải chi tiết người dùng...
+                    </div>
+                )}
+                {!isDetailLoading && selectedUser && (
+                    <div className="space-y-4 text-sm">
+                        <div className="space-y-2">
+                            <div>
+                                <span className="font-semibold">Họ và tên: </span>
+                                <span>{selectedUser.fullName}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Email: </span>
+                                <span>{selectedUser.email}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Vai trò: </span>
+                                <span>{selectedUser.role}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Trạng thái: </span>
+                                <span>{selectedUser.status}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Người bán: </span>
+                                <span>{selectedUser.isSeller ? "Có" : "Không"}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Số điện thoại liên hệ: </span>
+                                <span>{selectedUser.contactPhone}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Email liên hệ: </span>
+                                <span>{selectedUser.contactEmail}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Giới tính: </span>
+                                <span>{selectedUser.gender}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Ngày sinh: </span>
+                                <span>
+                                    {selectedUser.birthdate
+                                        ? new Date(selectedUser.birthdate).toLocaleDateString()
+                                        : "-"}
+                                </span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Địa chỉ: </span>
+                                <span>{selectedUser.address}</span>
+                            </div>
+                            <div>
+                                <span className="font-semibold">Tiểu sử: </span>
+                                <span>{selectedUser.bio}</span>
+                            </div>
+                        </div>
+                        <div className="pt-2 flex justify-end gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => setIsDetailOpen(false)}
+                            >
+                                Đóng
+                            </Button>
+                            <Button
+                                variant={selectedUser.status === "ACTIVE" ? "destructive" : "default"}
+                                className="flex-1"
+                                onClick={async () => {
+                                    if (!selectedUser) return;
+                                    const newStatus = selectedUser.status === "ACTIVE" ? "BAN" : "ACTIVE";
+                                    try {
+                                        await api.patch(`/user/${selectedUser.id}/status`, {
+                                            status: newStatus,
+                                        });
+                                        toast.success(`Trạng thái người dùng đã cập nhật thành ${newStatus}`);
+                                        setSelectedUser({ ...selectedUser, status: newStatus });
+                                        refetch();
+                                    } catch {
+                                        toast.error("Cập nhật trạng thái thất bại");
+                                    }
+                                }}
+                            >
+                                {selectedUser.status === "ACTIVE" ? "Cấm người dùng" : "Kích hoạt người dùng"}
+                            </Button>
+                        </div>
+                    </div>
+                )}
+            </ResponsiveDialog>
+            {isPending ? (
+                <CardContent>Đang tải...</CardContent>
+            ) : (
+                <>
+                    <CardContent className="flex-1">
+                        {/* <DataTableToolBar table={table} />  Toolbar might break if field names changed, disable for now or update */}
+                        <DataTable table={table} columns={columns} />
+                    </CardContent>
+                    <CardFooter>
+                        <DataTablePagination table={table} className="w-full" />
+                    </CardFooter>
+                </>
+            )}
+        </Card>
+    );
 }

@@ -228,6 +228,7 @@ export default function IdolListPage() {
                 <TeamForm
                     initialData={selectedTeam}
                     onSubmit={handleSubmit}
+                    onCancel={() => setIsFormOpen(false)}
                     isLoading={isSubmitting}
                 />
             </ResponsiveDialog>

@@ -260,7 +260,7 @@ export default function FinancePage() {
 
     const filteredByType = useMemo(() => {
         let allTransactions: FinanceTransaction[] = data?.transactions || []
-        
+
         // Sort: txAt desc (most recent transaction first)
         allTransactions = [...allTransactions].sort((a: FinanceTransaction, b: FinanceTransaction) => {
             const dateA = new Date(a.txAt || a.createdAt).getTime();
@@ -668,6 +668,9 @@ export default function FinancePage() {
                                 Giao dịch này đã được xác minh.
                             </div>
                         )}
+                        <div className="pt-4 flex justify-end">
+                            <Button variant="outline" onClick={() => setIsDetailOpen(false)}>Đóng</Button>
+                        </div>
                     </div>
                 )}
             </ResponsiveDialog>
