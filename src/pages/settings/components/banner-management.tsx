@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     ColumnFiltersState,
@@ -98,14 +98,14 @@ export default function BannerManagement() {
         },
     });
 
-    const handleOpenAdd = () => {
+    const handleOpenAdd = useCallback(() => {
         setSelectedBanner(null);
         setFormData({ link: "", order: "0", isActive: "1" });
         setFile(null);
         setIsDialogOpen(true);
-    };
+    }, []);
 
-    const handleOpenEdit = (banner: Banner) => {
+    const handleOpenEdit = useCallback((banner: Banner) => {
         setSelectedBanner(banner);
         setFormData({
             link: banner.link || "",
@@ -114,13 +114,13 @@ export default function BannerManagement() {
         });
         setFile(null);
         setIsDialogOpen(true);
-    };
+    }, []);
 
-    const handleDelete = (id: string) => {
+    const handleDelete = useCallback((id: string) => {
         if (confirm("Bạn có chắc chắn muốn xóa banner này?")) {
             deleteMutation.mutate(id);
         }
-    };
+    }, [deleteMutation]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -143,8 +143,15 @@ export default function BannerManagement() {
         }
     };
 
+    const tableData = useMemo(() => data?.banners || [], [data?.banners]);
+
+    const tableMeta = useMemo(() => ({
+        openEditDialog: handleOpenEdit,
+        deleteBanner: handleDelete,
+    }), [handleOpenEdit, handleDelete]);
+
     const table = useReactTable({
-        data: data?.banners || [],
+        data: tableData,
         columns: bannerColumns,
         state: {
             sorting,
@@ -156,10 +163,7 @@ export default function BannerManagement() {
         getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
-        meta: {
-            openEditDialog: handleOpenEdit,
-            deleteBanner: handleDelete,
-        },
+        meta: tableMeta,
     });
 
     return (

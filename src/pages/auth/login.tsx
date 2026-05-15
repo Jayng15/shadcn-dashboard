@@ -16,6 +16,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 
 const formSchema = z.object({
@@ -68,46 +69,48 @@ export default function LoginPage() {
     }
 
     return (
-        <div className="flex flex-col gap-6">
-            <div className="flex flex-col gap-2 text-center">
-                <h1 className="text-2xl font-bold">Đăng nhập</h1>
-                <p className="text-balance text-sm text-muted-foreground">
+        <Card className="mx-auto max-w-sm">
+            <CardHeader>
+                <CardTitle className="text-2xl">Đăng nhập</CardTitle>
+                <CardDescription>
                     Nhập email của bạn bên dưới để đăng nhập vào tài khoản
-                </p>
-            </div>
-            <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-6">
-                    <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                            <FormItem className="grid gap-2">
-                                <FormLabel>Email</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="admin@example.com" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                            <FormItem className="grid gap-2">
-                                <FormLabel>Mật khẩu</FormLabel>
-                                <FormControl>
-                                    <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <Button type="submit" className="w-full" disabled={loading}>
-                        {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-                    </Button>
-                </form>
-            </Form>
-        </div>
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                        <FormField
+                            control={form.control}
+                            name="email"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Email</FormLabel>
+                                    <FormControl>
+                                        <Input placeholder="admin@example.com" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="password"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Mật khẩu</FormLabel>
+                                    <FormControl>
+                                        <Input type="password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className="w-full" disabled={loading}>
+                            {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+                        </Button>
+                    </form>
+                </Form>
+            </CardContent>
+        </Card>
     );
 }
