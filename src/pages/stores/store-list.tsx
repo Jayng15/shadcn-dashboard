@@ -61,7 +61,7 @@ export default function StoreListPage() {
   const { isPending: isRequestPending, data: requestData, refetch: refetchRequests } = useQuery({
     queryKey: ["store-updates"],
     queryFn: async () => {
-        const res = await api.get("/store/admin/updates?status=PENDING&targetType=STORE");
+        const res = await api.get("/storeupdates?status=PENDING&targetType=STORE");
         return res.data;
     },
     enabled: tabFilter === "requests"
@@ -73,7 +73,7 @@ export default function StoreListPage() {
     queryFn: async () => {
       const endpoint = selectedStoreForReviews
         ? `/store/${selectedStoreForReviews.id}/reviews?limit=100`
-        : `/store/admin/all-reviews?limit=100`;
+        : `/storeall-reviews?limit=100`;
       const res = await api.get(endpoint);
       return res.data;
     },
@@ -86,7 +86,7 @@ export default function StoreListPage() {
     queryFn: async () => {
       const endpoint = selectedStoreForReports
         ? `/store/${selectedStoreForReports.id}/reports?limit=100`
-        : `/store/admin/all-reports?limit=100`;
+        : `/storeall-reports?limit=100`;
       const res = await api.get(endpoint);
       return res.data;
     },
@@ -259,7 +259,7 @@ export default function StoreListPage() {
               const reviewId = review.id;
               setIsInvalidatingReview(reviewId);
               try {
-                await api.post(`/store/admin/reviews/${reviewId}/invalidate`);
+                await api.post(`/storereviews/${reviewId}/invalidate`);
                 toast.success("Đã vô hiệu hóa đánh giá");
                 refetchReviews();
               } catch {
@@ -370,7 +370,7 @@ export default function StoreListPage() {
               const reportId = report.id;
               setIsInvalidatingReport(reportId ?? null);
               try {
-                await api.post(`/store/admin/reports/${reportId}/invalidate`);
+                await api.post(`/storereports/${reportId}/invalidate`);
                 toast.success("Đã vô hiệu hóa báo cáo");
                 refetchReports();
               } catch {

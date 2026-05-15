@@ -59,7 +59,7 @@ export default function LoginPage() {
             localStorage.setItem("user", JSON.stringify(fullUser));
 
             toast.success("Đăng nhập thành công");
-            navigate({ to: "/admin/" });
+            navigate({ to: "/admin" });
         } catch (error: any) {
             console.error(error);
             toast.error(error.response?.data?.message || "Đăng nhập thất bại");

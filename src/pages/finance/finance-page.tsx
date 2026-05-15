@@ -153,7 +153,7 @@ export default function FinancePage() {
             const params = new URLSearchParams({ limit: "100" })
             if (dateRange?.from) params.append("startDate", dateRange.from.toISOString())
             if (dateRange?.to) params.append("endDate", dateRange.to.toISOString())
-            const res = await api.get(`/finance/admin/transactions?${params.toString()}`)
+            const res = await api.get(`/financetransactions?${params.toString()}`)
             return res.data
         },
     })

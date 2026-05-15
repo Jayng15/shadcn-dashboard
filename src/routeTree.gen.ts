@@ -27,7 +27,7 @@ const InventoryLazyImport = createFileRoute('/admin/inventory')()
 const FinanceLazyImport = createFileRoute('/admin/finance')()
 const FaqLazyImport = createFileRoute('/admin/faq')()
 const CalendarLazyImport = createFileRoute('/admin/calendar')()
-const IndexLazyImport = createFileRoute('/admin/')()
+const IndexLazyImport = createFileRoute('/admin')()
 const UsersIndexLazyImport = createFileRoute('/admin/users/')()
 const StoresIndexLazyImport = createFileRoute('/admin/stores/')()
 const UsersUserIdLazyImport = createFileRoute('/admin/users/$userId')()
@@ -97,8 +97,8 @@ const LoginRoute = LoginImport.update({
 } as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
-    id: '/admin/',
-    path: '/admin/',
+    id: '/admin',
+    path: '/admin',
     getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/admin/index.lazy').then((d) => d.Route))
 
@@ -144,10 +144,10 @@ const IdolsTeamIdLazyRoute = IdolsTeamIdLazyImport.update({
 
 declare module '@tanstack/react-router' {
     interface FileRoutesByPath {
-        '/admin/': {
-            id: '/admin/'
-            path: '/admin/'
-            fullPath: '/admin/'
+        '/admin': {
+            id: '/admin'
+            path: '/admin'
+            fullPath: '/admin'
             preLoaderRoute: typeof IndexLazyImport
             parentRoute: typeof rootRoute
         }
@@ -269,7 +269,7 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-    '/admin/': typeof IndexLazyRoute
+    '/admin': typeof IndexLazyRoute
     '/login-lova': typeof LoginRoute
     '/admin/calendar': typeof CalendarLazyRoute
     '/admin/faq': typeof FaqLazyRoute
@@ -289,7 +289,7 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
-    '/admin/': typeof IndexLazyRoute
+    '/admin': typeof IndexLazyRoute
     '/login-lova': typeof LoginRoute
     '/admin/calendar': typeof CalendarLazyRoute
     '/admin/faq': typeof FaqLazyRoute
@@ -310,7 +310,7 @@ export interface FileRoutesByTo {
 
 export interface FileRoutesById {
     __root__: typeof rootRoute
-    '/admin/': typeof IndexLazyRoute
+    '/admin': typeof IndexLazyRoute
     '/login-lova': typeof LoginRoute
     '/admin/calendar': typeof CalendarLazyRoute
     '/admin/faq': typeof FaqLazyRoute
@@ -332,7 +332,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
     fileRoutesByFullPath: FileRoutesByFullPath
     fullPaths:
-    | '/admin/'
+    | '/admin'
     | '/login-lova'
     | '/admin/calendar'
     | '/admin/faq'
@@ -351,7 +351,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     fileRoutesByTo: FileRoutesByTo
     to:
-    | '/admin/'
+    | '/admin'
     | '/login-lova'
     | '/admin/calendar'
     | '/admin/faq'
@@ -370,7 +370,7 @@ export interface FileRouteTypes {
     | '/admin/users'
     id:
     | '__root__'
-    | '/admin/'
+    | '/admin'
     | '/login-lova'
     | '/admin/calendar'
     | '/admin/faq'
@@ -440,7 +440,7 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/admin/",
+        "/admin",
         "/login-lova",
         "/admin/calendar",
         "/admin/faq",
@@ -459,9 +459,9 @@ export const routeTree = rootRoute
         "/admin/users/"
       ]
     },
-    "/admin/": {
-      "filePath": "admin/index.lazy.tsx"
-    },
+        "/admin": {
+            "filePath": "admin/index.lazy.tsx"
+        },
     "/login-lova": {
       "filePath": "login-lova.tsx"
     },

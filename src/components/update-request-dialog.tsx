@@ -49,8 +49,8 @@ export function UpdateRequestDialog({
     try {
       setIsLoading(true)
       const endpoint = type === "STORE"
-        ? `/store/admin/updates/${request.id}/approve`
-        : `/product/admin/updates/${request.id}/approve`
+        ? `/storeupdates/${request.id}/approve`
+        : `/productupdates/${request.id}/approve`
 
       await api.post(endpoint)
       toast.success("Đã phê duyệt thay đổi")
@@ -79,8 +79,8 @@ export function UpdateRequestDialog({
     try {
       setIsLoading(true)
       const endpoint = type === "STORE"
-        ? `/store/admin/updates/${request.id}/reject`
-        : `/product/admin/updates/${request.id}/reject`
+        ? `/storeupdates/${request.id}/reject`
+        : `/productupdates/${request.id}/reject`
 
       await api.post(endpoint, { reason: rejectReason })
       toast.success("Đã từ chối yêu cầu")

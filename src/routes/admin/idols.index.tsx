@@ -8,6 +8,6 @@ const idolSearchSchema = z.object({
 
 export type IdolSearch = z.infer<typeof idolSearchSchema>
 
-export const Route = createFileRoute('/admin/idols/')({
+export const Route = createFileRoute('idols/')({
   validateSearch: (search) => idolSearchSchema.parse(search),
 })

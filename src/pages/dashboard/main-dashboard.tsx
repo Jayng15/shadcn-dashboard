@@ -55,7 +55,7 @@ export default function MainDashoard() {
                     api.get('/product', { params: { limit: 1, isAdminView: true } }),
                     api.get('/store', { params: { limit: 10, status: 'REQUESTED' } }),
                     api.get('/product', { params: { limit: 10, status: 'REQUESTED', isAdminView: true } }),
-                    api.get('/finance/admin/transactions', { params: { limit: 10, verifiedStatus: 'PENDING' } }),
+                    api.get('/financetransactions', { params: { limit: 10, verifiedStatus: 'PENDING' } }),
                     api.get('/order/admin', { params: { limit: 10, status: 'PENDING' } })
                 ]);
 

@@ -70,7 +70,7 @@ export default function ProductListPage() {
         queryFn: async () => {
             const sort = sorting[0];
             const sortQuery = sort ? `&sortBy=${sort.id}&order=${sort.desc ? 'desc' : 'asc'}` : '';
-            const res = await api.get(`/product/admin/updates?status=PENDING&targetType=PRODUCT${sortQuery}`);
+            const res = await api.get(`/productupdates?status=PENDING&targetType=PRODUCT${sortQuery}`);
             return res.data;
         },
         enabled: statusFilter === "requests"

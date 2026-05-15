@@ -33,7 +33,7 @@ import { useEffect, useState } from "react"
 const items = [
   {
     title: "Dashboard",
-    url: "/admin/",
+    url: "/admin",
     icon: Home,
   },
   {
@@ -137,8 +137,8 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {items.map((item) => {
-                  const isActive = item.url === "/admin/"
-                    ? pathname === "/admin" || pathname === "/admin/"
+                  const isActive = item.url === "/admin"
+                    ? pathname === "/admin" || pathname === "/admin"
                     : pathname === item.url ||
                       pathname.startsWith(item.url + "/")
 
