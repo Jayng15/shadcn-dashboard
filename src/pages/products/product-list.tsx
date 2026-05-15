@@ -253,7 +253,7 @@ export default function ProductListPage() {
                     </div>
                 )}
                 {!isDetailLoading && selectedProduct && (
-                    <div className="space-y-6 text-sm">
+                    <div className="space-y-6 text-sm max-h-[75vh] overflow-y-auto pr-2">
                         {/* Header Section */}
                         <div className="flex gap-4 p-4 rounded-lg bg-muted/30 border">
                             <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border bg-background">
@@ -300,9 +300,9 @@ export default function ProductListPage() {
                                     <span>Thông tin cơ bản</span>
                                 </div>
                                 <div className="space-y-3 rounded-md border p-3 bg-card">
-                                    <div className="flex justify-between items-start border-b border-muted pb-2 last:border-0 last:pb-0">
-                                        <span className="text-muted-foreground">Mô tả:</span>
-                                        <span className="text-right max-w-[200px] leading-relaxed">{selectedProduct.description || "Chưa có mô tả"}</span>
+                                    <div className="flex flex-col border-b border-muted pb-3 last:border-0 last:pb-0">
+                                        <span className="text-muted-foreground mb-2">Mô tả:</span>
+                                        <div className="text-left leading-relaxed max-h-[150px] overflow-y-auto pr-2 whitespace-pre-wrap">{selectedProduct.description || "Chưa có mô tả"}</div>
                                     </div>
                                     <div className="flex justify-between items-center border-b border-muted pb-2 last:border-0 last:pb-0">
                                         <span className="text-muted-foreground flex items-center gap-1.5"><Eye className="h-3.5 w-3.5" /> Lượt xem:</span>
