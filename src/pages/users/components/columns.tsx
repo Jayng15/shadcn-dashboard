@@ -119,7 +119,7 @@ export const columns: ColumnDef<User>[] = [
                             )
                         )}
                     </DropdownMenuContent>
-                    吐            </DropdownMenu>
+                    </DropdownMenu>
             )
         },
     }

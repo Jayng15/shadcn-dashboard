@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import useMediaQuery from "@/hooks/use-media-query";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from "./ui/drawer";
@@ -18,10 +19,23 @@ export function ResponsiveDialog({
   description,
 }: ResponsiveDialogProps) {
   const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [internalOpen, setInternalOpen] = useState(false);
+
+  // Defer the internal open state to prevent focus-fighting with 
+  // triggering elements (like DropdownMenus) which might still be 
+  // in their cleanup phase.
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => setInternalOpen(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setInternalOpen(false);
+    }
+  }, [isOpen]);
 
   if (isDesktop) {
     return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Dialog open={internalOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[425px]" onCloseAutoFocus={(e) => e.preventDefault()}>
           <DialogHeader>
             <DialogTitle>{title}</DialogTitle>
@@ -36,7 +50,7 @@ export function ResponsiveDialog({
   }
 
   return (
-    <Drawer open={isOpen} onOpenChange={setIsOpen}>
+    <Drawer open={internalOpen} onOpenChange={setIsOpen}>
       <DrawerContent>
         <DrawerHeader className="text-left">
           <DrawerTitle>{title}</DrawerTitle>
