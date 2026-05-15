@@ -35,8 +35,8 @@ api.interceptors.response.use(
       localStorage.removeItem('isAuthenticated');
       localStorage.removeItem('user');
       // Only redirect if not already on the login page to avoid loops
-      if (window.location.pathname !== '/login') {
-        window.location.href = '/login';
+      if (window.location.pathname !== '/login-lova') {
+        window.location.href = '/login-lova';
       }
     }
     return Promise.reject(error);
