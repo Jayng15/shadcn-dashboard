@@ -105,6 +105,14 @@ export default function BannerManagement() {
         setFile(null);
     }, []);
 
+    const handleOpenChange = useCallback((open: boolean) => {
+        if (!open) {
+            handleCloseDialog();
+        } else {
+            setIsDialogOpen(true);
+        }
+    }, [handleCloseDialog]);
+
     const handleOpenAdd = useCallback(() => {
         setSelectedBanner(null);
         setFormData({ link: "", order: "0", isActive: "1" });
@@ -197,7 +205,7 @@ export default function BannerManagement() {
 
             <ResponsiveDialog
                 isOpen={isDialogOpen}
-                setIsOpen={setIsDialogOpen}
+                setIsOpen={handleOpenChange}
                 title={selectedBanner ? "Chỉnh sửa Banner" : "Thêm Banner mới"}
             >
                 <form onSubmit={handleSubmit} className="space-y-4">
