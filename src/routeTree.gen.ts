@@ -14,81 +14,81 @@ import { createFileRoute } from '@tanstack/react-router'
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as LoginImport } from './routes/login-lova'
-import { Route as IdolsIndexImport } from './routes/idols.index'
+import { Route as IdolsIndexImport } from './routes/admin/idols.index'
 
 // Create Virtual Routes
 
-const TaskLazyImport = createFileRoute('/task')()
-const SettingsLazyImport = createFileRoute('/settings')()
-const ProductsLazyImport = createFileRoute('/products')()
-const PolicyLazyImport = createFileRoute('/policy')()
-const OrdersLazyImport = createFileRoute('/orders')()
-const InventoryLazyImport = createFileRoute('/inventory')()
-const FinanceLazyImport = createFileRoute('/finance')()
-const FaqLazyImport = createFileRoute('/faq')()
-const CalendarLazyImport = createFileRoute('/calendar')()
-const IndexLazyImport = createFileRoute('/')()
-const UsersIndexLazyImport = createFileRoute('/users/')()
-const StoresIndexLazyImport = createFileRoute('/stores/')()
-const UsersUserIdLazyImport = createFileRoute('/users/$userId')()
-const StoresStoreIdLazyImport = createFileRoute('/stores/$storeId')()
-const IdolsTeamIdLazyImport = createFileRoute('/idols/$teamId')()
+const TaskLazyImport = createFileRoute('/admin/task')()
+const SettingsLazyImport = createFileRoute('/admin/settings')()
+const ProductsLazyImport = createFileRoute('/admin/products')()
+const PolicyLazyImport = createFileRoute('/admin/policy')()
+const OrdersLazyImport = createFileRoute('/admin/orders')()
+const InventoryLazyImport = createFileRoute('/admin/inventory')()
+const FinanceLazyImport = createFileRoute('/admin/finance')()
+const FaqLazyImport = createFileRoute('/admin/faq')()
+const CalendarLazyImport = createFileRoute('/admin/calendar')()
+const IndexLazyImport = createFileRoute('/admin/')()
+const UsersIndexLazyImport = createFileRoute('/admin/users/')()
+const StoresIndexLazyImport = createFileRoute('/admin/stores/')()
+const UsersUserIdLazyImport = createFileRoute('/admin/users/$userId')()
+const StoresStoreIdLazyImport = createFileRoute('/admin/stores/$storeId')()
+const IdolsTeamIdLazyImport = createFileRoute('/admin/idols/$teamId')()
 
 // Create/Update Routes
 
 const TaskLazyRoute = TaskLazyImport.update({
-    id: '/task',
-    path: '/task',
+    id: '/admin/task',
+    path: '/admin/task',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/task.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/task.lazy').then((d) => d.Route))
 
 const SettingsLazyRoute = SettingsLazyImport.update({
-    id: '/settings',
-    path: '/settings',
+    id: '/admin/settings',
+    path: '/admin/settings',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/settings.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/settings.lazy').then((d) => d.Route))
 
 const ProductsLazyRoute = ProductsLazyImport.update({
-    id: '/products',
-    path: '/products',
+    id: '/admin/products',
+    path: '/admin/products',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/products.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/products.lazy').then((d) => d.Route))
 
 const PolicyLazyRoute = PolicyLazyImport.update({
-    id: '/policy',
-    path: '/policy',
+    id: '/admin/policy',
+    path: '/admin/policy',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/policy.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/policy.lazy').then((d) => d.Route))
 
 const OrdersLazyRoute = OrdersLazyImport.update({
-    id: '/orders',
-    path: '/orders',
+    id: '/admin/orders',
+    path: '/admin/orders',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/orders.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/orders.lazy').then((d) => d.Route))
 
 const InventoryLazyRoute = InventoryLazyImport.update({
-    id: '/inventory',
-    path: '/inventory',
+    id: '/admin/inventory',
+    path: '/admin/inventory',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/inventory.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/inventory.lazy').then((d) => d.Route))
 
 const FinanceLazyRoute = FinanceLazyImport.update({
-    id: '/finance',
-    path: '/finance',
+    id: '/admin/finance',
+    path: '/admin/finance',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/finance.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/finance.lazy').then((d) => d.Route))
 
 const FaqLazyRoute = FaqLazyImport.update({
-    id: '/faq',
-    path: '/faq',
+    id: '/admin/faq',
+    path: '/admin/faq',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/faq.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/faq.lazy').then((d) => d.Route))
 
 const CalendarLazyRoute = CalendarLazyImport.update({
-    id: '/calendar',
-    path: '/calendar',
+    id: '/admin/calendar',
+    path: '/admin/calendar',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/calendar.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/calendar.lazy').then((d) => d.Route))
 
 const LoginRoute = LoginImport.update({
     id: '/login-lova',
@@ -97,57 +97,57 @@ const LoginRoute = LoginImport.update({
 } as any)
 
 const IndexLazyRoute = IndexLazyImport.update({
-    id: '/',
-    path: '/',
+    id: '/admin/',
+    path: '/admin/',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/index.lazy').then((d) => d.Route))
 
 const UsersIndexLazyRoute = UsersIndexLazyImport.update({
-    id: '/users/',
-    path: '/users/',
+    id: '/admin/users/',
+    path: '/admin/users/',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/users.index.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/users.index.lazy').then((d) => d.Route))
 
 const StoresIndexLazyRoute = StoresIndexLazyImport.update({
-    id: '/stores/',
-    path: '/stores/',
+    id: '/admin/stores/',
+    path: '/admin/stores/',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/stores.index.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/stores.index.lazy').then((d) => d.Route))
 
 const IdolsIndexRoute = IdolsIndexImport.update({
-    id: '/idols/',
-    path: '/idols/',
+    id: '/admin/idols/',
+    path: '/admin/idols/',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/idols.index.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/idols.index.lazy').then((d) => d.Route))
 
 const UsersUserIdLazyRoute = UsersUserIdLazyImport.update({
-    id: '/users/$userId',
-    path: '/users/$userId',
+    id: '/admin/users/$userId',
+    path: '/admin/users/$userId',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/users.$userId.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/users.$userId.lazy').then((d) => d.Route))
 
 const StoresStoreIdLazyRoute = StoresStoreIdLazyImport.update({
-    id: '/stores/$storeId',
-    path: '/stores/$storeId',
+    id: '/admin/stores/$storeId',
+    path: '/admin/stores/$storeId',
     getParentRoute: () => rootRoute,
 } as any).lazy(() =>
-    import('./routes/stores.$storeId.lazy').then((d) => d.Route),
+    import('./routes/admin/stores.$storeId.lazy').then((d) => d.Route),
 )
 
 const IdolsTeamIdLazyRoute = IdolsTeamIdLazyImport.update({
-    id: '/idols/$teamId',
-    path: '/idols/$teamId',
+    id: '/admin/idols/$teamId',
+    path: '/admin/idols/$teamId',
     getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/idols.$teamId.lazy').then((d) => d.Route))
+} as any).lazy(() => import('./routes/admin/idols.$teamId.lazy').then((d) => d.Route))
 
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
     interface FileRoutesByPath {
-        '/': {
-            id: '/'
-            path: '/'
-            fullPath: '/'
+        '/admin/': {
+            id: '/admin/'
+            path: '/admin/'
+            fullPath: '/admin/'
             preLoaderRoute: typeof IndexLazyImport
             parentRoute: typeof rootRoute
         }
@@ -158,108 +158,108 @@ declare module '@tanstack/react-router' {
             preLoaderRoute: typeof LoginImport
             parentRoute: typeof rootRoute
         }
-        '/calendar': {
-            id: '/calendar'
-            path: '/calendar'
-            fullPath: '/calendar'
+        '/admin/calendar': {
+            id: '/admin/calendar'
+            path: '/admin/calendar'
+            fullPath: '/admin/calendar'
             preLoaderRoute: typeof CalendarLazyImport
             parentRoute: typeof rootRoute
         }
-        '/faq': {
-            id: '/faq'
-            path: '/faq'
-            fullPath: '/faq'
+        '/admin/faq': {
+            id: '/admin/faq'
+            path: '/admin/faq'
+            fullPath: '/admin/faq'
             preLoaderRoute: typeof FaqLazyImport
             parentRoute: typeof rootRoute
         }
-        '/finance': {
-            id: '/finance'
-            path: '/finance'
-            fullPath: '/finance'
+        '/admin/finance': {
+            id: '/admin/finance'
+            path: '/admin/finance'
+            fullPath: '/admin/finance'
             preLoaderRoute: typeof FinanceLazyImport
             parentRoute: typeof rootRoute
         }
-        '/inventory': {
-            id: '/inventory'
-            path: '/inventory'
-            fullPath: '/inventory'
+        '/admin/inventory': {
+            id: '/admin/inventory'
+            path: '/admin/inventory'
+            fullPath: '/admin/inventory'
             preLoaderRoute: typeof InventoryLazyImport
             parentRoute: typeof rootRoute
         }
-        '/orders': {
-            id: '/orders'
-            path: '/orders'
-            fullPath: '/orders'
+        '/admin/orders': {
+            id: '/admin/orders'
+            path: '/admin/orders'
+            fullPath: '/admin/orders'
             preLoaderRoute: typeof OrdersLazyImport
             parentRoute: typeof rootRoute
         }
-        '/policy': {
-            id: '/policy'
-            path: '/policy'
-            fullPath: '/policy'
+        '/admin/policy': {
+            id: '/admin/policy'
+            path: '/admin/policy'
+            fullPath: '/admin/policy'
             preLoaderRoute: typeof PolicyLazyImport
             parentRoute: typeof rootRoute
         }
-        '/products': {
-            id: '/products'
-            path: '/products'
-            fullPath: '/products'
+        '/admin/products': {
+            id: '/admin/products'
+            path: '/admin/products'
+            fullPath: '/admin/products'
             preLoaderRoute: typeof ProductsLazyImport
             parentRoute: typeof rootRoute
         }
-        '/settings': {
-            id: '/settings'
-            path: '/settings'
-            fullPath: '/settings'
+        '/admin/settings': {
+            id: '/admin/settings'
+            path: '/admin/settings'
+            fullPath: '/admin/settings'
             preLoaderRoute: typeof SettingsLazyImport
             parentRoute: typeof rootRoute
         }
-        '/task': {
-            id: '/task'
-            path: '/task'
-            fullPath: '/task'
+        '/admin/task': {
+            id: '/admin/task'
+            path: '/admin/task'
+            fullPath: '/admin/task'
             preLoaderRoute: typeof TaskLazyImport
             parentRoute: typeof rootRoute
         }
-        '/idols/$teamId': {
-            id: '/idols/$teamId'
-            path: '/idols/$teamId'
-            fullPath: '/idols/$teamId'
+        '/admin/idols/$teamId': {
+            id: '/admin/idols/$teamId'
+            path: '/admin/idols/$teamId'
+            fullPath: '/admin/idols/$teamId'
             preLoaderRoute: typeof IdolsTeamIdLazyImport
             parentRoute: typeof rootRoute
         }
-        '/stores/$storeId': {
-            id: '/stores/$storeId'
-            path: '/stores/$storeId'
-            fullPath: '/stores/$storeId'
+        '/admin/stores/$storeId': {
+            id: '/admin/stores/$storeId'
+            path: '/admin/stores/$storeId'
+            fullPath: '/admin/stores/$storeId'
             preLoaderRoute: typeof StoresStoreIdLazyImport
             parentRoute: typeof rootRoute
         }
-        '/users/$userId': {
-            id: '/users/$userId'
-            path: '/users/$userId'
-            fullPath: '/users/$userId'
+        '/admin/users/$userId': {
+            id: '/admin/users/$userId'
+            path: '/admin/users/$userId'
+            fullPath: '/admin/users/$userId'
             preLoaderRoute: typeof UsersUserIdLazyImport
             parentRoute: typeof rootRoute
         }
-        '/idols/': {
-            id: '/idols/'
-            path: '/idols'
-            fullPath: '/idols'
+        '/admin/idols/': {
+            id: '/admin/idols/'
+            path: '/admin/idols'
+            fullPath: '/admin/idols'
             preLoaderRoute: typeof IdolsIndexImport
             parentRoute: typeof rootRoute
         }
-        '/stores/': {
-            id: '/stores/'
-            path: '/stores'
-            fullPath: '/stores'
+        '/admin/stores/': {
+            id: '/admin/stores/'
+            path: '/admin/stores'
+            fullPath: '/admin/stores'
             preLoaderRoute: typeof StoresIndexLazyImport
             parentRoute: typeof rootRoute
         }
-        '/users/': {
-            id: '/users/'
-            path: '/users'
-            fullPath: '/users'
+        '/admin/users/': {
+            id: '/admin/users/'
+            path: '/admin/users'
+            fullPath: '/admin/users'
             preLoaderRoute: typeof UsersIndexLazyImport
             parentRoute: typeof rootRoute
         }
@@ -269,124 +269,124 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-    '/': typeof IndexLazyRoute
+    '/admin/': typeof IndexLazyRoute
     '/login-lova': typeof LoginRoute
-    '/calendar': typeof CalendarLazyRoute
-    '/faq': typeof FaqLazyRoute
-    '/finance': typeof FinanceLazyRoute
-    '/inventory': typeof InventoryLazyRoute
-    '/orders': typeof OrdersLazyRoute
-    '/policy': typeof PolicyLazyRoute
-    '/products': typeof ProductsLazyRoute
-    '/settings': typeof SettingsLazyRoute
-    '/task': typeof TaskLazyRoute
-    '/idols/$teamId': typeof IdolsTeamIdLazyRoute
-    '/stores/$storeId': typeof StoresStoreIdLazyRoute
-    '/users/$userId': typeof UsersUserIdLazyRoute
-    '/idols': typeof IdolsIndexRoute
-    '/stores': typeof StoresIndexLazyRoute
-    '/users': typeof UsersIndexLazyRoute
+    '/admin/calendar': typeof CalendarLazyRoute
+    '/admin/faq': typeof FaqLazyRoute
+    '/admin/finance': typeof FinanceLazyRoute
+    '/admin/inventory': typeof InventoryLazyRoute
+    '/admin/orders': typeof OrdersLazyRoute
+    '/admin/policy': typeof PolicyLazyRoute
+    '/admin/products': typeof ProductsLazyRoute
+    '/admin/settings': typeof SettingsLazyRoute
+    '/admin/task': typeof TaskLazyRoute
+    '/admin/idols/$teamId': typeof IdolsTeamIdLazyRoute
+    '/admin/stores/$storeId': typeof StoresStoreIdLazyRoute
+    '/admin/users/$userId': typeof UsersUserIdLazyRoute
+    '/admin/idols': typeof IdolsIndexRoute
+    '/admin/stores': typeof StoresIndexLazyRoute
+    '/admin/users': typeof UsersIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
-    '/': typeof IndexLazyRoute
+    '/admin/': typeof IndexLazyRoute
     '/login-lova': typeof LoginRoute
-    '/calendar': typeof CalendarLazyRoute
-    '/faq': typeof FaqLazyRoute
-    '/finance': typeof FinanceLazyRoute
-    '/inventory': typeof InventoryLazyRoute
-    '/orders': typeof OrdersLazyRoute
-    '/policy': typeof PolicyLazyRoute
-    '/products': typeof ProductsLazyRoute
-    '/settings': typeof SettingsLazyRoute
-    '/task': typeof TaskLazyRoute
-    '/idols/$teamId': typeof IdolsTeamIdLazyRoute
-    '/stores/$storeId': typeof StoresStoreIdLazyRoute
-    '/users/$userId': typeof UsersUserIdLazyRoute
-    '/idols': typeof IdolsIndexRoute
-    '/stores': typeof StoresIndexLazyRoute
-    '/users': typeof UsersIndexLazyRoute
+    '/admin/calendar': typeof CalendarLazyRoute
+    '/admin/faq': typeof FaqLazyRoute
+    '/admin/finance': typeof FinanceLazyRoute
+    '/admin/inventory': typeof InventoryLazyRoute
+    '/admin/orders': typeof OrdersLazyRoute
+    '/admin/policy': typeof PolicyLazyRoute
+    '/admin/products': typeof ProductsLazyRoute
+    '/admin/settings': typeof SettingsLazyRoute
+    '/admin/task': typeof TaskLazyRoute
+    '/admin/idols/$teamId': typeof IdolsTeamIdLazyRoute
+    '/admin/stores/$storeId': typeof StoresStoreIdLazyRoute
+    '/admin/users/$userId': typeof UsersUserIdLazyRoute
+    '/admin/idols': typeof IdolsIndexRoute
+    '/admin/stores': typeof StoresIndexLazyRoute
+    '/admin/users': typeof UsersIndexLazyRoute
 }
 
 export interface FileRoutesById {
     __root__: typeof rootRoute
-    '/': typeof IndexLazyRoute
+    '/admin/': typeof IndexLazyRoute
     '/login-lova': typeof LoginRoute
-    '/calendar': typeof CalendarLazyRoute
-    '/faq': typeof FaqLazyRoute
-    '/finance': typeof FinanceLazyRoute
-    '/inventory': typeof InventoryLazyRoute
-    '/orders': typeof OrdersLazyRoute
-    '/policy': typeof PolicyLazyRoute
-    '/products': typeof ProductsLazyRoute
-    '/settings': typeof SettingsLazyRoute
-    '/task': typeof TaskLazyRoute
-    '/idols/$teamId': typeof IdolsTeamIdLazyRoute
-    '/stores/$storeId': typeof StoresStoreIdLazyRoute
-    '/users/$userId': typeof UsersUserIdLazyRoute
-    '/idols/': typeof IdolsIndexRoute
-    '/stores/': typeof StoresIndexLazyRoute
-    '/users/': typeof UsersIndexLazyRoute
+    '/admin/calendar': typeof CalendarLazyRoute
+    '/admin/faq': typeof FaqLazyRoute
+    '/admin/finance': typeof FinanceLazyRoute
+    '/admin/inventory': typeof InventoryLazyRoute
+    '/admin/orders': typeof OrdersLazyRoute
+    '/admin/policy': typeof PolicyLazyRoute
+    '/admin/products': typeof ProductsLazyRoute
+    '/admin/settings': typeof SettingsLazyRoute
+    '/admin/task': typeof TaskLazyRoute
+    '/admin/idols/$teamId': typeof IdolsTeamIdLazyRoute
+    '/admin/stores/$storeId': typeof StoresStoreIdLazyRoute
+    '/admin/users/$userId': typeof UsersUserIdLazyRoute
+    '/admin/idols/': typeof IdolsIndexRoute
+    '/admin/stores/': typeof StoresIndexLazyRoute
+    '/admin/users/': typeof UsersIndexLazyRoute
 }
 
 export interface FileRouteTypes {
     fileRoutesByFullPath: FileRoutesByFullPath
     fullPaths:
-    | '/'
+    | '/admin/'
     | '/login-lova'
-    | '/calendar'
-    | '/faq'
-    | '/finance'
-    | '/inventory'
-    | '/orders'
-    | '/policy'
-    | '/products'
-    | '/settings'
-    | '/task'
-    | '/idols/$teamId'
-    | '/stores/$storeId'
-    | '/users/$userId'
-    | '/idols'
-    | '/stores'
-    | '/users'
+    | '/admin/calendar'
+    | '/admin/faq'
+    | '/admin/finance'
+    | '/admin/inventory'
+    | '/admin/orders'
+    | '/admin/policy'
+    | '/admin/products'
+    | '/admin/settings'
+    | '/admin/task'
+    | '/admin/idols/$teamId'
+    | '/admin/stores/$storeId'
+    | '/admin/users/$userId'
+    | '/admin/idols'
+    | '/admin/stores'
+    | '/admin/users'
     fileRoutesByTo: FileRoutesByTo
     to:
-    | '/'
+    | '/admin/'
     | '/login-lova'
-    | '/calendar'
-    | '/faq'
-    | '/finance'
-    | '/inventory'
-    | '/orders'
-    | '/policy'
-    | '/products'
-    | '/settings'
-    | '/task'
-    | '/idols/$teamId'
-    | '/stores/$storeId'
-    | '/users/$userId'
-    | '/idols'
-    | '/stores'
-    | '/users'
+    | '/admin/calendar'
+    | '/admin/faq'
+    | '/admin/finance'
+    | '/admin/inventory'
+    | '/admin/orders'
+    | '/admin/policy'
+    | '/admin/products'
+    | '/admin/settings'
+    | '/admin/task'
+    | '/admin/idols/$teamId'
+    | '/admin/stores/$storeId'
+    | '/admin/users/$userId'
+    | '/admin/idols'
+    | '/admin/stores'
+    | '/admin/users'
     id:
     | '__root__'
-    | '/'
+    | '/admin/'
     | '/login-lova'
-    | '/calendar'
-    | '/faq'
-    | '/finance'
-    | '/inventory'
-    | '/orders'
-    | '/policy'
-    | '/products'
-    | '/settings'
-    | '/task'
-    | '/idols/$teamId'
-    | '/stores/$storeId'
-    | '/users/$userId'
-    | '/idols/'
-    | '/stores/'
-    | '/users/'
+    | '/admin/calendar'
+    | '/admin/faq'
+    | '/admin/finance'
+    | '/admin/inventory'
+    | '/admin/orders'
+    | '/admin/policy'
+    | '/admin/products'
+    | '/admin/settings'
+    | '/admin/task'
+    | '/admin/idols/$teamId'
+    | '/admin/stores/$storeId'
+    | '/admin/users/$userId'
+    | '/admin/idols/'
+    | '/admin/stores/'
+    | '/admin/users/'
     fileRoutesById: FileRoutesById
 }
 
@@ -440,75 +440,75 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/",
+        "/admin/",
         "/login-lova",
-        "/calendar",
-        "/faq",
-        "/finance",
-        "/inventory",
-        "/orders",
-        "/policy",
-        "/products",
-        "/settings",
-        "/task",
-        "/idols/$teamId",
-        "/stores/$storeId",
-        "/users/$userId",
-        "/idols/",
-        "/stores/",
-        "/users/"
+        "/admin/calendar",
+        "/admin/faq",
+        "/admin/finance",
+        "/admin/inventory",
+        "/admin/orders",
+        "/admin/policy",
+        "/admin/products",
+        "/admin/settings",
+        "/admin/task",
+        "/admin/idols/$teamId",
+        "/admin/stores/$storeId",
+        "/admin/users/$userId",
+        "/admin/idols/",
+        "/admin/stores/",
+        "/admin/users/"
       ]
     },
-    "/": {
-      "filePath": "index.lazy.tsx"
+    "/admin/": {
+      "filePath": "admin/index.lazy.tsx"
     },
     "/login-lova": {
       "filePath": "login-lova.tsx"
     },
-    "/calendar": {
-      "filePath": "calendar.lazy.tsx"
+    "/admin/calendar": {
+      "filePath": "admin/calendar.lazy.tsx"
     },
-    "/faq": {
-      "filePath": "faq.lazy.tsx"
+    "/admin/faq": {
+      "filePath": "admin/faq.lazy.tsx"
     },
-    "/finance": {
-      "filePath": "finance.lazy.tsx"
+    "/admin/finance": {
+      "filePath": "admin/finance.lazy.tsx"
     },
-    "/inventory": {
-      "filePath": "inventory.lazy.tsx"
+    "/admin/inventory": {
+      "filePath": "admin/inventory.lazy.tsx"
     },
-    "/orders": {
-      "filePath": "orders.lazy.tsx"
+    "/admin/orders": {
+      "filePath": "admin/orders.lazy.tsx"
     },
-    "/policy": {
-      "filePath": "policy.lazy.tsx"
+    "/admin/policy": {
+      "filePath": "admin/policy.lazy.tsx"
     },
-    "/products": {
-      "filePath": "products.lazy.tsx"
+    "/admin/products": {
+      "filePath": "admin/products.lazy.tsx"
     },
-    "/settings": {
-      "filePath": "settings.lazy.tsx"
+    "/admin/settings": {
+      "filePath": "admin/settings.lazy.tsx"
     },
-    "/task": {
-      "filePath": "task.lazy.tsx"
+    "/admin/task": {
+      "filePath": "admin/task.lazy.tsx"
     },
-    "/idols/$teamId": {
-      "filePath": "idols.$teamId.lazy.tsx"
+    "/admin/idols/$teamId": {
+      "filePath": "admin/idols.$teamId.lazy.tsx"
     },
-    "/stores/$storeId": {
-      "filePath": "stores.$storeId.lazy.tsx"
+    "/admin/stores/$storeId": {
+      "filePath": "admin/stores.$storeId.lazy.tsx"
     },
-    "/users/$userId": {
-      "filePath": "users.$userId.lazy.tsx"
+    "/admin/users/$userId": {
+      "filePath": "admin/users.$userId.lazy.tsx"
     },
-    "/idols/": {
-      "filePath": "idols.index.tsx"
+    "/admin/idols/": {
+      "filePath": "admin/idols.index.tsx"
     },
-    "/stores/": {
-      "filePath": "stores.index.lazy.tsx"
+    "/admin/stores/": {
+      "filePath": "admin/stores.index.lazy.tsx"
     },
-    "/users/": {
-      "filePath": "users.index.lazy.tsx"
+    "/admin/users/": {
+      "filePath": "admin/users.index.lazy.tsx"
     }
   }
 }

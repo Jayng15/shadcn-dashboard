@@ -33,52 +33,52 @@ import { useEffect, useState } from "react"
 const items = [
   {
     title: "Dashboard",
-    url: "/",
+    url: "/admin/",
     icon: Home,
   },
   {
     title: "Orders",
-    url: "/orders",
+    url: "/admin/orders",
     icon: Package,
   },
   {
     title: "Users",
-    url: "/users",
+    url: "/admin/users",
     icon: User,
   },
   {
     title: "Stores",
-    url: "/stores",
+    url: "/admin/stores",
     icon: Store,
   },
   {
     title: "Products",
-    url: "/products",
+    url: "/admin/products",
     icon: ShoppingBag,
   },
   {
     title: "Finance",
-    url: "/finance",
+    url: "/admin/finance",
     icon: Banknote,
   },
   {
     title: "Idols",
-    url: "/idols",
+    url: "/admin/idols",
     icon: Star,
   },
   {
     title: "Policy",
-    url: "/policy",
+    url: "/admin/policy",
     icon: FileText,
   },
   {
     title: "FAQ",
-    url: "/faq",
+    url: "/admin/faq",
     icon: CircleHelp,
   },
   {
     title: "Settings",
-    url: "/settings",
+    url: "/admin/settings",
     icon: Settings,
   },
 ]
@@ -137,16 +137,10 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 {items.map((item) => {
-                  const currentPath =
-                    pathname.includes("/admin") && pathname.startsWith("/admin")
-                      ? pathname.replace("/admin", "") || "/"
-                      : pathname || "/"
-
-                  const isRoot = item.url === "/"
-                  const isActive = isRoot
-                    ? currentPath === "/"
-                    : currentPath === item.url ||
-                      currentPath.startsWith(item.url + "/")
+                  const isActive = item.url === "/admin/"
+                    ? pathname === "/admin" || pathname === "/admin/"
+                    : pathname === item.url ||
+                      pathname.startsWith(item.url + "/")
 
                   return (
                     <SidebarMenuItem key={item.title}>

@@ -10,7 +10,6 @@ import { routeTree } from './routeTree.gen'
 
 const router = createRouter({
   routeTree,
-  basepath: '/admin'
 })
 
 const queryClient = new QueryClient()

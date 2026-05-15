@@ -1,8 +1,8 @@
 import { useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
-  Card,
-  CardContent,
+    Card,
+    CardContent,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Search, X, Plus } from "lucide-react"
@@ -10,13 +10,13 @@ import { toast } from "sonner"
 import api from "@/lib/api"
 import { Input } from "@/components/ui/input"
 import {
-  ColumnFiltersState,
-  SortingState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
+    ColumnFiltersState,
+    SortingState,
+    getCoreRowModel,
+    getFilteredRowModel,
+    getPaginationRowModel,
+    getSortedRowModel,
+    useReactTable,
 } from "@tanstack/react-table"
 import DataTable from "@/pages/users/components/data-table"
 import DataTablePagination from "@/pages/users/components/data-table-pagination"
@@ -25,228 +25,228 @@ import { TeamForm } from "./components/team-form"
 import { ResponsiveDialog } from "@/components/responsive-dialog"
 import { Team } from "@/types"
 import { useNavigate, useSearch } from "@tanstack/react-router"
-import { IdolSearch } from "@/routes/idols.index"
+import { IdolSearch } from "@/routes/admin/idols.index"
 
 export default function IdolListPage() {
-  const search = useSearch({ from: '/idols/' }) as IdolSearch
-  const navigate = useNavigate()
-  const [sorting, setSorting] = useState<SortingState>([{ id: "createdAt", desc: true }])
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+    const search = useSearch({ from: '/admin/idols/' }) as IdolSearch
+    const navigate = useNavigate()
+    const [sorting, setSorting] = useState<SortingState>([{ id: "createdAt", desc: true }])
+    const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
 
-  const pagination = {
-    pageIndex: search.page,
-    pageSize: search.pageSize,
-  }
+    const pagination = {
+        pageIndex: search.page,
+        pageSize: search.pageSize,
+    }
 
-  const setPagination = (updater: any) => {
-    const next = typeof updater === 'function' ? updater(pagination) : updater
-    navigate({
-      search: ((prev: any) => ({
-        ...prev,
-        page: next.pageIndex,
-        pageSize: next.pageSize,
-      })) as any,
-      replace: true,
-    })
-  }
+    const setPagination = (updater: any) => {
+        const next = typeof updater === 'function' ? updater(pagination) : updater
+        navigate({
+            search: ((prev: any) => ({
+                ...prev,
+                page: next.pageIndex,
+                pageSize: next.pageSize,
+            })) as any,
+            replace: true,
+        })
+    }
 
-  const [isFormOpen, setIsFormOpen] = useState(false)
-  const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+    const [isFormOpen, setIsFormOpen] = useState(false)
+    const [selectedTeam, setSelectedTeam] = useState<Team | null>(null)
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false)
-  const [teamToDelete, setTeamToDelete] = useState<Team | null>(null)
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false)
+    const [teamToDelete, setTeamToDelete] = useState<Team | null>(null)
 
-  const { isPending, error, data, refetch } = useQuery({
-    queryKey: ["admin-teams", sorting, columnFilters, search.page, search.pageSize],
-    queryFn: async () => {
-      const searchTerm = columnFilters.find((f) => f.id === "name")?.value as string
-      const res = await api.get("/idol/teams", {
-        params: {
-          page: search.page + 1,
-          limit: search.pageSize,
-          query: searchTerm || undefined,
+    const { isPending, error, data, refetch } = useQuery({
+        queryKey: ["admin-teams", sorting, columnFilters, search.page, search.pageSize],
+        queryFn: async () => {
+            const searchTerm = columnFilters.find((f) => f.id === "name")?.value as string
+            const res = await api.get("/idol/teams", {
+                params: {
+                    page: search.page + 1,
+                    limit: search.pageSize,
+                    query: searchTerm || undefined,
+                },
+            })
+            return res.data
         },
-      })
-      return res.data
-    },
-  })
+    })
 
-  const handleOpenCreate = () => {
-    setSelectedTeam(null)
-    setIsFormOpen(true)
-  }
-
-  const handleOpenEdit = (team: Team) => {
-    setSelectedTeam(team)
-    setIsFormOpen(true)
-  }
-
-  const handleOpenDelete = (team: Team) => {
-    setTeamToDelete(team)
-    setIsDeleteOpen(true)
-  }
-
-  const handleManageMembers = (team: Team) => {
-    navigate({ to: "/idols/$teamId" as any, params: { teamId: team.id } as any })
-  }
-
-  const handleDelete = async () => {
-    if (!teamToDelete) return
-    try {
-      setIsSubmitting(true)
-      await api.delete(`/idol/teams/${teamToDelete.id}`)
-      toast.success("Xóa nhóm thành công")
-      setIsDeleteOpen(false)
-      refetch()
-    } catch (_e) {
-      toast.error("Xóa nhóm thất bại")
-    } finally {
-      setIsSubmitting(false)
+    const handleOpenCreate = () => {
+        setSelectedTeam(null)
+        setIsFormOpen(true)
     }
-  }
 
-  const handleSubmit = async (formData: FormData) => {
-    try {
-      setIsSubmitting(true)
-      if (selectedTeam) {
-        await api.put(`/idol/teams/${selectedTeam.id}`, formData, {
-           headers: { "Content-Type": "multipart/form-data" }
-        })
-        toast.success("Cập nhật nhóm thành công")
-      } else {
-        await api.post("/idol/teams", formData, {
-           headers: { "Content-Type": "multipart/form-data" }
-        })
-        toast.success("Tạo nhóm thành công")
-      }
-      setIsFormOpen(false)
-      refetch()
-    } catch (_e) {
-      toast.error("Lưu thất bại")
-    } finally {
-      setIsSubmitting(false)
+    const handleOpenEdit = (team: Team) => {
+        setSelectedTeam(team)
+        setIsFormOpen(true)
     }
-  }
 
-  const sortedTeams = useMemo(() => {
-    const teams = data?.teams || [];
-    return [...teams].sort((a: Team, b: Team) => {
-      const dateA = new Date(a.updatedAt || a.createdAt).getTime();
-      const dateB = new Date(b.updatedAt || b.createdAt).getTime();
-      if (dateB !== dateA) return dateB - dateA;
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-  }, [data?.teams]);
+    const handleOpenDelete = (team: Team) => {
+        setTeamToDelete(team)
+        setIsDeleteOpen(true)
+    }
 
-  const table = useReactTable({
-    data: sortedTeams,
-    columns,
-    state: {
-      sorting,
-      columnFilters,
-      pagination,
-    },
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
-    onPaginationChange: setPagination,
-    manualPagination: true,
-    rowCount: data?.pagination?.total || 0,
-    autoResetPageIndex: false,
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    meta: {
-      manageMembers: handleManageMembers,
-      editTeam: handleOpenEdit,
-      deleteTeam: handleOpenDelete,
-    },
-  })
+    const handleManageMembers = (team: Team) => {
+        navigate({ to: "/admin/idols/$teamId" as any, params: { teamId: team.id } as any })
+    }
 
-  if (error) {
+    const handleDelete = async () => {
+        if (!teamToDelete) return
+        try {
+            setIsSubmitting(true)
+            await api.delete(`/idol/teams/${teamToDelete.id}`)
+            toast.success("Xóa nhóm thành công")
+            setIsDeleteOpen(false)
+            refetch()
+        } catch (_e) {
+            toast.error("Xóa nhóm thất bại")
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    const handleSubmit = async (formData: FormData) => {
+        try {
+            setIsSubmitting(true)
+            if (selectedTeam) {
+                await api.put(`/idol/teams/${selectedTeam.id}`, formData, {
+                    headers: { "Content-Type": "multipart/form-data" }
+                })
+                toast.success("Cập nhật nhóm thành công")
+            } else {
+                await api.post("/idol/teams", formData, {
+                    headers: { "Content-Type": "multipart/form-data" }
+                })
+                toast.success("Tạo nhóm thành công")
+            }
+            setIsFormOpen(false)
+            refetch()
+        } catch (_e) {
+            toast.error("Lưu thất bại")
+        } finally {
+            setIsSubmitting(false)
+        }
+    }
+
+    const sortedTeams = useMemo(() => {
+        const teams = data?.teams || [];
+        return [...teams].sort((a: Team, b: Team) => {
+            const dateA = new Date(a.updatedAt || a.createdAt).getTime();
+            const dateB = new Date(b.updatedAt || b.createdAt).getTime();
+            if (dateB !== dateA) return dateB - dateA;
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+    }, [data?.teams]);
+
+    const table = useReactTable({
+        data: sortedTeams,
+        columns,
+        state: {
+            sorting,
+            columnFilters,
+            pagination,
+        },
+        onSortingChange: setSorting,
+        onColumnFiltersChange: setColumnFilters,
+        onPaginationChange: setPagination,
+        manualPagination: true,
+        rowCount: data?.pagination?.total || 0,
+        autoResetPageIndex: false,
+        getCoreRowModel: getCoreRowModel(),
+        getPaginationRowModel: getPaginationRowModel(),
+        getSortedRowModel: getSortedRowModel(),
+        getFilteredRowModel: getFilteredRowModel(),
+        meta: {
+            manageMembers: handleManageMembers,
+            editTeam: handleOpenEdit,
+            deleteTeam: handleOpenDelete,
+        },
+    })
+
+    if (error) {
+        return (
+            <div className="p-4 text-red-500">
+                Đã xảy ra lỗi: {(error as Error).message}
+            </div>
+        )
+    }
+
     return (
-      <div className="p-4 text-red-500">
-        Đã xảy ra lỗi: {(error as Error).message}
-      </div>
-    )
-  }
+        <div className="flex flex-col space-y-4 h-full">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight">Nhóm Idol (Teams)</h2>
+                    <p className="text-muted-foreground">Quản lý các nhóm Idol trên hệ thống.</p>
+                </div>
+                <Button onClick={handleOpenCreate}>
+                    <Plus className="mr-2 h-4 w-4" /> Thêm nhóm
+                </Button>
+            </div>
 
-  return (
-    <div className="flex flex-col space-y-4 h-full">
-      <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Nhóm Idol (Teams)</h2>
-          <p className="text-muted-foreground">Quản lý các nhóm Idol trên hệ thống.</p>
-        </div>
-        <Button onClick={handleOpenCreate}>
-          <Plus className="mr-2 h-4 w-4" /> Thêm nhóm
-        </Button>
-      </div>
+            <Card className="bg-sidebar w-full min-h-full flex flex-col">
+                <div className="flex items-center gap-2 p-4 border-b">
+                    <div className="relative flex-1 max-w-sm">
+                        <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                        <Input
+                            placeholder="Tìm tên nhóm..."
+                            className="pl-8"
+                            value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+                            onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
+                        />
+                    </div>
+                    {table.getState().columnFilters.length > 0 && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => table.resetColumnFilters()}
+                        >
+                            <X className="h-4 w-4 mr-1" />
+                            Xóa bộ lọc
+                        </Button>
+                    )}
+                </div>
+                <CardContent className="flex-1 p-0">
+                    {isPending ? (
+                        <div className="p-4">Đang tải...</div>
+                    ) : (
+                        <DataTable table={table} columns={columns} />
+                    )}
+                </CardContent>
+                {!isPending && (
+                    <div className="p-4 border-t">
+                        <DataTablePagination table={table} className="w-full" />
+                    </div>
+                )}
+            </Card>
 
-      <Card className="bg-sidebar w-full min-h-full flex flex-col">
-        <div className="flex items-center gap-2 p-4 border-b">
-          <div className="relative flex-1 max-w-sm">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
-            <Input
-              placeholder="Tìm tên nhóm..."
-              className="pl-8"
-              value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
-              onChange={(e) => table.getColumn("name")?.setFilterValue(e.target.value)}
-            />
-          </div>
-          {table.getState().columnFilters.length > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => table.resetColumnFilters()}
+            <ResponsiveDialog
+                isOpen={isFormOpen}
+                setIsOpen={setIsFormOpen}
+                title={selectedTeam ? "Cập nhật nhóm Idol" : "Thêm nhóm Idol mới"}
             >
-              <X className="h-4 w-4 mr-1" />
-              Xóa bộ lọc
-            </Button>
-          )}
+                <TeamForm
+                    initialData={selectedTeam}
+                    onSubmit={handleSubmit}
+                    isLoading={isSubmitting}
+                />
+            </ResponsiveDialog>
+
+            <ResponsiveDialog
+                isOpen={isDeleteOpen}
+                setIsOpen={setIsDeleteOpen}
+                title="Xác nhận xóa"
+            >
+                <div className="space-y-4">
+                    <p>Bạn có chắc chắn muốn xóa nhóm <b>{teamToDelete?.name}</b> không? Hành động này sẽ xóa tất cả thành viên trong nhóm và không thể hoàn tác.</p>
+                    <div className="flex justify-end gap-2">
+                        <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isSubmitting}>Hủy</Button>
+                        <Button variant="destructive" onClick={handleDelete} disabled={isSubmitting}>
+                            {isSubmitting ? "Đang xóa..." : "Xóa"}
+                        </Button>
+                    </div>
+                </div>
+            </ResponsiveDialog>
         </div>
-        <CardContent className="flex-1 p-0">
-          {isPending ? (
-             <div className="p-4">Đang tải...</div>
-          ) : (
-             <DataTable table={table} columns={columns} />
-          )}
-        </CardContent>
-        {!isPending && (
-           <div className="p-4 border-t">
-              <DataTablePagination table={table} className="w-full" />
-           </div>
-        )}
-      </Card>
-
-      <ResponsiveDialog
-        isOpen={isFormOpen}
-        setIsOpen={setIsFormOpen}
-        title={selectedTeam ? "Cập nhật nhóm Idol" : "Thêm nhóm Idol mới"}
-      >
-         <TeamForm
-            initialData={selectedTeam}
-            onSubmit={handleSubmit}
-            isLoading={isSubmitting}
-         />
-      </ResponsiveDialog>
-
-      <ResponsiveDialog
-         isOpen={isDeleteOpen}
-         setIsOpen={setIsDeleteOpen}
-         title="Xác nhận xóa"
-      >
-         <div className="space-y-4">
-             <p>Bạn có chắc chắn muốn xóa nhóm <b>{teamToDelete?.name}</b> không? Hành động này sẽ xóa tất cả thành viên trong nhóm và không thể hoàn tác.</p>
-             <div className="flex justify-end gap-2">
-                 <Button variant="outline" onClick={() => setIsDeleteOpen(false)} disabled={isSubmitting}>Hủy</Button>
-                 <Button variant="destructive" onClick={handleDelete} disabled={isSubmitting}>
-                    {isSubmitting ? "Đang xóa..." : "Xóa"}
-                 </Button>
-             </div>
-         </div>
-      </ResponsiveDialog>
-    </div>
-  )
+    )
 }
