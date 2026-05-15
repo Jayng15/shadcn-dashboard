@@ -3,11 +3,11 @@ import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite"
 export default defineConfig({
-  plugins: [TanStackRouterVite(), react()],
-  base: '/',
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
+    plugins: [TanStackRouterVite(), react()],
+    base: '/admin/',
+    resolve: {
+        alias: {
+            "@": path.resolve(__dirname, "./src"),
+        },
     },
-  },
 })
